@@ -43,7 +43,7 @@ return [
     'active' => true,
     'followPageStatus' => false, // Prevent auto-blocking of drafts/unlisted
     'index' => true, // Allow indexing of all published pages
-    'sitemap' => 'https://www.index-journal.org/sitemap.xml',
+    // 'sitemap' => 'https://www.index-journal.org/sitemap.xml',
     'content' => [
       '*' => [
         'Allow' => ['/'],

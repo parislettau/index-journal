@@ -25,7 +25,7 @@ return array(
     'League\\ColorExtractor\\' => array($vendorDir . '/league/color-extractor/src'),
     'League\\CLImate\\' => array($vendorDir . '/league/climate/src'),
     'Laminas\\Escaper\\' => array($vendorDir . '/laminas/laminas-escaper/src'),
-    'Kirby\\' => array($vendorDir . '/getkirby/cli/src', $vendorDir . '/getkirby/cli/tests', $baseDir . '/kirby/src', $vendorDir . '/getkirby/composer-installer/src'),
+    'Kirby\\' => array($baseDir . '/kirby/src', $vendorDir . '/getkirby/cli/src', $vendorDir . '/getkirby/cli/tests', $vendorDir . '/getkirby/composer-installer/src'),
     'JohannSchopplich\\' => array($baseDir . '/site/plugins/kirby-helpers/classes/JohannSchopplich'),
     'Jaybizzle\\CrawlerDetect\\' => array($vendorDir . '/jaybizzle/crawler-detect/src'),
     'Hananils\\' => array($baseDir . '/site/plugins/kirby-colors/lib'),
@@ -36,5 +36,6 @@ return array(
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'DeviceDetector\\' => array($vendorDir . '/matomo/device-detector'),
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
-    'Bnomei\\' => array($baseDir . '/site/plugins/kirby3-janitor/classes', $baseDir . '/site/plugins/kirby3-pageviewcounter/classes'),
+    'Bnomei\\' => array($baseDir . '/site/plugins/kirby3-pageviewcounter/classes', $baseDir . '/site/plugins/kirby3-janitor/classes'),
+    'Base32\\' => array($vendorDir . '/christian-riesen/base32/src'),
 );

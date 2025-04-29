@@ -1,100 +1,116 @@
 title: Issue
-sections:
-  # registration:
-  #   type: fields
-  #   fields:
-  #     crossrefButton:
-  #       type: button
-  #       label: CrossRef XML
-  #       text: Downlaod CrossRef XML File
-  #       url: /generate-xml/{{ page.id }}
-  #       theme: positive
-  #       # reload: true # trigger a page refresh on success to display updated data
-  builder:
-    headline: Builder
-    type: fields
-    fields:
-      cfp_builder:
-        label: Intro builder
-        type: structure
+
+tabs:
+  content:
+    sections:
+      # registration:
+      #   type: fields
+      #   fields:
+      #     crossrefButton:
+      #       type: button
+      #       label: CrossRef XML
+      #       text: Downlaod CrossRef XML File
+      #       url: /generate-xml/{{ page.id }}
+      #       theme: positive
+      #       # reload: true # trigger a page refresh on success to display updated data
+      builder:
+        headline: Builder
+        type: fields
         fields:
-          message:
-            label: Main message
-            type: textarea
-          wipe_img:
-            label: Wipe image
+          cfp_builder:
+            label: Intro builder
+            type: structure
+            fields:
+              message:
+                label: Main message
+                type: textarea
+              wipe_img:
+                label: Wipe image
+                type: files
+                limit: 1
+              wipe_img_caption:
+                label: Wipe image caption
+                type: text
+              secondary_text:
+                label: Secondary text
+                type: textarea
+
+      issue_cover:
+        headline: Issue cover image
+        type: fields
+        fields:
+          issue_image:
+            label: Issue image (full)
             type: files
-            limit: 1
-          wipe_img_caption:
-            label: Wipe image caption
+            width: 1/2
+          issue_color:
+            label: Issue color
             type: text
-          secondary_text:
-            label: Secondary text
-            type: textarea
-
-  issue_cover:
-    headline: Issue cover image
-    type: fields
-    fields:
-      issue_image:
-        label: Issue image (full)
-        type: files
-        width: 1/2
-      issue_color:
-        label: Issue color
-        type: text
-        width: 1/2
-      issue_doi:
-        label: Issue DOI
-        type: text
-        width: 1/3
-      issue_date:
-        label: Issue Date
-        type: date
-        width: 1/3
-      issue_num:
-        label: Issue Number
-        type: number
-        width: 1/3
-      editors:
-        label: Editors
-        type: structure
-        fields:
-          first_name:
-            label: First Name
+            width: 1/2
+          issue_doi:
+            label: Issue DOI
             type: text
-          last_name:
-            label: Last Name/s
-            type: text
-          orcid:
-            label: ORCID
-            type: text
-  issue_type:
-    headline: Type
-    type: fields
-    fields:
-      issue_pdf:
-        label: Issue PDF
-        type: files
+            width: 1/3
+          issue_date:
+            label: Issue Date
+            type: date
+            width: 1/3
+          issue_num:
+            label: Issue Number
+            type: number
+            width: 1/3
+          editors:
+            label: Editors
+            type: structure
+            fields:
+              first_name:
+                label: First Name
+                type: text
+              last_name:
+                label: Last Name/s
+                type: text
+              orcid:
+                label: ORCID
+                type: text
       issue_type:
-        label: Issue type
-        type: radio
-        columns: 3
-        options:
-          archive: Archive
-          current: Current
+        headline: Type
+        type: fields
+        fields:
+          issue_pdf:
+            label: Issue PDF
+            type: files
+          issue_type:
+            label: Issue type
+            type: radio
+            columns: 3
+            options:
+              archive: Archive
+              current: Current
 
-  published:
-    headline: Essays / Sections
-    type: pages
-    status: all
-    layout: table
-    help: Essays can be manually sorted if they are published
-    columns:
-      author: true
-      doi: true
-    templates:
-      - essay
-      - section
+      published:
+        headline: Essays / Sections
+        type: pages
+        status: all
+        layout: table
+        help: Essays can be manually sorted if they are published
+        columns:
+          author: true
+          doi: true
+        templates:
+          - essay
+          - section
+      files:
+        layout: cardlets
+
   files:
-    layout: cardlets
+    sections:
+    
+      files:
+        type: files
+        # size: tiny
+        layout: cards
+        image:
+          back: black
+        upload: false
+        
+  seo: seo/page

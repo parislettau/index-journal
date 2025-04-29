@@ -9,15 +9,15 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '04c6c5c2f7095ccf6c481d3e53e1776f' => __DIR__ . '/..' . '/mustangostang/spyc/Spyc.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'f864ae44e8154e5ff6f4eec32f46d37f' => __DIR__ . '/../..' . '/kirby/config/setup.php',
         '87988fc7b1c1f093da22a1a3de972f3a' => __DIR__ . '/../..' . '/kirby/config/helpers.php',
-        '04c6c5c2f7095ccf6c481d3e53e1776f' => __DIR__ . '/..' . '/mustangostang/spyc/Spyc.php',
-        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'a14d633e3c7e6d2a0914d958e340f4fa' => __DIR__ . '/../..' . '/site/plugins/kirby-helpers/helpers.php',
     );
 
@@ -88,6 +88,7 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'B' => 
         array (
             'Bnomei\\' => 7,
+            'Base32\\' => 7,
         ),
     );
 
@@ -171,9 +172,9 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         ),
         'Kirby\\' => 
         array (
-            0 => __DIR__ . '/..' . '/getkirby/cli/src',
-            1 => __DIR__ . '/..' . '/getkirby/cli/tests',
-            2 => __DIR__ . '/../..' . '/kirby/src',
+            0 => __DIR__ . '/../..' . '/kirby/src',
+            1 => __DIR__ . '/..' . '/getkirby/cli/src',
+            2 => __DIR__ . '/..' . '/getkirby/cli/tests',
             3 => __DIR__ . '/..' . '/getkirby/composer-installer/src',
         ),
         'JohannSchopplich\\' => 
@@ -218,8 +219,12 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         ),
         'Bnomei\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/site/plugins/kirby3-janitor/classes',
-            1 => __DIR__ . '/../..' . '/site/plugins/kirby3-pageviewcounter/classes',
+            0 => __DIR__ . '/../..' . '/site/plugins/kirby3-pageviewcounter/classes',
+            1 => __DIR__ . '/../..' . '/site/plugins/kirby3-janitor/classes',
+        ),
+        'Base32\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/christian-riesen/base32/src',
         ),
     );
 
@@ -242,6 +247,8 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
 
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'Base32\\Base32' => __DIR__ . '/..' . '/christian-riesen/base32/src/Base32.php',
+        'Base32\\Base32Hex' => __DIR__ . '/..' . '/christian-riesen/base32/src/Base32Hex.php',
         'Bnomei\\Janitor' => __DIR__ . '/../..' . '/site/plugins/kirby3-janitor/classes/Janitor.php',
         'Bnomei\\PageViewCountIncrementor' => __DIR__ . '/../..' . '/site/plugins/kirby3-pageviewcounter/classes/PageViewCountIncrementor.php',
         'Bnomei\\PageViewCounter' => __DIR__ . '/../..' . '/site/plugins/kirby3-pageviewcounter/classes/PageViewCounter.php',
@@ -846,6 +853,7 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'League\\CLImate\\Util\\OutputImporter' => __DIR__ . '/..' . '/league/climate/src/Util/OutputImporter.php',
         'League\\CLImate\\Util\\Reader\\ReaderInterface' => __DIR__ . '/..' . '/league/climate/src/Util/Reader/ReaderInterface.php',
         'League\\CLImate\\Util\\Reader\\Stdin' => __DIR__ . '/..' . '/league/climate/src/Util/Reader/Stdin.php',
+        'League\\CLImate\\Util\\Reader\\Stream' => __DIR__ . '/..' . '/league/climate/src/Util/Reader/Stream.php',
         'League\\CLImate\\Util\\System\\Linux' => __DIR__ . '/..' . '/league/climate/src/Util/System/Linux.php',
         'League\\CLImate\\Util\\System\\System' => __DIR__ . '/..' . '/league/climate/src/Util/System/System.php',
         'League\\CLImate\\Util\\System\\SystemFactory' => __DIR__ . '/..' . '/league/climate/src/Util/System/SystemFactory.php',
@@ -1031,6 +1039,8 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\CategoryCodeSet' => __DIR__ . '/..' . '/spatie/schema-org/src/CategoryCodeSet.php',
         'Spatie\\SchemaOrg\\CatholicChurch' => __DIR__ . '/..' . '/spatie/schema-org/src/CatholicChurch.php',
         'Spatie\\SchemaOrg\\Cemetery' => __DIR__ . '/..' . '/spatie/schema-org/src/Cemetery.php',
+        'Spatie\\SchemaOrg\\Certification' => __DIR__ . '/..' . '/spatie/schema-org/src/Certification.php',
+        'Spatie\\SchemaOrg\\CertificationStatusEnumeration' => __DIR__ . '/..' . '/spatie/schema-org/src/CertificationStatusEnumeration.php',
         'Spatie\\SchemaOrg\\Chapter' => __DIR__ . '/..' . '/spatie/schema-org/src/Chapter.php',
         'Spatie\\SchemaOrg\\CheckAction' => __DIR__ . '/..' . '/spatie/schema-org/src/CheckAction.php',
         'Spatie\\SchemaOrg\\CheckInAction' => __DIR__ . '/..' . '/spatie/schema-org/src/CheckInAction.php',
@@ -1200,6 +1210,8 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\Contracts\\CategoryCodeSetContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CategoryCodeSetContract.php',
         'Spatie\\SchemaOrg\\Contracts\\CatholicChurchContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CatholicChurchContract.php',
         'Spatie\\SchemaOrg\\Contracts\\CemeteryContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CemeteryContract.php',
+        'Spatie\\SchemaOrg\\Contracts\\CertificationContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CertificationContract.php',
+        'Spatie\\SchemaOrg\\Contracts\\CertificationStatusEnumerationContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CertificationStatusEnumerationContract.php',
         'Spatie\\SchemaOrg\\Contracts\\ChapterContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/ChapterContract.php',
         'Spatie\\SchemaOrg\\Contracts\\CheckActionContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CheckActionContract.php',
         'Spatie\\SchemaOrg\\Contracts\\CheckInActionContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/CheckInActionContract.php',
@@ -1562,6 +1574,8 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\Contracts\\MedicalWebPageContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MedicalWebPageContract.php',
         'Spatie\\SchemaOrg\\Contracts\\MedicineSystemContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MedicineSystemContract.php',
         'Spatie\\SchemaOrg\\Contracts\\MeetingRoomContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MeetingRoomContract.php',
+        'Spatie\\SchemaOrg\\Contracts\\MemberProgramContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MemberProgramContract.php',
+        'Spatie\\SchemaOrg\\Contracts\\MemberProgramTierContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MemberProgramTierContract.php',
         'Spatie\\SchemaOrg\\Contracts\\MensClothingStoreContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MensClothingStoreContract.php',
         'Spatie\\SchemaOrg\\Contracts\\MenuContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MenuContract.php',
         'Spatie\\SchemaOrg\\Contracts\\MenuItemContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/MenuItemContract.php',
@@ -1661,6 +1675,7 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\Contracts\\PaymentCardContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PaymentCardContract.php',
         'Spatie\\SchemaOrg\\Contracts\\PaymentChargeSpecificationContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PaymentChargeSpecificationContract.php',
         'Spatie\\SchemaOrg\\Contracts\\PaymentMethodContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PaymentMethodContract.php',
+        'Spatie\\SchemaOrg\\Contracts\\PaymentMethodTypeContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PaymentMethodTypeContract.php',
         'Spatie\\SchemaOrg\\Contracts\\PaymentServiceContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PaymentServiceContract.php',
         'Spatie\\SchemaOrg\\Contracts\\PaymentStatusTypeContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PaymentStatusTypeContract.php',
         'Spatie\\SchemaOrg\\Contracts\\PeopleAudienceContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/PeopleAudienceContract.php',
@@ -1889,6 +1904,7 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\Contracts\\ThreeDimensionalModelContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/ThreeDimensionalModelContract.php',
         'Spatie\\SchemaOrg\\Contracts\\TicketContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/TicketContract.php',
         'Spatie\\SchemaOrg\\Contracts\\TieActionContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/TieActionContract.php',
+        'Spatie\\SchemaOrg\\Contracts\\TierBenefitEnumerationContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/TierBenefitEnumerationContract.php',
         'Spatie\\SchemaOrg\\Contracts\\TipActionContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/TipActionContract.php',
         'Spatie\\SchemaOrg\\Contracts\\TireShopContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/TireShopContract.php',
         'Spatie\\SchemaOrg\\Contracts\\TouristAttractionContract' => __DIR__ . '/..' . '/spatie/schema-org/src/Contracts/TouristAttractionContract.php',
@@ -2296,6 +2312,8 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\MedicalWebPage' => __DIR__ . '/..' . '/spatie/schema-org/src/MedicalWebPage.php',
         'Spatie\\SchemaOrg\\MedicineSystem' => __DIR__ . '/..' . '/spatie/schema-org/src/MedicineSystem.php',
         'Spatie\\SchemaOrg\\MeetingRoom' => __DIR__ . '/..' . '/spatie/schema-org/src/MeetingRoom.php',
+        'Spatie\\SchemaOrg\\MemberProgram' => __DIR__ . '/..' . '/spatie/schema-org/src/MemberProgram.php',
+        'Spatie\\SchemaOrg\\MemberProgramTier' => __DIR__ . '/..' . '/spatie/schema-org/src/MemberProgramTier.php',
         'Spatie\\SchemaOrg\\MensClothingStore' => __DIR__ . '/..' . '/spatie/schema-org/src/MensClothingStore.php',
         'Spatie\\SchemaOrg\\Menu' => __DIR__ . '/..' . '/spatie/schema-org/src/Menu.php',
         'Spatie\\SchemaOrg\\MenuItem' => __DIR__ . '/..' . '/spatie/schema-org/src/MenuItem.php',
@@ -2396,6 +2414,7 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\PaymentCard' => __DIR__ . '/..' . '/spatie/schema-org/src/PaymentCard.php',
         'Spatie\\SchemaOrg\\PaymentChargeSpecification' => __DIR__ . '/..' . '/spatie/schema-org/src/PaymentChargeSpecification.php',
         'Spatie\\SchemaOrg\\PaymentMethod' => __DIR__ . '/..' . '/spatie/schema-org/src/PaymentMethod.php',
+        'Spatie\\SchemaOrg\\PaymentMethodType' => __DIR__ . '/..' . '/spatie/schema-org/src/PaymentMethodType.php',
         'Spatie\\SchemaOrg\\PaymentService' => __DIR__ . '/..' . '/spatie/schema-org/src/PaymentService.php',
         'Spatie\\SchemaOrg\\PaymentStatusType' => __DIR__ . '/..' . '/spatie/schema-org/src/PaymentStatusType.php',
         'Spatie\\SchemaOrg\\PeopleAudience' => __DIR__ . '/..' . '/spatie/schema-org/src/PeopleAudience.php',
@@ -2626,6 +2645,7 @@ class ComposerStaticInitec0a6952b29456578f9d47535aa1f598
         'Spatie\\SchemaOrg\\ThreeDimensionalModel' => __DIR__ . '/..' . '/spatie/schema-org/src/ThreeDimensionalModel.php',
         'Spatie\\SchemaOrg\\Ticket' => __DIR__ . '/..' . '/spatie/schema-org/src/Ticket.php',
         'Spatie\\SchemaOrg\\TieAction' => __DIR__ . '/..' . '/spatie/schema-org/src/TieAction.php',
+        'Spatie\\SchemaOrg\\TierBenefitEnumeration' => __DIR__ . '/..' . '/spatie/schema-org/src/TierBenefitEnumeration.php',
         'Spatie\\SchemaOrg\\TipAction' => __DIR__ . '/..' . '/spatie/schema-org/src/TipAction.php',
         'Spatie\\SchemaOrg\\TireShop' => __DIR__ . '/..' . '/spatie/schema-org/src/TireShop.php',
         'Spatie\\SchemaOrg\\TouristAttraction' => __DIR__ . '/..' . '/spatie/schema-org/src/TouristAttraction.php',

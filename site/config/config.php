@@ -51,7 +51,7 @@ return [
   'panel.install' => true,
 
   'diesdasdigital.meta-knight' => [
-    'siteTitleAfterPageTitle' => false,
+    'siteTitleAfterPageTitle' => true,
   ],
   'hooks' => [
     'page.update:after' => function ($newPage, $oldPage) {

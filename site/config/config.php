@@ -39,6 +39,18 @@ return [
   // 'debug' => true,
   'debug' => false,
 
+  'tobimori.seo.robots' => [
+    'active' => true,
+    'followPageStatus' => false, // Prevent auto-blocking of drafts/unlisted
+    'index' => true, // Allow indexing of all published pages
+    'sitemap' => 'https://www.index-journal.org/sitemap.xml',
+    'content' => [
+      '*' => [
+        'Allow' => ['/'],
+        'Disallow' => ['/kirby', '/panel', '/content']
+      ]
+    ]
+
   # https://getkirby.com/docs/reference/system/options/panel
   // 'panel' => [
   //   'install' => true

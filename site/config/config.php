@@ -36,8 +36,8 @@ return [
   },
 
 
-  // 'debug' => true,
-  'debug' => false,
+  'debug' => true,
+  // 'debug' => false,
 
   'tobimori.seo.robots' => [
     'active' => true,
@@ -50,6 +50,7 @@ return [
         'Disallow' => ['/kirby', '/panel', '/content']
       ]
     ]
+  ],
 
   # https://getkirby.com/docs/reference/system/options/panel
   // 'panel' => [

@@ -15,7 +15,8 @@ tabs:
       issues:
         type: pages
         parent: kirby.page("issues")
-        layout: table
+        template: issue
+        # layout: table
 
         # size: medium
         # info: "{{ page.author }}"

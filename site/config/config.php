@@ -37,7 +37,7 @@ return [
 
 
   // 'debug' => true,
-  'debug' => true,
+  'debug' => false,
 
   # https://getkirby.com/docs/reference/system/options/panel
   // 'panel' => [

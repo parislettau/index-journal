@@ -78,6 +78,5 @@
       </span>
     <?php endif ?>
 </main>
-</body>
-
+<?php snippet('footer') ?>
 </html>

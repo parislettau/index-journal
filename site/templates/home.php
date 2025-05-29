@@ -63,8 +63,7 @@
   <img src="<?= $page->wipe_img_full()->toFile()->url() ?>" alt="">
   <figcaption style="text-align: center;max-width: 78%;">
     <?= $page->wipe_img_caption() ?>
-  </figcaption>
+</figcaption>
 </div>
-</body>
-
+<?php snippet('footer') ?>
 </html>

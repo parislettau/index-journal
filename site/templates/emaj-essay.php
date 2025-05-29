@@ -44,6 +44,5 @@
   </div>
 
 </main>
-</body>
-
+<?php snippet('footer') ?>
 </html>

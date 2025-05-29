@@ -76,8 +76,7 @@
           <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
         </span>
       </span>
-    <?php endif ?>
+<?php endif ?>
 </main>
-</body>
-
+<?php snippet('footer') ?>
 </html>

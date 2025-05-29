@@ -88,9 +88,8 @@
 <script>
   document.getElementById('downloadXML').addEventListener('click', function(e) {
     e.preventDefault(); // prevent the default action
-    window.location.href = '/generate-xml/<?= $page->id() ?>';
-  });
+window.location.href = '/generate-xml/<?= $page->id() ?>';
+});
 </script>
-</body>
-
+<?php snippet('footer') ?>
 </html>

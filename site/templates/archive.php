@@ -5,6 +5,5 @@
     <?= $issue->title() ?>
   <?php endforeach ?>
 </main>
-</body>
-
+<?php snippet('footer') ?>
 </html>

@@ -105,6 +105,13 @@ return [
     ],
 
   ],
+
+  'crossref' => [
+    'username' => env('CROSSREF_USERNAME'),
+    'password' => env('CROSSREF_PASSWORD'),
+    'token'    => env('CROSSREF_TOKEN'),
+    'apiUrl'   => env('CROSSREF_API_URL', 'https://api.crossref.org/deposits')
+  ],
   # https://getkirby.com/docs/reference/system/options/email
   'email' => [
     'transport' => [

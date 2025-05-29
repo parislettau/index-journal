@@ -53,6 +53,54 @@ Kirby::plugin('custom/crossref', [
                     'Content-Disposition' => 'attachment; filename="' . 'Issue No. ' . $issueData['issue_num'] . ', ' .  $issueData['issue_title'] . ' - ' . generateBatchId() . '.xml"'
                 ]);
             }
+        ],
+        [
+            'pattern' => 'submit-crossref/(:all)',
+            'action'  => function ($id) {
+                $user = kirby()->user();
+                if (!$user) {
+                    return new Response('Unauthorized', 'text/plain', 403);
+                }
+
+                $issue = page($id);
+
+                if (!$issue) {
+                    return new Response('Issue not found', 'text/plain', 404);
+                }
+
+                $issueData = [
+                    'issue_title' => $issue->title()->value(),
+                    'doi'         => $issue->issue_doi()->value(),
+                    'issue_date'  => $issue->issue_date()->toDate('Y-m-d'),
+                    'issue_num'   => $issue->issue_num()->value(),
+                    'editors'     => $issue->editors()->toStructure()->toArray(),
+                    'url'         => $issue->url(),
+                    'year'        => $issue->issue_date()->toDate('Y'),
+                ];
+
+                $essays = kirby()->site()->index()->filterBy('template', 'essay')->filter(function ($child) use ($issue) {
+                    return $child->isDescendantOf($issue);
+                });
+
+                $essaysData = [];
+                foreach ($essays as $essay) {
+                    $essaysData[] = [
+                        'title'    => $essay->title()->value(),
+                        'subtitle' => $essay->subtitle()->value(),
+                        'authors'  => $essay->authors()->toStructure()->toArray(),
+                        'doi'      => $essay->doi()->value(),
+                        'abstract' => $essay->abstract()->value(),
+                        'url'      => $essay->url(),
+                        'year'     => $issue->issue_date()->toDate('Y'),
+                    ];
+                }
+
+                $xml = generateXML($issueData, $essaysData);
+
+                $response = sendToCrossref($xml);
+
+                return new Response($response, 'application/json');
+            }
         ]
     ]
 ]);
@@ -126,6 +174,41 @@ function generateBatchId()
 {
     // Sample function to generate a unique batch ID; can be modified as needed
     return 'batch_' . time();
+}
+
+function sendToCrossref(string $xml): string
+{
+    $options = kirby()->option('crossref', []);
+    $url      = $options['apiUrl'] ?? 'https://api.crossref.org/deposits';
+    $username = $options['username'] ?? null;
+    $password = $options['password'] ?? null;
+    $token    = $options['token'] ?? null;
+
+    $ch = curl_init($url);
+    $headers = [
+        'Content-Type: application/xml'
+    ];
+    if ($token) {
+        $headers[] = 'Authorization: Bearer ' . $token;
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+    if ($username && $password) {
+        curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
+    }
+
+    $result = curl_exec($ch);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($error) {
+        return json_encode(['error' => $error]);
+    }
+
+    return $result ?: '';
 }
 
 ?>

@@ -71,6 +71,10 @@
             <a href="http://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></a>
           </span>
         <?php endif ?>
+        <span class="citation">
+          <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
+          <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
+        </span>
       </span>
     <?php endif ?>
 </main>

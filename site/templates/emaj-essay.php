@@ -27,7 +27,20 @@
       <?= smartypants($page->bibilography()->kirbytext()) ?>
     </div>
 
-    <?php if ($page->slug() != 'introduction') : ?><span class="essay-extra">(<?php if ($page->doi()->isNotEmpty()) : ?><span class="doi">DOI: <a href="https://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></span></a><?php endif ?><?php if ($page->hasDocuments()) : ?><span class="pdf"><a href="<?= $page->documents()->first()->url() ?>" target="_blank">PDF</a></span><?php endif ?>)</span><?php endif ?>
+    <?php if ($page->slug() != 'introduction') : ?>
+      <span class="essay-extra">
+        <?php if ($page->doi()->isNotEmpty()) : ?>
+          <span class="doi">DOI: <a href="https://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></a></span>
+        <?php endif ?>
+        <?php if ($page->hasDocuments()) : ?>
+          <span class="pdf"><a href="<?= $page->documents()->first()->url() ?>" target="_blank">PDF</a></span>
+        <?php endif ?>
+        <span class="citation">
+          <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
+          <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
+        </span>
+      </span>
+    <?php endif ?>
   </div>
 
 </main>

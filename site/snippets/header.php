@@ -23,6 +23,9 @@
     <?php if ($page->documents()->isNotEmpty()) : ?>
       <meta name="citation_pdf_url" content="<?= $page->documents()->first()->url() ?>">
     <?php endif; ?>
+    <?php if ($page->doi()->isNotEmpty()) : ?>
+      <meta name="citation_doi" content="<?= $page->doi() ?>">
+    <?php endif ?>
   <?php endif ?>
 
   <!-- plausible -->

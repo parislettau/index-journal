@@ -3,16 +3,22 @@ title: Issue
 tabs:
   content:
     sections:
-      # registration:
-      #   type: fields
-      #   fields:
-      #     crossrefButton:
-      #       type: button
-      #       label: CrossRef XML
-      #       text: Downlaod CrossRef XML File
-      #       url: /generate-xml/{{ page.id }}
-      #       theme: positive
-      #       # reload: true # trigger a page refresh on success to display updated data
+      registration:
+        type: fields
+        fields:
+          crossrefXML:
+            type: button
+            label: CrossRef XML
+            text: Download CrossRef XML File
+            url: /generate-xml/{{ page.id }}
+            theme: positive
+          crossrefSubmit:
+            type: button
+            label: Submit to Crossref
+            text: Send XML to Crossref
+            url: /submit-crossref/{{ page.id }}
+            theme: positive
+            open: true
       builder:
         headline: Builder
         type: fields

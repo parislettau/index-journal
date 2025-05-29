@@ -103,6 +103,24 @@ return [
         return go("https://index-press.com/", 301);
       }
     ],
+    [
+      'pattern' => 'citation/bibtex/(:all)',
+      'action'  => function ($id) {
+        if (!$page = page($id)) {
+          return new Kirby\Cms\Response('Page not found', 'text/plain', 404);
+        }
+        return new Kirby\Cms\Response(citationBibtex($page), 'text/x-bibtex');
+      }
+    ],
+    [
+      'pattern' => 'citation/ris/(:all)',
+      'action'  => function ($id) {
+        if (!$page = page($id)) {
+          return new Kirby\Cms\Response('Page not found', 'text/plain', 404);
+        }
+        return new Kirby\Cms\Response(citationRis($page), 'application/x-research-info-systems');
+      }
+    ],
 
   ],
 

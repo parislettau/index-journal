@@ -49,8 +49,7 @@
         </span>
       <?php endif ?>
     </span>
-  <?php endif ?>
+<?php endif ?>
 </main>
-</body>
-
+<?php snippet('footer') ?>
 </html>

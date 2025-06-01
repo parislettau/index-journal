@@ -2,18 +2,33 @@
 
 use Kirby\Cms\Response;
 
-function validateCrossrefSettings(array $opts): ?Response
+function crossrefOptions(): array
 {
-    $required = [
+    $site = kirby()->site();
+    return [
+        'apiUrl'       => $site->crossref_apiUrl()->or('https://api.crossref.org/v2/deposits')->value(),
+        'username'     => $site->crossref_username()->value(),
+        'password'     => $site->crossref_password()->value(),
+        'journalTitle' => $site->crossref_journalTitle()->value(),
+        'issn'         => $site->crossref_issn()->value(),
+    ];
+}
+
+function validateCrossrefSettings(array $opts, array $keys = null): ?Response
+{
+    $labels = [
         'username'     => 'Crossref username',
         'password'     => 'Crossref password',
         'apiUrl'       => 'Crossref API URL',
         'journalTitle' => 'Journal title',
-        'issn'         => 'Journal ISSN'
+        'issn'         => 'Journal ISSN',
     ];
 
-    foreach ($required as $key => $label) {
+    $keys ??= array_keys($labels);
+
+    foreach ($keys as $key) {
         if (empty($opts[$key])) {
+            $label = $labels[$key] ?? $key;
             return new Response("Missing required Crossref setting: {$label}", 'text/plain', 400);
         }
     }
@@ -30,6 +45,11 @@ Kirby::plugin('custom/crossref', [
                 $issue = page($id);
                 if (!$issue) {
                     return new Response('Issue not found', 'text/plain', 404);
+                }
+
+                $opts = crossrefOptions();
+                if ($resp = validateCrossrefSettings($opts, ['journalTitle', 'issn'])) {
+                    return $resp;
                 }
 
                 [$issueData, $essaysData] = collectIssueData($issue);
@@ -53,9 +73,14 @@ Kirby::plugin('custom/crossref', [
                     return new Response('Issue not found', 'text/plain', 404);
                 }
 
+                $opts = crossrefOptions();
+                if ($resp = validateCrossrefSettings($opts)) {
+                    return $resp;
+                }
+
                 [$issueData, $essaysData] = collectIssueData($issue);
                 $xml       = generateXML($issueData, $essaysData);
-                $apiResult = sendToCrossref($xml);
+                $apiResult = sendToCrossref($xml, $opts);
 
                 return new Response($apiResult, 'application/json');
             }
@@ -168,20 +193,12 @@ function generateBatchId(): string
 }
 
 /**
- * POST the XML to Crossref using the correct multipart/form-data payload.
- */
-/**
  * POST the XML to Crossref and return a detailed result object.
+ * Uses the correct multipart/form-data payload.
  */
-function sendToCrossref(string $xml): string
+function sendToCrossref(string $xml, array $opt = null): string
 {
-    $site = kirby()->site();
-
-    $opt = [
-        'apiUrl'   => $site->crossref_apiUrl()->or('https://api.crossref.org/v2/deposits')->value(),
-        'username' => $site->crossref_username()->value(),
-        'password' => $site->crossref_password()->value(),
-    ];
+    $opt ??= crossrefOptions();
 
     $url   = $opt['apiUrl']   ?? 'https://doi.crossref.org/servlet/deposit';
     $user  = $opt['username'] ?? '';

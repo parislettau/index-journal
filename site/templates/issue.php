@@ -77,19 +77,20 @@
     <?php foreach ($sections as $section) : ?><?= $section->wipe_img_caption() ?> <?php endforeach ?>
   </figcaption>
 </div>
-<h2 style="position:fixed; bottom:1rem;left:1rem;margin:0;width: 100%;">
+<!-- <h2 style="position:fixed; bottom:1rem;left:1rem;margin:0;width: 100%;">
   <?php if ($kirby->user()) : ?>
     <a href="#" id="downloadXML" class="custom-download-btn" style="background: black;
     color: white;
     padding: 0.75rem 2rem;
     border-radius: 127px;">Download CrossRef XML</a>
   <?php endif; ?>
-</h2>
+</h2> -->
 <script>
   document.getElementById('downloadXML').addEventListener('click', function(e) {
     e.preventDefault(); // prevent the default action
-window.location.href = '/generate-xml/<?= $page->id() ?>';
-});
+    window.location.href = '/generate-xml/<?= $page->id() ?>';
+  });
 </script>
 <?php snippet('footer') ?>
+
 </html>

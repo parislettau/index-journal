@@ -12,7 +12,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install packages: web server Apache, PHP and extensions
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install --no-install-recommends -y \
     apache2 \
     apache2-utils \
     ca-certificates \
@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install imagemagick and utilities
-RUN apt-get update && \
+RUN apt-get update -o Acquire::ForceIPv4=true && \
     apt-get install -y --no-install-recommends apt-utils imagemagick --fix-missing && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 # Copy virtual host configuration from current path onto existing 000-default.conf

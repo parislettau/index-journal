@@ -139,6 +139,12 @@ function collectIssueData(Kirby\Cms\Page $issue): array
     return [$issueData, $essaysData];
 }
 
+function generateTimestamp(): string
+{
+    return date('YmdHis') . sprintf('%03d', (int)(microtime(true) * 1000) % 1000);
+}
+
+
 /**
  * Build Crossref 5.3.1 XML payload.
  */
@@ -160,7 +166,7 @@ function generateXML(array $issue, array $essays): string
         // head
         . '<head>'
         . '<doi_batch_id>' . generateBatchId() . '</doi_batch_id>'
-        . '<timestamp>' . date('YmdHis') . '</timestamp>'
+        . '<timestamp>' . generateTimestamp() . '</timestamp>'
         . '<depositor><depositor_name>indj</depositor_name>'
         . '<email_address>editors@index-journal.org</email_address></depositor>'
         . '<registrant>WEB-FORM</registrant>'

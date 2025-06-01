@@ -28,6 +28,7 @@ RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install --no-install-re
     php-xml \
     php-zip \
     chromium-browser && \
+    pandoc && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install imagemagick and utilities

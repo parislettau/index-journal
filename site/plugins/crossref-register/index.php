@@ -175,6 +175,35 @@ function generateXML(array $issue, array $essays): string
         . '</journal_metadata>'
 
         . '<journal_issue>'
+        . '<contributors>';
+
+    $buildEditor = function (array $editor, string $sequence) use ($esc) {
+        $given   = $editor['first_name'] ?? null;
+        $surname = $editor['last_name']  ?? null;
+
+        if (!$given && !$surname && isset($editor['name'])) {
+            $parts   = preg_split('/\s+/', $editor['name'], 2);
+            $given   = $parts[0] ?? '';
+            $surname = $parts[1] ?? '';
+        }
+
+        $xml = '<person_name contributor_role="editor" sequence="' . $sequence . '">' .
+            '<given_name>' . $esc($given) . '</given_name>' .
+            '<surname>'    . $esc($surname) . '</surname>';
+
+        if (!empty($editor['orcid'])) {
+            $xml .= '<ORCID>' . $esc($editor['orcid']) . '</ORCID>';
+        }
+
+        return $xml . '</person_name>';
+    };
+
+    foreach ($issue['editors'] as $i => $editor) {
+        $sequence = $i === 0 ? 'first' : 'additional';
+        $xml .= $buildEditor($editor, $sequence);
+    }
+
+    $xml .= '</contributors>'
         . '<publication_date media_type="online"><year>' . $esc($issue['year']) . '</year></publication_date>'
         . '<issue>' . $esc($issue['issue_num']) . '</issue>'
         . '<doi_data><doi>' . $esc($issue['doi']) . '</doi><resource>' . $esc($issue['url']) . '</resource></doi_data>'

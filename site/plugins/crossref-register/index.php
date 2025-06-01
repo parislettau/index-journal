@@ -2,11 +2,15 @@
 
 use Kirby\Cms\Response;
 
+/**
+ * Read Crossref-related site options.
+ */
 function crossrefOptions(): array
 {
     $site = kirby()->site();
     return [
-        'apiUrl'       => $site->crossref_apiUrl()->or('https://api.crossref.org/v2/deposits')->value(),
+        // you can override apiUrl in the Panel; falls back to Crossref’s v2 endpoint
+        'apiUrl'       => $site->crossref_apiUrl()->or('https://api.crossref.org/deposits')->value(),
         'username'     => $site->crossref_username()->value(),
         'password'     => $site->crossref_password()->value(),
         'journalTitle' => $site->crossref_journalTitle()->value(),
@@ -14,6 +18,9 @@ function crossrefOptions(): array
     ];
 }
 
+/**
+ * Abort with 400 if any required option is missing.
+ */
 function validateCrossrefSettings(array $opts, ?array $keys = null): ?Response
 {
     $labels = [
@@ -32,66 +39,76 @@ function validateCrossrefSettings(array $opts, ?array $keys = null): ?Response
             return new Response("Missing required Crossref setting: {$label}", 'text/plain', 400);
         }
     }
-
     return null;
 }
 
-
-Kirby::plugin('custom/crossref', [
+/**
+ * Kirby plugin.
+ */
+Kirby::plugin('custom/crossref-register', [
+    'snippets' => [
+        'confirm' => __DIR__ . '/snippets/confirm.php'
+    ],
     'routes' => [
         [
-            'pattern' => 'generate-xml/(:all)',
-            'action'  => function ($id) {
-                $issue = page($id);
-                if (!$issue) {
-                    return new Response('Issue not found', 'text/plain', 404);
-                }
-
-                $opts = crossrefOptions();
-                if ($resp = validateCrossrefSettings($opts, ['journalTitle', 'issn'])) {
-                    return $resp;
-                }
-
-                [$issueData, $essaysData] = collectIssueData($issue);
-                $xml = generateXML($issueData, $essaysData);
-
-                $filename = 'issue-' . $issueData['issue_num'] . '-' . generateBatchId() . '.xml';
-                return new Response($xml, 'application/xml', 200, [
-                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
-                ]);
-            }
-        ],
-        [
             'pattern' => 'submit-crossref/(:all)',
-            'action'  => function ($id) {
+            'method'  => 'GET|POST',
+            'action'  => function (string $id) {
+
+                // 1. basic guards ---------------------------------------------------
                 if (!kirby()->user()) {
                     return new Response('Unauthorized', 'text/plain', 403);
                 }
 
-                $issue = page($id);
-                if (!$issue) {
+                if (!$issue = page($id)) {
                     return new Response('Issue not found', 'text/plain', 404);
                 }
 
-                $opts = crossrefOptions();
-                if ($resp = validateCrossrefSettings($opts)) {
-                    return $resp;
+                // 2. gather metadata -----------------------------------------------
+                [$issueData, $essaysData] = collectIssueData($issue);
+
+                // 3. confirmation preview ------------------------------------------
+                $request = kirby()->request();
+
+                // var_dump($issueData, $essaysData);
+                // exit;
+
+                if ($request->method() === 'GET' && $request->get('confirm') !== '1') {
+                    $html = snippet('confirm', [
+                        'issue'      => $issue,
+                        'issueData'  => $issueData,
+                        'essaysData' => $essaysData,
+                    ], true);                         // true → return HTML string
+                    return new Response($html, 'text/html');
                 }
 
-                [$issueData, $essaysData] = collectIssueData($issue);
+                // 4. reject POSTs without confirm=1 --------------------------------
+                if ($request->method() === 'POST') {
+                    $confirm = $request->body()->get('confirm');
+                    if ($confirm !== '1') {
+                        return new Response('Confirmation required', 'text/plain', 400);
+                    }
+                }
+
+                // 5. ready to talk to Crossref -------------------------------------
+                $opts = crossrefOptions();
+                if ($resp = validateCrossrefSettings($opts)) {
+                    return $resp;                     // missing setting → abort
+                }
+
                 $xml       = generateXML($issueData, $essaysData);
                 $apiResult = sendToCrossref($xml, $opts);
 
                 return new Response($apiResult, 'application/json');
-            }
-        ]
-    ]
+            },
+        ],
+    ],
 ]);
 
 /**
  * Collect metadata for an issue and its descendant essays.
  */
-function collectIssueData($issue): array
+function collectIssueData(Kirby\Cms\Page $issue): array
 {
     $issueData = [
         'issue_title' => $issue->title()->value(),
@@ -103,7 +120,10 @@ function collectIssueData($issue): array
         'year'        => $issue->issue_date()->toDate('Y'),
     ];
 
-    $essays = kirby()->site()->index()->filterBy('template', 'essay')->filter(fn($c) => $c->isDescendantOf($issue));
+    $essays = kirby()->site()->index()
+        ->filterBy('template', 'essay')
+        ->filter(fn($c) => $c->isDescendantOf($issue));
+
     $essaysData = array_map(function ($essay) use ($issue) {
         return [
             'title'    => $essay->title()->value(),
@@ -120,19 +140,13 @@ function collectIssueData($issue): array
 }
 
 /**
- * Build Crossref 5.3.1 XML (minimal but valid).
+ * Build Crossref 5.3.1 XML payload.
  */
 function generateXML(array $issue, array $essays): string
 {
-
     $site = kirby()->site();
-    $opts = [
-        'journalTitle' => $site->crossref_journalTitle()->value(),
-        'issn'         => $site->crossref_issn()->value(),
-    ];
-
-    $issn   = $opts['issn'];
-    $journalTitle = $opts['journalTitle'];
+    $journalTitle = $site->crossref_journalTitle()->value();
+    $issn         = $site->crossref_issn()->value();
 
     $esc = fn($s) => htmlspecialchars($s ?? '', ENT_XML1 | ENT_COMPAT, 'UTF-8');
 
@@ -147,7 +161,8 @@ function generateXML(array $issue, array $essays): string
         . '<head>'
         . '<doi_batch_id>' . generateBatchId() . '</doi_batch_id>'
         . '<timestamp>' . date('YmdHis') . '</timestamp>'
-        . '<depositor><depositor_name>indj</depositor_name><email_address>editors@index-journal.org</email_address></depositor>'
+        . '<depositor><depositor_name>indj</depositor_name>'
+        . '<email_address>editors@index-journal.org</email_address></depositor>'
         . '<registrant>WEB-FORM</registrant>'
         . '</head>'
 
@@ -166,16 +181,33 @@ function generateXML(array $issue, array $essays): string
         . '</journal_issue>';
 
     foreach ($essays as $essay) {
+
+        // support either separate first/last or a single name field
+        $buildPerson = function (array $author, string $sequence) use ($esc) {
+            $given   = $author['first_name'] ?? null;
+            $surname = $author['last_name']  ?? null;
+
+            if (!$given && !$surname && isset($author['name'])) {
+                $parts   = preg_split('/\s+/', $author['name'], 2);
+                $given   = $parts[0] ?? '';
+                $surname = $parts[1] ?? '';
+            }
+
+            return '<person_name contributor_role="author" sequence="' . $sequence . '">'
+                . '<given_name>' . $esc($given) . '</given_name>'
+                . '<surname>'    . $esc($surname) . '</surname>'
+                . '</person_name>';
+        };
+
         $xml .= '<journal_article publication_type="full_text">'
             . '<titles><title>' . $esc($essay['title']) . '</title></titles>'
             . '<contributors>';
+
         foreach ($essay['authors'] as $i => $author) {
             $sequence = $i === 0 ? 'first' : 'additional';
-            $xml .= '<person_name contributor_role="author" sequence="' . $sequence . '">'
-                . '<given_name>' . $esc($author['first_name'] ?? '') . '</given_name>'
-                . '<surname>' . $esc($author['last_name'] ?? '') . '</surname>'
-                . '</person_name>';
+            $xml .= $buildPerson($author, $sequence);
         }
+
         $xml .= '</contributors>'
             . '<publication_date media_type="online"><year>' . $esc($essay['year']) . '</year></publication_date>'
             . '<doi_data><doi>' . $esc($essay['doi']) . '</doi><resource>' . $esc($essay['url']) . '</resource></doi_data>'
@@ -187,24 +219,24 @@ function generateXML(array $issue, array $essays): string
     return $xml;
 }
 
+/**
+ * Simple batch id.
+ */
 function generateBatchId(): string
 {
     return 'batch_' . date('YmdHis');
 }
 
 /**
- * POST the XML to Crossref and return a detailed result object.
- * Uses the correct multipart/form-data payload.
+ * Upload XML to Crossref and return a JSON string describing the outcome.
  */
 function sendToCrossref(string $xml, ?array $opt = null): string
 {
     $opt ??= crossrefOptions();
 
-    $url   = $opt['apiUrl']   ?? 'https://doi.crossref.org/servlet/deposit';
-    $user  = $opt['username'] ?? '';
-    $pass  = $opt['password'] ?? '';
-
-
+    $url  = $opt['apiUrl']   ?? 'https://api.crossref.org/deposits';
+    $user = $opt['username'] ?? '';
+    $pass = $opt['password'] ?? '';
 
     // 1. temp file and multipart/form-data POST
     $tmp = tempnam(sys_get_temp_dir(), 'cr_');
@@ -212,14 +244,14 @@ function sendToCrossref(string $xml, ?array $opt = null): string
     $curlFile = curl_file_create($tmp, 'application/xml', 'metadata.xml');
 
     // choose field names depending on endpoint flavour
-    if (str_contains($url, '/servlet/deposit')) {
+    if (str_contains($url, '/servlet/deposit')) {       // legacy
         $post = [
             'operation'    => 'doMDUpload',
             'login_id'     => $user,
             'login_passwd' => $pass,
             'fname'        => $curlFile,
         ];
-    } else { // synchronous /v2/deposits
+    } else {                                            // v2 sync
         $post = [
             'operation' => 'doMDUpload',
             'usr'       => $user,
@@ -228,17 +260,17 @@ function sendToCrossref(string $xml, ?array $opt = null): string
         ];
     }
 
-    // 2. cURL with headers captured
+    // 2. cURL
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST           => true,
         CURLOPT_POSTFIELDS     => $post,
-        CURLOPT_HEADER         => true,            // capture headers
+        CURLOPT_HEADER         => true,
     ]);
-    $raw      = curl_exec($ch);
-    $curlErr  = curl_error($ch);
-    $info     = curl_getinfo($ch);
+    $raw     = curl_exec($ch);
+    $curlErr = curl_error($ch);
+    $info    = curl_getinfo($ch);
     curl_close($ch);
     @unlink($tmp);
 
@@ -246,43 +278,66 @@ function sendToCrossref(string $xml, ?array $opt = null): string
     $headerSize = $info['header_size'] ?? 0;
     $body       = substr($raw, $headerSize);
 
-    // 4. Build response object
+    // 4. build response object
     $out = [
-        'http_code' => $info['http_code'] ?? 0,
-        'curl_error' => $curlErr ?: null,
-        'body' => $body ?: null,
+        'http_code'     => $info['http_code'] ?? 0,
+        'curl_error'    => $curlErr ?: null,
+        'submission_id' => null,
+        'batch_id'      => null,
+        'records'       => [],
+        'summary'       => [],
     ];
 
-    // 4a. Try to parse Crossref’s normal diagnostic XML
+    // 4a. parse XML
     if (str_starts_with(trim($body), '<?xml')) {
         try {
             $xmlObj = new SimpleXMLElement($body);
-            // <doi_batch_diagnostic> is the root for both servlet and v2
-            if ($xmlObj->getName() === 'doi_batch_diagnostic') {
-                $out['status']        = (string) $xmlObj['status'];
-                $out['submission_id'] = (string) $xmlObj->submission_id ?? null;
-                $out['batch_id']      = (string) $xmlObj->batch_id      ?? null;
 
-                // extract first record-level diagnostic if present
-                if (isset($xmlObj->record_diagnostic)) {
-                    $diag = $xmlObj->record_diagnostic;
-                    $out['record_status'] = (string) $diag['status'];
-                    $out['message']       = trim((string) $diag);
-                    $out['msg_id']        = (string) $diag['msg_id'] ?? null;
+            if ($xmlObj->getName() === 'doi_batch_diagnostic') {
+                $out['submission_id'] = (string) $xmlObj->submission_id ?? null;
+                $out['batch_id']      = (string) $xmlObj->batch_id ?? null;
+
+                $success = $warning = $failure = 0;
+
+                foreach ($xmlObj->record_diagnostic as $diag) {
+                    $status = (string) $diag['status'];
+                    $doi    = (string) $diag->doi ?? '';
+                    $msg    = (string) $diag->msg ?? '';
+
+                    $conflict = [];
+                    if ($status === 'Warning' && isset($diag->dois_in_conflict)) {
+                        foreach ($diag->dois_in_conflict->doi as $c) {
+                            $conflict[] = (string) $c;
+                        }
+                    }
+
+                    $out['records'][] = [
+                        'doi'      => $doi,
+                        'status'   => $status,
+                        'message'  => $msg,
+                        'conflict' => $conflict,
+                    ];
+
+                    if ($status === 'Success')     $success++;
+                    elseif ($status === 'Warning') $warning++;
+                    elseif ($status === 'Failure') $failure++;
                 }
+
+                $out['summary'] = [
+                    'success' => $success,
+                    'warning' => $warning,
+                    'failure' => $failure,
+                ];
             } else {
-                // some other XML – just send raw
-                $out['xml'] = $body;
+                $out['raw_xml'] = $body;
             }
         } catch (Throwable $e) {
-            // malformed XML – return raw for inspection
-            $out['xml'] = $body;
+            $out['parse_error'] = 'Invalid response XML';
+            $out['raw'] = $body;
         }
     } elseif (str_starts_with(trim($body), '{')) {
-        // v2 endpoint sometimes responds in JSON
         $out['json'] = json_decode($body, true);
     } else {
-        // plain text or empty
         $out['body'] = $body ?: null;
     }
 

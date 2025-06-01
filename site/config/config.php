@@ -20,6 +20,7 @@ $base = dirname(__DIR__, 2);
 return [
   'url' => env('URL'),
 
+
   // 'floriankarsten.plausible' => [
   //   'sharedLink' => env('PLAUSIBLE_SHARED_LINK'),
   //   // 'domain' => 'test.com' // not required if not set it will be taken from $site->url
@@ -37,7 +38,7 @@ return [
 
 
   // 'debug' => true,
-  'debug' => false,
+  'debug' => true,
 
   'tobimori.seo.robots' => [
     'active' => true,

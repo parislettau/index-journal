@@ -117,6 +117,13 @@ tabs:
             text: Check Chicago Manual of Style
             url: /check-style/{{ page.id }}
             theme: positive
+          exportDocx:
+            type: button
+            text: Download DOCX
+            icon: download
+            url: /download-docx/{{ page.id }}
+            open: true
+            theme: positive
           
   files:
     sections:

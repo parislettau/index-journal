@@ -6,13 +6,13 @@ tabs:
       registration:
         type: fields
         fields:
-          crossrefXML:
-            type: button
-            label: CrossRef XML
-            text: Download CrossRef XML File
-            url: /generate-xml/{{ page.id }}
+          # crossrefXML:
+          #   type: button
+          #   label: CrossRef XML
+          #   text: Download CrossRef XML File
+          #   url: /generate-xml/{{ page.id }}
             # theme: positive
-            width: 1/2
+            # width: 1/2
           crossrefSubmit:
             type: button
             label: Submit to Crossref
@@ -20,7 +20,7 @@ tabs:
             url: /submit-crossref/{{ page.id }}
             # theme: positive
             open: true
-            width: 1/2
+            width: 1
 
       builder:
         headline: Builder

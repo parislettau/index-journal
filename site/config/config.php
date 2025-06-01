@@ -3,13 +3,27 @@
 
 function output_pdf($newPage)
 {
-  if ($newPage->template() == 'essay') :
-    $pdf_name = $newPage->slug() . '.pdf';
-    $outfile = $newPage->contentFileDirectory() . '/' . $pdf_name;
-    $url = $newPage->previewUrl();
-    exec('google-chrome --headless --print-to-pdf="' . $outfile . '" ' . $url . ' > /dev/null 2>/dev/null &');
-  // exec('google-chrome-stable --headless --print-to-pdf="' . $outfile . '" ' . $url . ' > /dev/null 2>/dev/null &');
-  endif;
+    if ($newPage->template() == 'essay') :
+        $pdf_name = $newPage->slug() . '.pdf';
+        $outfile  = $newPage->contentFileDirectory() . '/' . $pdf_name;
+        $url      = $newPage->previewUrl();
+
+        // try to locate a chrome binary
+        $binaries = ['google-chrome', 'google-chrome-stable', 'chromium-browser', 'chromium'];
+        $chrome   = null;
+        foreach ($binaries as $bin) {
+            $path = trim(shell_exec('command -v ' . $bin . ' 2>/dev/null'));
+            if (!empty($path)) {
+                $chrome = $path;
+                break;
+            }
+        }
+
+        if ($chrome !== null) {
+            $cmd = $chrome . ' --headless --no-sandbox --print-to-pdf=' . escapeshellarg($outfile) . ' ' . escapeshellarg($url) . ' > /dev/null 2>/dev/null &';
+            exec($cmd);
+        }
+    endif;
 }
 
 # https://github.com/johannschopplich/kirby-helpers
@@ -67,11 +81,11 @@ return [
   'diesdasdigital.meta-knight' => [
     'siteTitleAfterPageTitle' => true,
   ],
-  'hooks' => [
-    'page.update:after' => function ($newPage, $oldPage) {
-      // output_pdf($newPage);
-    }
-  ],
+    'hooks' => [
+      'page.update:after' => function ($newPage, $oldPage) {
+        output_pdf($newPage);
+      }
+    ],
 
   // https://github.com/medienbaecker/kirby-autoresize
   // 'medienbaecker.autoresize.maxWidth' => 3000,

@@ -29,10 +29,28 @@ return [
                     throw new LogicException('Deployment request failed: ' . $response->content());
                 }
 
+                $pageId = $kirby->request()->get('id')
+                    ?? $kirby->request()->get('pageId')
+                    ?? $kirby->request()->body()->get('id')
+                    ?? $kirby->request()->body()->get('pageId');
+
+                $crossref = null;
+                if ($pageId && function_exists('collectIssueData')) {
+                    if ($issue = page($pageId)) {
+                        [$issueData, $essaysData] = collectIssueData($issue);
+                        $opts = crossrefOptions();
+                        if (!validateCrossrefSettings($opts)) {
+                            $xml = generateXML($issueData, $essaysData);
+                            $crossref = sendToCrossref($xml, $opts);
+                        }
+                    }
+                }
+
                 return [
                     'status' => 'ok',
                     'code' => 200,
-                    'data' => $response->content()
+                    'data' => $response->content(),
+                    'crossref' => $crossref,
                 ];
             }
         ]

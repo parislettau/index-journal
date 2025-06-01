@@ -34,9 +34,7 @@ return [
 				$parent = $this->uploadParent($uploads['parent'] ?? null);
 
 				if ($parent === null) {
-					throw new InvalidArgumentException(
-						message: '"' . $uploads['parent'] . '" could not be resolved as a valid parent for the upload'
-					);
+					throw new InvalidArgumentException('"' . $uploads['parent'] . '" could not be resolved as a valid parent for the upload');
 				}
 
 				$file = new File([
@@ -54,9 +52,7 @@ return [
 	'methods' => [
 		'upload' => function (Api $api, $params, Closure $map) {
 			if ($params === false) {
-				throw new Exception(
-					message: 'Uploads are disabled for this field'
-				);
+				throw new Exception('Uploads are disabled for this field');
 			}
 
 			$parent = $this->uploadParent($params['parent'] ?? null);
@@ -72,9 +68,7 @@ return [
 				$file = $parent->createFile($props, true);
 
 				if ($file instanceof File === false) {
-					throw new Exception(
-						message: 'The file could not be uploaded'
-					);
+					throw new Exception('The file could not be uploaded');
 				}
 
 				return $map($file, $parent);

@@ -5,7 +5,6 @@ namespace Kirby\Panel;
 use Kirby\Cms\File as CmsFile;
 use Kirby\Cms\ModelWithContent;
 use Kirby\Filesystem\Asset;
-use Kirby\Panel\Ui\Buttons\ViewButtons;
 use Kirby\Toolkit\I18n;
 
 /**
@@ -38,21 +37,6 @@ class Page extends Model
 				'link'  => $parent->panel()->url(true),
 			]
 		);
-	}
-
-	/**
-	 * Returns header buttons which should be displayed
-	 * on the page view
-	 */
-	public function buttons(): array
-	{
-		return ViewButtons::view($this)->defaults(
-			'open',
-			'preview',
-			'settings',
-			'languages',
-			'status'
-		)->render();
 	}
 
 	/**
@@ -90,31 +74,24 @@ class Page extends Model
 	 */
 	public function dropdown(array $options = []): array
 	{
-		$page        = $this->model;
-		$request     = $page->kirby()->request();
-		$defaults    = $request->get(['view', 'sort', 'delete']);
-		$options     = [...$defaults, ...$options];
+		$page     = $this->model;
+		$request  = $page->kirby()->request();
+		$defaults = $request->get(['view', 'sort', 'delete']);
+		$options  = array_merge($defaults, $options);
+
 		$permissions = $this->options(['preview']);
 		$view        = $options['view'] ?? 'view';
 		$url         = $this->url(true);
 		$result      = [];
 
 		if ($view === 'list') {
-			$result['open'] = [
+			$result['preview'] = [
 				'link'     => $page->previewUrl(),
 				'target'   => '_blank',
 				'icon'     => 'open',
 				'text'     => I18n::translate('open'),
-				'disabled' => $isPreviewDisabled = $this->isDisabledDropdownOption('preview', $options, $permissions)
+				'disabled' => $this->isDisabledDropdownOption('preview', $options, $permissions)
 			];
-
-			$result['preview'] = [
-				'icon'     => 'window',
-				'link'     => $page->panel()->url(true) . '/preview/changes',
-				'text'     => I18n::translate('preview'),
-				'disabled' => $isPreviewDisabled
-			];
-
 			$result[] = '-';
 		}
 
@@ -225,10 +202,7 @@ class Page extends Model
 			$defaults['icon'] = $icon;
 		}
 
-		return [
-			...parent::imageDefaults(),
-			...$defaults
-		];
+		return array_merge(parent::imageDefaults(), $defaults);
 	}
 
 	/**
@@ -261,12 +235,11 @@ class Page extends Model
 	{
 		$params['text'] ??= '{{ page.title }}';
 
-		return [
-			...parent::pickerData($params),
+		return array_merge(parent::pickerData($params), [
 			'dragText'    => $this->dragText(),
 			'hasChildren' => $this->model->hasChildren(),
 			'url'         => $this->model->url()
-		];
+		]);
 	}
 
 	/**
@@ -293,7 +266,7 @@ class Page extends Model
 
 		// create siblings collection based on
 		// blueprint navigation
-		$siblings = static function (string $direction) use ($page) {
+		$siblings = function (string $direction) use ($page) {
 			$navigation = $page->blueprint()->navigation();
 			$sortBy     = $navigation['sortBy'] ?? null;
 			$status     = $navigation['status'] ?? null;
@@ -320,12 +293,12 @@ class Page extends Model
 				$templates = (array)($template ?? $page->intendedTemplate());
 
 				// do not filter if template navigation is all
-				if (in_array('all', $templates, true) === false) {
+				if (in_array('all', $templates) === false) {
 					$siblings = $siblings->filter('intendedTemplate', 'in', $templates);
 				}
 
 				// do not filter if status navigation is all
-				if (in_array('all', $statuses, true) === false) {
+				if (in_array('all', $statuses) === false) {
 					$siblings = $siblings->filter('status', 'in', $statuses);
 				}
 			} else {
@@ -351,27 +324,30 @@ class Page extends Model
 	 */
 	public function props(): array
 	{
-		$props = parent::props();
+		$page = $this->model;
 
-		// Additional model information
-		// @deprecated Use the top-level props instead
-		$model = [
-			'id'         => $props['id'],
-			'link'       => $props['link'],
-			'parent'     => $this->model->parentModel()->panel()->url(true),
-			'previewUrl' => $this->model->previewUrl(),
-			'status'     => $this->model->status(),
-			'title'      => $this->model->title()->toString(),
-			'uuid'       => $props['uuid'],
-		];
-
-		return [
-			...$props,
-			...$this->prevNext(),
-			'blueprint'  => $this->model->intendedTemplate()->name(),
-			'model'      => $model,
-			'title'      => $model['title'],
-		];
+		return array_merge(
+			parent::props(),
+			$this->prevNext(),
+			[
+				'blueprint' => $page->intendedTemplate()->name(),
+				'model' => [
+					'content'    => $this->content(),
+					'id'         => $page->id(),
+					'link'       => $this->url(true),
+					'parent'     => $page->parentModel()->panel()->url(true),
+					'previewUrl' => $page->previewUrl(),
+					'status'     => $page->status(),
+					'title'      => $page->title()->toString(),
+					'uuid'       => fn () => $page->uuid()?->toString(),
+				],
+				'status' => function () use ($page) {
+					if ($status = $page->status()) {
+						return $page->blueprint()->status()[$status] ?? null;
+					}
+				},
+			]
+		);
 	}
 
 	/**
@@ -382,11 +358,13 @@ class Page extends Model
 	 */
 	public function view(): array
 	{
+		$page = $this->model;
+
 		return [
-			'breadcrumb' => $this->model->panel()->breadcrumb(),
+			'breadcrumb' => $page->panel()->breadcrumb(),
 			'component'  => 'k-page-view',
-			'props'      => $props = $this->props(),
-			'title'      => $props['title'],
+			'props'      => $this->props(),
+			'title'      => $page->title()->toString(),
 		];
 	}
 }

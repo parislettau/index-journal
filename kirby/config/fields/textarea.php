@@ -89,11 +89,12 @@ return [
 			[
 				'pattern' => 'files',
 				'action' => function () {
-					return $this->field()->filepicker([
-						...$this->field()->files(),
+					$params = array_merge($this->field()->files(), [
 						'page'   => $this->requestQuery('page'),
 						'search' => $this->requestQuery('search')
 					]);
+
+					return $this->field()->filepicker($params);
 				}
 			],
 			[
@@ -103,12 +104,14 @@ return [
 					$field   = $this->field();
 					$uploads = $field->uploads();
 
-					return $this->field()->upload($this, $uploads, fn ($file, $parent) => [
-						'filename' => $file->filename(),
-						'dragText' => $file->panel()->dragText(
-							absolute: $field->model()->is($parent) === false
-						),
-					]);
+					return $this->field()->upload($this, $uploads, function ($file, $parent) use ($field) {
+						$absolute = $field->model()->is($parent) === false;
+
+						return [
+							'filename' => $file->filename(),
+							'dragText' => $file->panel()->dragText('auto', $absolute),
+						];
+					});
 				}
 			]
 		];

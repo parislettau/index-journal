@@ -19,8 +19,6 @@ use Kirby\Content\Content;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
- *
- * @extends \Kirby\Cms\Item<\Kirby\Cms\Structure>
  */
 class StructureObject extends Item
 {
@@ -79,9 +77,9 @@ class StructureObject extends Item
 	 */
 	public function toArray(): array
 	{
-		return [
-			...$this->content()->toArray(),
-			...parent::toArray()
-		];
+		return array_merge(
+			$this->content()->toArray(),
+			parent::toArray()
+		);
 	}
 }

@@ -46,7 +46,7 @@ class Menu
 			$defaults    = ['site', 'languages', 'users', 'system'];
 			// add all other areas after that
 			$additionals = array_diff(array_keys($this->areas), $defaults);
-			$areas       = [...$defaults, ...$additionals];
+			$areas       = array_merge($defaults, $additionals);
 		}
 
 		$result = [];
@@ -73,11 +73,12 @@ class Menu
 			// merge area definition (e.g. from config)
 			// with global area definition
 			if (is_array($area) === true) {
-				$area = Panel::area($id, [
-					...$this->areas[$id] ?? [],
-					'menu' => true,
-					...$area
-				]);
+				$area = array_merge(
+					$this->areas[$id] ?? [],
+					['menu' => true],
+					$area
+				);
+				$area = Panel::area($id, $area);
 			}
 
 			$result[] = $area;
@@ -118,7 +119,7 @@ class Menu
 			default    => $menu
 		};
 
-		$entry = [
+		$entry = array_merge([
 			'current'  => $this->isCurrent(
 				$area['id'],
 				$area['current'] ?? null
@@ -127,11 +128,8 @@ class Menu
 			'link'     => $area['link'] ?? null,
 			'dialog'   => $area['dialog'] ?? null,
 			'drawer'   => $area['drawer'] ?? null,
-			'target'   => $area['target'] ?? null,
-			'text'     => I18n::translate($area['label'], $area['label']),
-			'title'    => I18n::translate($area['title'] ?? null, $area['title'] ?? null),
-			...$menu
-		];
+			'text'     => I18n::translate($area['label'], $area['label'])
+		], $menu);
 
 		// unset the link (which is always added by default to an area)
 		// if a dialog or drawer should be opened instead
@@ -160,7 +158,7 @@ class Menu
 
 		$entries[] = '-';
 
-		return [...$entries, ...$this->options()];
+		return array_merge($entries, $this->options());
 	}
 
 	/**

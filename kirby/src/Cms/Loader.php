@@ -28,10 +28,24 @@ use Kirby\Filesystem\F;
  */
 class Loader
 {
-	public function __construct(
-		protected App $kirby,
-		protected bool $withPlugins = true
-	) {
+	/**
+	 * @var \Kirby\Cms\App
+	 */
+	protected $kirby;
+
+	/**
+	 * @var bool
+	 */
+	protected $withPlugins;
+
+	/**
+	 * @param \Kirby\Cms\App $kirby
+	 * @param bool $withPlugins
+	 */
+	public function __construct(App $kirby, bool $withPlugins = true)
+	{
+		$this->kirby       = $kirby;
+		$this->withPlugins = $withPlugins;
 	}
 
 	/**
@@ -49,10 +63,7 @@ class Loader
 	public function areas(): array
 	{
 		$areas      = [];
-		$extensions = match ($this->withPlugins) {
-			true  => $this->kirby->extensions('areas'),
-			false => []
-		};
+		$extensions = $this->withPlugins === true ? $this->kirby->extensions('areas') : [];
 
 		// load core areas and extend them with elements
 		// from plugins if they exist
@@ -110,10 +121,7 @@ class Loader
 	 */
 	public function extensions(string $type): array
 	{
-		return match ($this->withPlugins) {
-			true  => $this->kirby->extensions($type),
-			false => $this->kirby->core()->$type()
-		};
+		return $this->withPlugins === false ? $this->kirby->core()->$type() : $this->kirby->extensions($type);
 	}
 
 	/**
@@ -166,11 +174,12 @@ class Loader
 	 */
 	public function resolveArea(string|array|Closure $area): array
 	{
-		$area = $this->resolve($area);
+		$area      = $this->resolve($area);
+		$dropdowns = $area['dropdowns'] ?? [];
 
 		// convert closure dropdowns to an array definition
 		// otherwise they cannot be merged properly later
-		foreach ($area['dropdowns'] ?? [] as $key => $dropdown) {
+		foreach ($dropdowns as $key => $dropdown) {
 			if ($dropdown instanceof Closure) {
 				$area['dropdowns'][$key] = [
 					'options' => $dropdown

@@ -80,7 +80,7 @@ class Query
 
 		// merge data with default entries
 		if (is_array($data) === true) {
-			$data = [...static::$entries, ...$data];
+			$data = array_merge(static::$entries, $data);
 		}
 
 		// direct data array access via key

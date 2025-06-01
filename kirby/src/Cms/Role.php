@@ -2,10 +2,10 @@
 
 namespace Kirby\Cms;
 
+use Exception;
 use Kirby\Data\Data;
 use Kirby\Filesystem\F;
 use Kirby\Toolkit\I18n;
-use Stringable;
 
 /**
  * Represents a User role with attached
@@ -17,7 +17,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-class Role implements Stringable
+class Role
 {
 	protected string|null $description;
 	protected string $name;
@@ -48,14 +48,13 @@ class Role implements Stringable
 		return $this->name();
 	}
 
-	public static function defaultAdmin(array $inject = []): static
+	public static function admin(array $inject = []): static
 	{
-		return static::factory(static::defaults()['admin'], $inject);
-	}
-
-	public static function defaultNobody(array $inject = []): static
-	{
-		return static::factory(static::defaults()['nobody'], $inject);
+		try {
+			return static::load('admin');
+		} catch (Exception) {
+			return static::factory(static::defaults()['admin'], $inject);
+		}
 	}
 
 	protected static function defaults(): array
@@ -107,10 +106,8 @@ class Role implements Stringable
 
 	public static function load(string $file, array $inject = []): static
 	{
-		$data = [
-			...Data::read($file),
-			'name' => F::name($file)
-		];
+		$data = Data::read($file);
+		$data['name'] = F::name($file);
 
 		return static::factory($data, $inject);
 	}
@@ -118,6 +115,15 @@ class Role implements Stringable
 	public function name(): string
 	{
 		return $this->name;
+	}
+
+	public static function nobody(array $inject = []): static
+	{
+		try {
+			return static::load('nobody');
+		} catch (Exception) {
+			return static::factory(static::defaults()['nobody'], $inject);
+		}
 	}
 
 	public function permissions(): Permissions

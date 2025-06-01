@@ -3,7 +3,6 @@
 namespace Kirby\Panel;
 
 use Kirby\Cms\App;
-use Kirby\Cms\Helpers;
 use Kirby\Cms\Url;
 use Kirby\Exception\Exception;
 use Kirby\Exception\InvalidArgumentException;
@@ -27,7 +26,7 @@ use Kirby\Toolkit\A;
  */
 class Assets
 {
-	protected bool $isDev;
+	protected bool $dev;
 	protected App $kirby;
 	protected string $nonce;
 	protected Plugins $plugins;
@@ -43,14 +42,12 @@ class Assets
 		$vite       = $this->kirby->roots()->panel() . '/.vite-running';
 		$this->vite = is_file($vite) === true;
 
-		// Check if Panel is running in dev mode to
-		// get the assets from the Vite dev server;
+		// get the assets from the Vite dev server in dev mode;
 		// dev mode = explicitly enabled in the config AND Vite is running
-		$this->isDev =
-			$this->kirby->option('panel.dev', false) !== false &&
-			$this->vite === true;
+		$dev       = $this->kirby->option('panel.dev', false);
+		$this->dev = $dev !== false && $this->vite === true;
 
-		// Get the base URL
+		// get the base URL
 		$this->url = $this->url();
 	}
 
@@ -67,7 +64,7 @@ class Assets
 
 		// during dev mode we do not need to load
 		// the general stylesheet (as styling will be inlined)
-		if ($this->isDev === true) {
+		if ($this->dev === true) {
 			$css['index'] = null;
 		}
 
@@ -111,16 +108,19 @@ class Assets
 		return [
 			'css'            => $this->css(),
 			'icons'          => $this->favicons(),
-			'import-maps'    => $this->importMaps(),
-			'js'             => $this->js(),
 			// loader for plugins' index.dev.mjs files – inlined,
 			// so we provide the code instead of the asset URL
 			'plugin-imports' => $this->plugins->read('mjs'),
+			'js'             => $this->js()
 		];
 	}
 
 	/**
-	 * Returns array of favicon icons based on config option
+	 * Returns array of favicon icons
+	 * based on config option
+	 *
+	 * @todo Deprecate `url` option in v5, use `href` option instead
+	 * @todo Deprecate `rel` usage as array key in v5, use `rel` option instead
 	 *
 	 * @throws \Kirby\Exception\InvalidArgumentException
 	 */
@@ -161,16 +161,12 @@ class Assets
 			foreach ($icons as $rel => &$icon) {
 				// TODO: remove this backward compatibility check in v6
 				if (isset($icon['url']) === true) {
-					Helpers::deprecated('`panel.favicon` option: use `href` instead of `url` attribute');
-
 					$icon['href'] = $icon['url'];
 					unset($icon['url']);
 				}
 
 				// TODO: remove this backward compatibility check in v6
 				if (is_string($rel) === true && isset($icon['rel']) === false) {
-					Helpers::deprecated('`panel.favicon` option: use `rel` attribute instead of passing string as key');
-
 					$icon['rel'] = $rel;
 				}
 
@@ -193,9 +189,7 @@ class Assets
 			];
 		}
 
-		throw new InvalidArgumentException(
-			message: 'Invalid panel.favicon option'
-		);
+		throw new InvalidArgumentException('Invalid panel.favicon option');
 	}
 
 	/**
@@ -206,20 +200,10 @@ class Assets
 	public function icons(): string
 	{
 		$dir   = $this->kirby->root('panel') . '/';
-		$dir  .= $this->isDev ? 'public' : 'dist';
+		$dir  .= $this->dev ? 'public' : 'dist';
 		$icons = F::read($dir . '/img/icons.svg');
 		$icons = preg_replace('/<!--(.|\s)*?-->/', '', $icons);
 		return $icons;
-	}
-
-	/**
-	 * Get all import maps
-	 */
-	public function importMaps(): array
-	{
-		return array_filter([
-			'vue' => $this->vue()
-		]);
 	}
 
 	/**
@@ -228,12 +212,16 @@ class Assets
 	public function js(): array
 	{
 		$js = [
+			'vue' => [
+				'nonce' => $this->nonce,
+				'src'   => $this->vue(),
+			],
 			'vendor' => [
 				'nonce' => $this->nonce,
 				'src'   => $this->url . '/js/vendor.min.js',
 				'type'  => 'module'
 			],
-			'plugin-registry' => [
+			'pluginloader' => [
 				'nonce' => $this->nonce,
 				'src'   => $this->url . '/js/plugins.js',
 				'type'  => 'module'
@@ -246,25 +234,27 @@ class Assets
 			...A::map($this->custom('panel.js'), fn ($src) => [
 				'nonce' => $this->nonce,
 				'src'   => $src,
-				'type'  => 'module',
-				'defer' => true
+				'type'  => 'module'
 			]),
 			'index' => [
-				'src'  => $this->url . '/js/index.min.js',
-				'type' => 'module'
+				'nonce' => $this->nonce,
+				'src'   => $this->url . '/js/index.min.js',
+				'type'  => 'module'
 			],
 		];
 
 
-		// During dev mode, add vite client and adapt
+		// during dev mode, add vite client and adapt
 		// path to `index.js` - vendor does not need
 		// to be loaded in dev mode
-		if ($this->isDev === true) {
-			// Load the non-minified index.js, remove vendor script
+		if ($this->dev === true) {
+			// load the non-minified index.js, remove vendor script and
+			//  development version of Vue
+			$js['vendor']['src'] = null;
 			$js['index']['src']  = $this->url . '/src/index.js';
-			$js['vendor'] = null;
+			$js['vue']['src']    = $this->vue(production: false);
 
-			// Add vite dev client
+			// add vite dev client
 			$js['vite'] = [
 				'nonce' => $this->nonce,
 				'src'   => $this->url . '/@vite/client',
@@ -272,7 +262,7 @@ class Assets
 			];
 		}
 
-		return array_filter($js);
+		return array_filter($js, fn ($js) => empty($js['src']) === false);
 	}
 
 	/**
@@ -301,9 +291,7 @@ class Assets
 
 		// copy assets to the dist folder
 		if (Dir::copy($panelRoot, $versionRoot) !== true) {
-			throw new Exception(
-				message: 'Panel assets could not be linked'
-			);
+			throw new Exception('Panel assets could not be linked');
 		}
 
 		return true;
@@ -315,13 +303,12 @@ class Assets
 	public function url(): string
 	{
 		// vite is not running, use production assets
-		if ($this->isDev === false) {
+		if ($this->dev === false) {
 			return $this->kirby->url('media') . '/panel/' . $this->kirby->versionHash();
 		}
 
 		// explicitly configured base URL
 		$dev = $this->kirby->option('panel.dev');
-
 		if (is_string($dev) === true) {
 			return $dev;
 		}
@@ -339,17 +326,14 @@ class Assets
 	 * Get the correct Vue script URL depending on dev mode
 	 * and the enabled/disabled template compiler
 	 */
-	public function vue(): string
+	public function vue(bool $production = true): string
 	{
-		// During dev mode, load the dev version of Vue
-		if ($this->isDev === true) {
-			return $this->url . '/node_modules/vue/dist/vue.esm.browser.js';
+		$script = $this->kirby->option('panel.vue.compiler', true) === true ? 'vue' : 'vue.runtime';
+
+		if ($production === false) {
+			return $this->url . '/node_modules/vue/dist/' . $script . '.js';
 		}
 
-		if ($this->kirby->option('panel.vue.compiler', true) === true) {
-			return $this->url . '/js/vue.esm.browser.min.js';
-		}
-
-		return $this->url . '/js/vue.runtime.esm.min.js';
+		return $this->url . '/js/' . $script . '.min.js';
 	}
 }

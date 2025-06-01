@@ -93,7 +93,7 @@ class Category
 		return $this->id;
 	}
 
-	public static function isInstalled(): bool
+	public static function installed(): bool
 	{
 		return Dir::exists(static::base()) === true;
 	}

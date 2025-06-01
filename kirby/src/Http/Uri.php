@@ -5,7 +5,6 @@ namespace Kirby\Http;
 use Kirby\Cms\App;
 use Kirby\Exception\InvalidArgumentException;
 use SensitiveParameter;
-use Stringable;
 use Throwable;
 
 /**
@@ -17,7 +16,7 @@ use Throwable;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class Uri implements Stringable
+class Uri
 {
 	/**
 	 * Cache for the current Uri object
@@ -101,7 +100,8 @@ class Uri implements Stringable
 
 			$props['username'] = $props['user'] ?? null;
 			$props['password'] = $props['pass'] ?? null;
-			$props             = [...$props, ...$inject];
+
+			$props = array_merge($props, $inject);
 		}
 
 		// parse the path and extract params
@@ -245,7 +245,7 @@ class Uri implements Stringable
 
 		if (
 			$this->port !== null &&
-			in_array($this->port, [80, 443], true) === false
+			in_array($this->port, [80, 443]) === false
 		) {
 			$domain .= ':' . $this->port;
 		}
@@ -374,9 +374,7 @@ class Uri implements Stringable
 
 		if ($port !== null) {
 			if ($port < 1 || $port > 65535) {
-				throw new InvalidArgumentException(
-					message: 'Invalid port format: ' . $port
-				);
+				throw new InvalidArgumentException('Invalid port format: ' . $port);
 			}
 		}
 
@@ -398,13 +396,8 @@ class Uri implements Stringable
 	 */
 	public function setScheme(string|null $scheme = null): static
 	{
-		if (
-			$scheme !== null &&
-			in_array($scheme, static::$schemes, true) === false
-		) {
-			throw new InvalidArgumentException(
-				message: 'Invalid URL scheme: ' . $scheme
-			);
+		if ($scheme !== null && in_array($scheme, static::$schemes) === false) {
+			throw new InvalidArgumentException('Invalid URL scheme: ' . $scheme);
 		}
 
 		$this->scheme = $scheme;
@@ -522,7 +515,7 @@ class Uri implements Stringable
 		// use the full path;
 		// automatically detect the trailing slash from it if possible
 		if (is_string($props['path']) === true) {
-			$props['slash'] = str_ends_with($props['path'], '/') === true;
+			$props['slash'] = substr($props['path'], -1, 1) === '/';
 		}
 
 		return $props;

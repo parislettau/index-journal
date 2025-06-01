@@ -264,8 +264,10 @@ class Svg extends Xml
 
 	/**
 	 * Allowed hostnames for HTTP(S) URLs
+	 *
+	 * @var array|true
 	 */
-	public static array|true $allowedDomains = [];
+	public static array|bool $allowedDomains = [];
 
 	/**
 	 * Associative array of all allowed namespace URIs
@@ -430,10 +432,8 @@ class Svg extends Xml
 	 *
 	 * @return array Array with exception objects for each modification
 	 */
-	public static function sanitizeElement(
-		DOMElement $element,
-		array $options
-	): array {
+	public static function sanitizeElement(DOMElement $element, array $options): array
+	{
 		$errors = [];
 
 		// check for URLs inside <style> elements
@@ -456,12 +456,10 @@ class Svg extends Xml
 	 * Custom callback for additional doctype validation
 	 * @internal
 	 */
-	public static function validateDoctype(
-		DOMDocumentType $doctype,
-		array $options
-	): void {
+	public static function validateDoctype(DOMDocumentType $doctype, array $options): void
+	{
 		if (mb_strtolower($doctype->name) !== 'svg') {
-			throw new InvalidArgumentException(message: 'Invalid doctype');
+			throw new InvalidArgumentException('Invalid doctype');
 		}
 	}
 
@@ -473,14 +471,13 @@ class Svg extends Xml
 	 */
 	protected static function options(bool $isExternal): array
 	{
-		return [
-			...parent::options($isExternal),
+		return array_merge(parent::options($isExternal), [
 			'allowedAttrPrefixes' => static::$allowedAttrPrefixes,
 			'allowedAttrs'        => static::$allowedAttrs,
 			'allowedNamespaces'   => static::$allowedNamespaces,
 			'allowedTags'         => static::$allowedTags,
 			'disallowedTags'      => static::$disallowedTags,
-		];
+		]);
 	}
 
 	/**
@@ -490,14 +487,13 @@ class Svg extends Xml
 	 */
 	protected static function parse(string $string): Dom
 	{
-		$svg  = parent::parse($string);
-		$root = $svg->document()->documentElement->nodeName;
+		$svg = parent::parse($string);
 
 		// basic validation before we continue sanitizing/validating
-		if ($root !== 'svg') {
-			throw new InvalidArgumentException(
-				message: 'The file is not a SVG (got <' . $root . '>)'
-			);
+		$rootName = $svg->document()->documentElement->nodeName;
+
+		if ($rootName !== 'svg') {
+			throw new InvalidArgumentException('The file is not a SVG (got <' . $rootName . '>)');
 		}
 
 		return $svg;

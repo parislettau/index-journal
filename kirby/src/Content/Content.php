@@ -3,9 +3,7 @@
 namespace Kirby\Content;
 
 use Kirby\Cms\Blueprint;
-use Kirby\Cms\File;
 use Kirby\Cms\ModelWithContent;
-use Kirby\Exception\Exception;
 use Kirby\Form\Form;
 
 /**
@@ -98,15 +96,14 @@ class Content
 		);
 
 		// forms
-		$oldForm = new Form(
-			fields: $old->fields(),
-			model: $this->parent
-		);
-
-		$newForm = new Form(
-			fields: $new->fields(),
-			model: $this->parent
-		);
+		$oldForm = new Form([
+			'fields' => $old->fields(),
+			'model'  => $this->parent
+		]);
+		$newForm = new Form([
+			'fields' => $new->fields(),
+			'model'  => $this->parent
+		]);
 
 		// fields
 		$oldFields = $oldForm->fields();
@@ -125,14 +122,8 @@ class Content
 			}
 		}
 
-		// if the parent is a file, overwrite the template
-		// with the new template name
-		if ($this->parent instanceof File) {
-			$data['template'] = $to;
-		}
-
 		// preserve existing fields
-		return [...$this->data, ...$data];
+		return array_merge($this->data, $data);
 	}
 
 	/**
@@ -237,17 +228,21 @@ class Content
 	}
 
 	/**
-	 * Removed in 5.0.0. We only keep it to simplify debugging,
-	 * when this method is still in use in the wild.
+	 * Updates the content and returns
+	 * a cloned object
 	 *
-	 * Use $model->version()->update() instead.
-	 *
-	 * @todo Remove in 7.0.0
+	 * @return $this
 	 */
 	public function update(
 		array|null $content = null,
 		bool $overwrite = false
 	): static {
-		throw new Exception('`$content->update()` is no longer functional. Please use `$model->version()->update()` instead');
+		$content = array_change_key_case((array)$content, CASE_LOWER);
+		$this->data = $overwrite === true ? $content : array_merge($this->data, $content);
+
+		// clear cache of Field objects
+		$this->fields = [];
+
+		return $this;
 	}
 }

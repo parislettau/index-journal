@@ -2,7 +2,6 @@
 
 namespace Kirby\Cms;
 
-use Kirby\Exception\LogicException;
 use Kirby\Toolkit\A;
 
 /**
@@ -16,17 +15,18 @@ use Kirby\Toolkit\A;
  */
 abstract class ModelPermissions
 {
-	protected const CATEGORY = 'model';
+	protected string $category;
+	protected ModelWithContent $model;
 	protected array $options;
+	protected Permissions $permissions;
+	protected User $user;
 
-	protected static array $cache = [];
-
-	public function __construct(protected ModelWithContent|Language $model)
+	public function __construct(ModelWithContent $model)
 	{
-		$this->options = match (true) {
-			$model instanceof ModelWithContent => $model->blueprint()->options(),
-			default                            => []
-		};
+		$this->model       = $model;
+		$this->options     = $model->blueprint()->options();
+		$this->user        = $model->kirby()->user() ?? User::nobody();
+		$this->permissions = $this->user->role()->permissions();
 	}
 
 	public function __call(string $method, array $arguments = []): bool
@@ -44,17 +44,6 @@ abstract class ModelPermissions
 	}
 
 	/**
-	 * Can be overridden by specific child classes
-	 * to return a model-specific value used to
-	 * cache a once determined permission in memory
-	 * @codeCoverageIgnore
-	 */
-	protected static function cacheKey(ModelWithContent|Language $model): string
-	{
-		return '';
-	}
-
-	/**
 	 * Returns whether the current user is allowed to do
 	 * a certain action on the model
 	 *
@@ -64,9 +53,8 @@ abstract class ModelPermissions
 		string $action,
 		bool $default = false
 	): bool {
-		$user   = static::user();
-		$userId = $user->id();
-		$role   = $user->role()->id();
+		$user = $this->user->id();
+		$role = $this->user->role()->id();
 
 		// users with the `nobody` role can do nothing
 		// that needs a permission check
@@ -85,7 +73,7 @@ abstract class ModelPermissions
 		}
 
 		// the almighty `kirby` user can do anything
-		if ($userId === 'kirby' && $role === 'admin') {
+		if ($user === 'kirby' && $role === 'admin') {
 			return true;
 		}
 
@@ -115,32 +103,7 @@ abstract class ModelPermissions
 			}
 		}
 
-		$permissions = $user->role()->permissions();
-		return $permissions->for(static::category($this->model), $action, $default);
-	}
-
-	/**
-	 * Quickly determines a permission for the current user role
-	 * and model blueprint unless dynamic checking is required
-	 */
-	public static function canFromCache(
-		ModelWithContent|Language $model,
-		string $action,
-		bool $default = false
-	): bool {
-		$role     = $model->kirby()->role()?->id() ?? '__none__';
-		$category = static::category($model);
-		$cacheKey = $category . '.' . $action . '/' . static::cacheKey($model) . '/' . $role;
-
-		if (isset(static::$cache[$cacheKey]) === true) {
-			return static::$cache[$cacheKey];
-		}
-
-		if (method_exists(static::class, 'can' . $action) === true) {
-			throw new LogicException('Cannot use permission cache for dynamically-determined permission');
-		}
-
-		return static::$cache[$cacheKey] = $model->permissions()->can($action, $role, $default);
+		return $this->permissions->for($this->category, $action, $default);
 	}
 
 	/**
@@ -156,15 +119,6 @@ abstract class ModelPermissions
 		return $this->can($action, !$default) === false;
 	}
 
-	/**
-	 * Can be overridden by specific child classes
-	 * if the permission category needs to be dynamic
-	 */
-	protected static function category(ModelWithContent|Language $model): string
-	{
-		return static::CATEGORY;
-	}
-
 	public function toArray(): array
 	{
 		$array = [];
@@ -174,13 +128,5 @@ abstract class ModelPermissions
 		}
 
 		return $array;
-	}
-
-	/**
-	 * Returns the currently logged in user
-	 */
-	protected static function user(): User
-	{
-		return App::instance()->user() ?? User::nobody();
 	}
 }

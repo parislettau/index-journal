@@ -24,9 +24,7 @@ class License
 {
 	public const HISTORY = [
 		'3' => '2019-02-05',
-		'4' => '2023-11-28',
-		// @todo replace this date with the actual launch date
-		'5' => '2024-12-31'
+		'4' => '2023-11-28'
 	];
 
 	protected const SALT = 'kwAHMLyLPBnHEskzH9pPbJsBxQhKXZnX';
@@ -44,13 +42,9 @@ class License
 		protected string|null $date = null,
 		protected string|null $signature = null,
 	) {
-		if ($code !== null) {
-			$this->code = trim($code);
-		}
-
-		if ($email !== null) {
-			$this->email = $this->normalizeEmail($email);
-		}
+		// normalize arguments
+		$this->code  = $this->code !== null ? trim($this->code) : null;
+		$this->email = $this->email !== null ? $this->normalizeEmail($this->email) : null;
 	}
 
 	/**
@@ -187,9 +181,7 @@ class License
 		// rather throw an exception to avoid further issues
 		// @codeCoverageIgnoreStart
 		if ($release === false) {
-			throw new InvalidArgumentException(
-				message: 'The version for your license could not be found'
-			);
+			throw new InvalidArgumentException('The version for your license could not be found');
 		}
 		// @codeCoverageIgnoreEnd
 
@@ -343,21 +335,15 @@ class License
 	public function register(): static
 	{
 		if ($this->type() === LicenseType::Invalid) {
-			throw new InvalidArgumentException(
-				key: 'license.format'
-			);
+			throw new InvalidArgumentException(['key' => 'license.format']);
 		}
 
 		if ($this->hasValidEmailAddress() === false) {
-			throw new InvalidArgumentException(
-				key: 'license.email'
-			);
+			throw new InvalidArgumentException(['key' => 'license.email']);
 		}
 
 		if ($this->domain === null) {
-			throw new InvalidArgumentException(
-				key: 'license.domain'
-			);
+			throw new InvalidArgumentException(['key' => 'license.domain']);
 		}
 
 		// @codeCoverageIgnoreStart
@@ -400,10 +386,7 @@ class License
 		if ($response->code() !== 200) {
 			$message = $response->json()['message'] ?? 'The request failed';
 
-			throw new LogicException(
-				key: $response->code(),
-				message: $message,
-			);
+			throw new LogicException($message, $response->code());
 		}
 
 		return $response->json();
@@ -416,9 +399,9 @@ class License
 	public function save(): bool
 	{
 		if ($this->status()->activatable() !== true) {
-			throw new InvalidArgumentException(
-				key: 'license.verification'
-			);
+			throw new InvalidArgumentException([
+				'key' => 'license.verification'
+			]);
 		}
 
 		// where to store the license file
@@ -470,10 +453,10 @@ class License
 	public function status(): LicenseStatus
 	{
 		return $this->status ??= match (true) {
-			$this->isMissing()  => LicenseStatus::Missing,
-			$this->isLegacy()   => LicenseStatus::Legacy,
-			$this->isInactive() => LicenseStatus::Inactive,
-			default             => LicenseStatus::Active
+			$this->isMissing()  === true => LicenseStatus::Missing,
+			$this->isLegacy()   === true => LicenseStatus::Legacy,
+			$this->isInactive() === true => LicenseStatus::Inactive,
+			default                      => LicenseStatus::Active
 		};
 	}
 
@@ -527,9 +510,7 @@ class License
 		if (empty($response['url']) === false) {
 			// validate the redirect URL
 			if (Str::startsWith($response['url'], static::hub()) === false) {
-				throw new Exception(
-					message: 'We couldn’t redirect you to the Hub'
-				);
+				throw new Exception('We couldn’t redirect you to the Hub');
 			}
 
 			return [

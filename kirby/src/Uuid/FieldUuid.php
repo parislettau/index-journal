@@ -88,7 +88,7 @@ abstract class FieldUuid extends Uuid
 	 */
 	public static function index(): Generator
 	{
-		$generate = static function (Generator $models): Generator {
+		$generate = function (Generator $models): Generator {
 			foreach ($models as $model) {
 				$fields = $model->blueprint()->fields();
 

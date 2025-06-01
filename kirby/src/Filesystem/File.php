@@ -11,7 +11,6 @@ use Kirby\Sane\Sane;
 use Kirby\Toolkit\Escape;
 use Kirby\Toolkit\Html;
 use Kirby\Toolkit\V;
-use Stringable;
 
 /**
  * Flexible File object with a set of helpful
@@ -25,7 +24,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-class File implements Stringable
+class File
 {
 	/**
 	 * Parent file model
@@ -80,9 +79,7 @@ class File implements Stringable
 			$this->model !== null &&
 			method_exists($this->model, 'hasIsFileTrait') !== true
 		) {
-			throw new InvalidArgumentException(
-				message: 'The model object must use the "Kirby\Filesystem\IsFile" trait'
-			);
+			throw new InvalidArgumentException('The model object must use the "Kirby\Filesystem\IsFile" trait');
 		}
 	}
 
@@ -117,9 +114,7 @@ class File implements Stringable
 	public function copy(string $target, bool $force = false): static
 	{
 		if (F::copy($this->root(), $target, $force) !== true) {
-			throw new Exception(
-				message: 'The file "' . $this->root() . '" could not be copied'
-			);
+			throw new Exception('The file "' . $this->root() . '" could not be copied');
 		}
 
 		return new static($target);
@@ -132,10 +127,11 @@ class File implements Stringable
 	 */
 	public function dataUri(bool $base64 = true): string
 	{
-		return match ($base64) {
-			true  => 'data:' . $this->mime() . ';base64,' . $this->base64(),
-			false => 'data:' . $this->mime() . ',' . Escape::url($this->read())
-		};
+		if ($base64 === true) {
+			return 'data:' . $this->mime() . ';base64,' . $this->base64();
+		}
+
+		return 'data:' . $this->mime() . ',' . Escape::url($this->read());
 	}
 
 	/**
@@ -144,9 +140,7 @@ class File implements Stringable
 	public function delete(): bool
 	{
 		if (F::remove($this->root()) !== true) {
-			throw new Exception(
-				message: 'The file "' . $this->root() . '" could not be deleted'
-			);
+			throw new Exception('The file "' . $this->root() . '" could not be deleted');
 		}
 
 		return true;
@@ -161,10 +155,7 @@ class File implements Stringable
 	 */
 	public function download(string|null $filename = null): string
 	{
-		return Response::download(
-			$this->root(),
-			$filename ?? $this->filename()
-		);
+		return Response::download($this->root(), $filename ?? $this->filename());
 	}
 
 	/**
@@ -250,7 +241,7 @@ class File implements Stringable
 
 	/**
 	 * Checks if a preview can be displayed for the file
-	 * in the Panel or in the frontend
+	 * in the panel or in the frontend
 	 */
 	public function isViewable(): bool
 	{
@@ -289,10 +280,10 @@ class File implements Stringable
 			// the MIME type could not be determined, but matching
 			// to it was requested explicitly
 			if ($mime === null) {
-				throw new Exception(
-					key: 'file.mime.missing',
-					data: ['filename' => $this->filename()]
-				);
+				throw new Exception([
+					'key'  => 'file.mime.missing',
+					'data' => ['filename' => $this->filename()]
+				]);
 			}
 
 			// determine if any pattern matches the MIME type;
@@ -304,30 +295,30 @@ class File implements Stringable
 			);
 
 			if ($matches !== true) {
-				throw new Exception(
-					key: 'file.mime.invalid',
-					data: compact('mime')
-				);
+				throw new Exception([
+					'key'  => 'file.mime.invalid',
+					'data' => compact('mime')
+				]);
 			}
 		}
 
 		if (is_array($rules['extension'] ?? null) === true) {
 			$extension = $this->extension();
-			if (in_array($extension, $rules['extension'], true) !== true) {
-				throw new Exception(
-					key: 'file.extension.invalid',
-					data: compact('extension')
-				);
+			if (in_array($extension, $rules['extension']) !== true) {
+				throw new Exception([
+					'key'  => 'file.extension.invalid',
+					'data' => compact('extension')
+				]);
 			}
 		}
 
 		if (is_array($rules['type'] ?? null) === true) {
 			$type = $this->type();
-			if (in_array($type, $rules['type'], true) !== true) {
-				throw new Exception(
-					key: 'file.type.invalid',
-					data: compact('type')
-				);
+			if (in_array($type, $rules['type']) !== true) {
+				throw new Exception([
+					'key'  => 'file.type.invalid',
+					'data' => compact('type')
+				]);
 			}
 		}
 
@@ -339,10 +330,10 @@ class File implements Stringable
 				$validator = $arguments[1];
 
 				if (V::$validator($this->$property(), $rule) === false) {
-					throw new Exception(
-						key: 'file.' . $key,
-						data: [$property => $rule]
-					);
+					throw new Exception([
+						'key'  => 'file.' . $key,
+						'data' => [$property => $rule]
+					]);
 				}
 			}
 		}
@@ -387,9 +378,7 @@ class File implements Stringable
 	public function move(string $newRoot, bool $overwrite = false): static
 	{
 		if (F::move($this->root(), $newRoot, $overwrite) !== true) {
-			throw new Exception(
-				message: 'The file: "' . $this->root() . '" could not be moved to: "' . $newRoot . '"'
-			);
+			throw new Exception('The file: "' . $this->root() . '" could not be moved to: "' . $newRoot . '"');
 		}
 
 		return new static($newRoot);
@@ -444,9 +433,7 @@ class File implements Stringable
 		$newRoot = F::rename($this->root(), $newName, $overwrite);
 
 		if ($newRoot === false) {
-			throw new Exception(
-				message: 'The file: "' . $this->root() . '" could not be renamed to: "' . $newName . '"'
-			);
+			throw new Exception('The file: "' . $this->root() . '" could not be renamed to: "' . $newName . '"');
 		}
 
 		return new static($newRoot);
@@ -571,9 +558,7 @@ class File implements Stringable
 	public function write(string $content): bool
 	{
 		if (F::write($this->root(), $content) !== true) {
-			throw new Exception(
-				message: 'The file "' . $this->root() . '" could not be written'
-			);
+			throw new Exception('The file "' . $this->root() . '" could not be written');
 		}
 
 		return true;

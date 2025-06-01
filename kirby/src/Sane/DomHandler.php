@@ -40,8 +40,10 @@ class DomHandler extends Handler
 
 	/**
 	 * Allowed hostnames for HTTP(S) URLs
+	 *
+	 * @var array|true
 	 */
-	public static array|true $allowedDomains = true;
+	public static array|bool $allowedDomains = true;
 
 	/**
 	 * Whether URLs that begin with `/` should be allowed even if the
@@ -69,10 +71,8 @@ class DomHandler extends Handler
 	 *
 	 * @throws \Kirby\Exception\InvalidArgumentException If the file couldn't be parsed
 	 */
-	public static function sanitize(
-		string $string,
-		bool $isExternal = false
-	): string {
+	public static function sanitize(string $string, bool $isExternal = false): string
+	{
 		$dom = static::parse($string);
 		$dom->sanitize(static::options($isExternal));
 		return $dom->toString();
@@ -87,10 +87,8 @@ class DomHandler extends Handler
 	 * @throws \Kirby\Exception\InvalidArgumentException If the file couldn't be parsed
 	 * @throws \Kirby\Exception\InvalidArgumentException If the file didn't pass validation
 	 */
-	public static function validate(
-		string $string,
-		bool $isExternal = false
-	): void {
+	public static function validate(string $string, bool $isExternal = false): void
+	{
 		$dom    = static::parse($string);
 		$errors = $dom->sanitize(static::options($isExternal));
 
@@ -106,10 +104,8 @@ class DomHandler extends Handler
 	 *
 	 * @return array Array with exception objects for each modification
 	 */
-	public static function sanitizeAttr(
-		DOMAttr $attr,
-		array $options
-	): array {
+	public static function sanitizeAttr(DOMAttr $attr, array $options): array
+	{
 		// to be extended in child classes
 		return [];
 	}
@@ -120,10 +116,8 @@ class DomHandler extends Handler
 	 *
 	 * @return array Array with exception objects for each modification
 	 */
-	public static function sanitizeElement(
-		DOMElement $element,
-		array $options
-	): array {
+	public static function sanitizeElement(DOMElement $element, array $options): array
+	{
 		// to be extended in child classes
 		return [];
 	}
@@ -132,10 +126,8 @@ class DomHandler extends Handler
 	 * Custom callback for additional doctype validation
 	 * @internal
 	 */
-	public static function validateDoctype(
-		DOMDocumentType $doctype,
-		array $options
-	): void {
+	public static function validateDoctype(DOMDocumentType $doctype, array $options): void
+	{
 		// to be extended in child classes
 	}
 
@@ -153,9 +145,9 @@ class DomHandler extends Handler
 			'allowedDomains'        => static::$allowedDomains,
 			'allowHostRelativeUrls' => static::$allowHostRelativeUrls,
 			'allowedPIs'            => static::$allowedPIs,
-			'attrCallback'          => static::sanitizeAttr(...),
-			'doctypeCallback'       => static::validateDoctype(...),
-			'elementCallback'       => static::sanitizeElement(...),
+			'attrCallback'          => [static::class, 'sanitizeAttr'],
+			'doctypeCallback'       => [static::class, 'validateDoctype'],
+			'elementCallback'       => [static::class, 'sanitizeElement'],
 		];
 
 		// never allow host-relative URLs in external files as we

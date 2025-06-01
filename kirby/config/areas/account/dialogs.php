@@ -5,6 +5,7 @@ use Kirby\Panel\UserTotpEnableDialog;
 $dialogs = require __DIR__ . '/../users/dialogs.php';
 
 return [
+
 	// change email
 	'account.changeEmail' => [
 		'pattern' => '(account)/changeEmail',

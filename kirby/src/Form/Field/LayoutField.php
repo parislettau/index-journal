@@ -7,8 +7,6 @@ use Kirby\Cms\Blueprint;
 use Kirby\Cms\Fieldset;
 use Kirby\Cms\Layout;
 use Kirby\Cms\Layouts;
-use Kirby\Data\Data;
-use Kirby\Data\Json;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Form\Form;
 use Kirby\Toolkit\Str;
@@ -30,19 +28,14 @@ class LayoutField extends BlocksField
 		parent::__construct($params);
 	}
 
-	/**
-	 * @psalm-suppress MethodSignatureMismatch
-	 * @todo Remove psalm suppress after https://github.com/vimeo/psalm/issues/8673 is fixed
-	 */
-	public function fill(mixed $value): static
+	public function fill(mixed $value = null): void
 	{
-		$attrs   = $this->attrsForm();
-		$value   = Data::decode($value, type: 'json', fail: false);
+		$value   = $this->valueFromJson($value);
 		$layouts = Layouts::factory($value, ['parent' => $this->model])->toArray();
 
 		foreach ($layouts as $layoutIndex => $layout) {
 			if ($this->settings !== null) {
-				$layouts[$layoutIndex]['attrs'] = $attrs->reset()->fill($layout['attrs'])->toFormValues();
+				$layouts[$layoutIndex]['attrs'] = $this->attrsForm($layout['attrs'])->values();
 			}
 
 			foreach ($layout['columns'] as $columnIndex => $column) {
@@ -51,16 +44,18 @@ class LayoutField extends BlocksField
 		}
 
 		$this->value = $layouts;
-
-		return $this;
 	}
 
-	public function attrsForm(): Form
+	public function attrsForm(array $input = []): Form
 	{
-		return new Form(
-			fields: $this->settings()?->fields() ?? [],
-			model:  $this->model
-		);
+		$settings = $this->settings();
+
+		return new Form([
+			'fields' => $settings?->fields() ?? [],
+			'model'  => $this->model,
+			'strict' => true,
+			'values' => $input,
+		]);
 	}
 
 	public function layouts(): array|null
@@ -101,7 +96,7 @@ class LayoutField extends BlocksField
 
 			// remove the row if layout not available for the pasted layout field
 			$columns = array_column($layout['columns'], 'width');
-			if (in_array($columns, $this->layouts(), true) === false) {
+			if (in_array($columns, $this->layouts()) === false) {
 				unset($layouts[$layoutIndex]);
 				continue;
 			}
@@ -127,12 +122,13 @@ class LayoutField extends BlocksField
 
 	public function props(): array
 	{
-		return [
-			...parent::props(),
+		$settings = $this->settings();
+
+		return array_merge(parent::props(), [
 			'layouts'  => $this->layouts(),
 			'selector' => $this->selector(),
-			'settings' => $this->settings()?->toArray()
-		];
+			'settings' => $settings?->toArray()
+		]);
 	}
 
 	public function routes(): array
@@ -146,14 +142,13 @@ class LayoutField extends BlocksField
 			'action'  => function () use ($field): array {
 				$request = App::instance()->request();
 
-				$columns = $request->get('columns') ?? ['1/1'];
-				$form    = $field->attrsForm();
-
-				$form->fill(input: $form->defaults());
-				$form->submit(input: $request->get('attrs') ?? []);
+				$input    = $request->get('attrs') ?? [];
+				$defaults = $field->attrsForm($input)->data(true);
+				$attrs    = $field->attrsForm($defaults)->values();
+				$columns  = $request->get('columns') ?? ['1/1'];
 
 				return Layout::factory([
-					'attrs'   => $form->toFormValues(),
+					'attrs'   => $attrs,
 					'columns' => array_map(fn ($width) => [
 						'blocks' => [],
 						'id'     => Str::uuid(),
@@ -187,10 +182,10 @@ class LayoutField extends BlocksField
 
 				$fieldApi = $this->clone([
 					'routes' => $field->api(),
-					'data'   => [
-						...$this->data(),
-						'field' => $field
-					]
+					'data'   => array_merge(
+						$this->data(),
+						['field' => $field]
+					)
 				]);
 
 				return $fieldApi->call(
@@ -272,21 +267,19 @@ class LayoutField extends BlocksField
 		return $this->settings;
 	}
 
-	public function toStoredValue(bool $default = false): mixed
+	public function store(mixed $value): mixed
 	{
-		$attrs = $this->attrsForm();
-		$value = $this->toFormValue($default);
 		$value = Layouts::factory($value, ['parent' => $this->model])->toArray();
 
 		// returns empty string to avoid storing empty array as string `[]`
 		// and to consistency work with `$field->isEmpty()`
-		if ($value === []) {
+		if (empty($value) === true) {
 			return '';
 		}
 
 		foreach ($value as $layoutIndex => $layout) {
 			if ($this->settings !== null) {
-				$value[$layoutIndex]['attrs'] = $attrs->reset()->fill($layout['attrs'])->toStoredValues();
+				$value[$layoutIndex]['attrs'] = $this->attrsForm($layout['attrs'])->content();
 			}
 
 			foreach ($layout['columns'] as $columnIndex => $column) {
@@ -294,31 +287,32 @@ class LayoutField extends BlocksField
 			}
 		}
 
-		return Json::encode($value, pretty: $this->pretty());
+		return $this->valueToJson($value, $this->pretty());
 	}
 
 	public function validations(): array
 	{
 		return [
 			'layout' => function ($value) {
-				$attrsForm   = $this->attrsForm();
-				$blockForms  = [];
+				$fields      = [];
 				$layoutIndex = 0;
 
 				foreach ($value as $layout) {
 					$layoutIndex++;
 
 					// validate settings form
-					$form = $attrsForm->reset()->fill($layout['attrs'] ?? []);
+					$form = $this->attrsForm($layout['attrs'] ?? []);
 
 					foreach ($form->fields() as $field) {
 						$errors = $field->errors();
 
-						if (count($errors) > 0) {
-							throw new InvalidArgumentException(
-								key:'layout.validation.settings',
-								data: ['index' => $layoutIndex]
-							);
+						if (empty($errors) === false) {
+							throw new InvalidArgumentException([
+								'key' => 'layout.validation.settings',
+								'data' => [
+									'index' => $layoutIndex
+								]
+							]);
 						}
 					}
 
@@ -330,34 +324,34 @@ class LayoutField extends BlocksField
 							$blockIndex++;
 							$blockType = $block['type'];
 
-							if (isset($blockForms[$blockType]) === false) {
-								try {
-									$fieldset = $this->fieldset($blockType);
-									$fields   = $this->fields($blockType) ?? [];
-									$blockForms[$blockType] = $this->form($fields);
-								} catch (Throwable) {
-									// skip invalid blocks
-									continue;
-								}
+							try {
+								$fieldset    = $this->fieldset($blockType);
+								$blockFields = $fields[$blockType] ?? $this->fields($blockType) ?? [];
+							} catch (Throwable) {
+								// skip invalid blocks
+								continue;
 							}
 
+							// store the fields for the next round
+							$fields[$blockType] = $blockFields;
+
 							// overwrite the content with the serialized form
-							$form = $blockForms[$blockType]->reset()->fill($block['content']);
+							$form = $this->form($blockFields, $block['content']);
 
 							foreach ($form->fields() as $field) {
 								$errors = $field->errors();
 
 								// rough first validation
-								if (count($errors) > 0) {
-									throw new InvalidArgumentException(
-										key: 'layout.validation.block',
-										data: [
+								if (empty($errors) === false) {
+									throw new InvalidArgumentException([
+										'key' => 'layout.validation.block',
+										'data' => [
 											'blockIndex'  => $blockIndex,
 											'field'       => $field->label(),
 											'fieldset'    => $fieldset->name(),
 											'layoutIndex' => $layoutIndex
 										]
-									);
+									]);
 								}
 							}
 						}

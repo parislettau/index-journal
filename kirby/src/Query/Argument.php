@@ -70,7 +70,7 @@ class Argument
 
 		// numeric
 		if (is_numeric($argument) === true) {
-			if (str_contains($argument, '.') === false) {
+			if (strpos($argument, '.') === false) {
 				return new static((int)$argument);
 			}
 

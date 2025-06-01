@@ -20,8 +20,6 @@ use Throwable;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
- *
- * @extends \Kirby\Cms\Items<\Kirby\Cms\Block>
  */
 class Blocks extends Items
 {
@@ -75,7 +73,7 @@ class Blocks extends Items
 	 */
 	protected static function extractFromLayouts(array $input): array
 	{
-		if ($input === []) {
+		if (empty($input) === true) {
 			return [];
 		}
 
@@ -116,10 +114,7 @@ class Blocks extends Items
 	 */
 	public static function parse(array|string|null $input): array
 	{
-		if (
-			empty($input) === false &&
-			is_array($input) === false
-		) {
+		if (empty($input) === false && is_array($input) === false) {
 			try {
 				$input = Json::decode((string)$input);
 			} catch (Throwable) {
@@ -132,17 +127,17 @@ class Blocks extends Items
 
 					// check for valid yaml
 					if (
-						$yaml === [] ||
+						empty($yaml) === true ||
 						(
 							isset($first['_key']) === false &&
 							isset($first['type']) === false
 						)
 					) {
-						throw new Exception(message: 'Invalid YAML');
+						throw new Exception('Invalid YAML');
+					} else {
+						$input = $yaml;
 					}
-
-					$input = $yaml;
-				} catch (Throwable) {
+				} catch (Throwable $e) {
 					// the next 2 lines remain after removing block.converter
 					// @codeCoverageIgnoreEnd
 					$parser = new Parsley((string)$input, new BlockSchema());

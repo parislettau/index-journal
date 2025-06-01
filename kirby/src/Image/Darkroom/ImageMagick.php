@@ -19,6 +19,19 @@ use Kirby\Image\Focus;
 class ImageMagick extends Darkroom
 {
 	/**
+	 * Activates imagemagick's auto-orient feature unless
+	 * it is deactivated via the options
+	 */
+	protected function autoOrient(string $file, array $options): string|null
+	{
+		if ($options['autoOrient'] === true) {
+			return '-auto-orient';
+		}
+
+		return null;
+	}
+
+	/**
 	 * Applies the blur settings
 	 */
 	protected function blur(string $file, array $options): string|null
@@ -122,7 +135,7 @@ class ImageMagick extends Darkroom
 		$command[] = $this->interlace($file, $options);
 		$command[] = $this->coalesce($file, $options);
 		$command[] = $this->grayscale($file, $options);
-		$command[] = '-auto-orient';
+		$command[] = $this->autoOrient($file, $options);
 		$command[] = $this->resize($file, $options);
 		$command[] = $this->quality($file, $options);
 		$command[] = $this->blur($file, $options);
@@ -137,7 +150,7 @@ class ImageMagick extends Darkroom
 
 		// log broken commands
 		if ($return !== 0) {
-			throw new Exception(message: 'The imagemagick convert command could not be executed: ' . $command);
+			throw new Exception('The imagemagick convert command could not be executed: ' . $command);
 		}
 
 		return $options;

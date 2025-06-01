@@ -16,8 +16,6 @@ use Kirby\Filesystem\F;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
- *
- * @extends \Kirby\Cms\Collection<\Kirby\Cms\Translation>
  */
 class Translations extends Collection
 {
@@ -48,11 +46,7 @@ class Translations extends Collection
 			}
 
 			$locale      = F::name($filename);
-			$translation = Translation::load(
-				$locale,
-				$root . '/' . $filename,
-				$inject[$locale] ?? []
-			);
+			$translation = Translation::load($locale, $root . '/' . $filename, $inject[$locale] ?? []);
 
 			$collection->data[$locale] = $translation;
 		}

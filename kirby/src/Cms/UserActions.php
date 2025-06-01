@@ -3,13 +3,13 @@
 namespace Kirby\Cms;
 
 use Closure;
-use Kirby\Content\ImmutableMemoryStorage;
-use Kirby\Content\MemoryStorage;
 use Kirby\Data\Data;
 use Kirby\Data\Json;
+use Kirby\Exception\LogicException;
 use Kirby\Exception\PermissionException;
 use Kirby\Filesystem\Dir;
 use Kirby\Filesystem\F;
+use Kirby\Form\Form;
 use Kirby\Http\Idn;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Str;
@@ -35,8 +35,16 @@ trait UserActions
 		$email = trim($email);
 
 		return $this->commit('changeEmail', ['user' => $this, 'email' => Idn::decodeEmail($email)], function ($user, $email) {
-			$user = $user->clone(['email' => $email]);
-			$user->updateCredentials(['email' => $email]);
+			$user = $user->clone([
+				'email' => $email
+			]);
+
+			$user->updateCredentials([
+				'email' => $email
+			]);
+
+			// update the users collection
+			$user->kirby()->users()->set($user->id(), $user);
 
 			return $user;
 		});
@@ -48,8 +56,16 @@ trait UserActions
 	public function changeLanguage(string $language): static
 	{
 		return $this->commit('changeLanguage', ['user' => $this, 'language' => $language], function ($user, $language) {
-			$user = $user->clone(['language' => $language]);
-			$user->updateCredentials(['language' => $language]);
+			$user = $user->clone([
+				'language' => $language,
+			]);
+
+			$user->updateCredentials([
+				'language' => $language
+			]);
+
+			// update the users collection
+			$user->kirby()->users()->set($user->id(), $user);
 
 			return $user;
 		});
@@ -63,8 +79,16 @@ trait UserActions
 		$name = trim($name);
 
 		return $this->commit('changeName', ['user' => $this, 'name' => $name], function ($user, $name) {
-			$user = $user->clone(['name' => $name]);
-			$user->updateCredentials(['name' => $name]);
+			$user = $user->clone([
+				'name' => $name
+			]);
+
+			$user->updateCredentials([
+				'name' => $name
+			]);
+
+			// update the users collection
+			$user->kirby()->users()->set($user->id(), $user);
 
 			return $user;
 		});
@@ -82,10 +106,13 @@ trait UserActions
 	): static {
 		return $this->commit('changePassword', ['user' => $this, 'password' => $password], function ($user, $password) {
 			$user = $user->clone([
-				'password' => $password = static::hashPassword($password)
+				'password' => $password = User::hashPassword($password)
 			]);
 
 			$user->writePassword($password);
+
+			// update the users collection
+			$user->kirby()->users()->set($user->id(), $user);
 
 			// keep the user logged in to the current browser
 			// if they changed their own password
@@ -104,8 +131,16 @@ trait UserActions
 	public function changeRole(string $role): static
 	{
 		return $this->commit('changeRole', ['user' => $this, 'role' => $role], function ($user, $role) {
-			$user = $user->clone(['role' => $role]);
-			$user->updateCredentials(['role' => $role]);
+			$user = $user->clone([
+				'role' => $role,
+			]);
+
+			$user->updateCredentials([
+				'role' => $role
+			]);
+
+			// update the users collection
+			$user->kirby()->users()->set($user->id(), $user);
 
 			return $user;
 		});
@@ -136,10 +171,10 @@ trait UserActions
 	/**
 	 * Commits a user action, by following these steps
 	 *
-	 * 1. applies the `before` hook
-	 * 2. checks the action rules
+	 * 1. checks the action rules
+	 * 2. sends the before hook
 	 * 3. commits the action
-	 * 4. applies the `after` hook
+	 * 4. sends the after hook
 	 * 5. returns the result
 	 *
 	 * @throws \Kirby\Exception\PermissionException
@@ -150,55 +185,59 @@ trait UserActions
 		Closure $callback
 	): mixed {
 		if ($this->isKirby() === true) {
-			throw new PermissionException(
-				message: 'The Kirby user cannot be changed'
-			);
+			throw new PermissionException('The Kirby user cannot be changed');
 		}
 
-		$commit = new ModelCommit(
-			model: $this,
-			action: $action
-		);
+		$old            = $this->hardcopy();
+		$kirby          = $this->kirby();
+		$argumentValues = array_values($arguments);
 
-		return $commit->call($arguments, $callback);
+		$this->rules()->$action(...$argumentValues);
+		$kirby->trigger('user.' . $action . ':before', $arguments);
+
+		$result = $callback(...$argumentValues);
+
+		$argumentsAfter = match ($action) {
+			'create' => ['user' => $result],
+			'delete' => ['status' => $result, 'user' => $old],
+			default  => ['newUser' => $result, 'oldUser' => $old]
+		};
+
+		$kirby->trigger('user.' . $action . ':after', $argumentsAfter);
+
+		$kirby->cache('pages')->flush();
+		return $result;
 	}
 
 	/**
 	 * Creates a new User from the given props and returns a new User object
 	 */
-	public static function create(array $props): User
+	public static function create(array|null $props = null): User
 	{
-		$input = $props;
-		$props = self::normalizeProps($props);
+		$data = $props;
 
-		// create the instance without content or translations
-		// to avoid that the user is created in memory storage
-		$user = User::factory([
-			...$props,
-			'content'      => null,
-			'translations' => null
+		if (isset($props['email']) === true) {
+			$data['email'] = Idn::decodeEmail($props['email']);
+		}
+
+		if (isset($props['password']) === true) {
+			$data['password'] = User::hashPassword($props['password']);
+		}
+
+		$props['role'] = $props['model'] = strtolower($props['role'] ?? 'default');
+
+		$user = User::factory($data);
+
+		// create a form for the user
+		$form = Form::for($user, [
+			'values' => $props['content'] ?? []
 		]);
 
-		// merge the content with the defaults
-		$props['content'] = [
-			...$user->createDefaultContent(),
-			...$props['content'],
-		];
-
-		// keep the initial storage class
-		$storage = $user->storage()::class;
-
-		// make sure that the temporary user is stored in memory
-		$user->changeStorage(MemoryStorage::class);
-
 		// inject the content
-		$user->setContent($props['content']);
-
-		// inject the translations
-		$user->setTranslations($props['translations'] ?? null);
+		$user = $user->clone(['content' => $form->strings(true)]);
 
 		// run the hook
-		return $user->commit('create', ['user' => $user, 'input' => $input], function ($user) use ($storage) {
+		return $user->commit('create', ['user' => $user, 'input' => $props], function ($user, $props) {
 			$user->writeCredentials([
 				'email'    => $user->email(),
 				'language' => $user->language(),
@@ -207,10 +246,19 @@ trait UserActions
 			]);
 
 			$user->writePassword($user->password());
-			$user->changeStorage($storage);
+
+			// always create users in the default language
+			if ($user->kirby()->multilang() === true) {
+				$languageCode = $user->kirby()->defaultLanguage()->code();
+			} else {
+				$languageCode = null;
+			}
+
+			// add the user to users collection
+			$user->kirby()->users()->add($user);
 
 			// write the user data
-			return $user;
+			return $user->save($user->content()->toArray(), $languageCode);
 		});
 	}
 
@@ -224,8 +272,9 @@ trait UserActions
 		do {
 			try {
 				$id = Str::random($length);
-				UserRules::validId($this, $id);
-				return $id;
+				if (UserRules::validId($this, $id) === true) {
+					return $id;
+				}
 
 				// we can't really test for a random match
 				// @codeCoverageIgnoreStart
@@ -244,51 +293,23 @@ trait UserActions
 	public function delete(): bool
 	{
 		return $this->commit('delete', ['user' => $this], function ($user) {
-			$old = $user->clone();
-
-			// keep the content in iummtable memory storage
-			// to still have access to it in after hooks
-			$user->changeStorage(ImmutableMemoryStorage::class);
-
-			// delete all files individually
-			foreach ($old->files() as $file) {
-				$file->delete();
+			if ($user->exists() === false) {
+				return true;
 			}
 
-			// delete all versions,
-			// the plain text storage handler will then clean
-			// up the directory if it's empty
-			$old->versions()->delete();
+			// delete all public assets for this user
+			Dir::remove($user->mediaRoot());
 
-			// delete the user directory to get rid
-			// of the .htpasswd and index.php files.
-			// we need to solve this at a later point with
-			// something like a credential storage
-			Dir::remove($old->root());
+			// delete the user directory
+			if (Dir::remove($user->root()) !== true) {
+				throw new LogicException('The user directory for "' . $user->email() . '" could not be deleted');
+			}
+
+			// remove the user from users collection
+			$user->kirby()->users()->remove($user);
 
 			return true;
 		});
-	}
-
-	protected static function normalizeProps(array $props): array
-	{
-		$content = $props['content'] ?? [];
-		$role    = $props['role']    ?? 'default';
-
-		if (isset($props['email']) === true) {
-			$props['email'] = Idn::decodeEmail($props['email']);
-		}
-
-		if (isset($props['password']) === true) {
-			$props['password'] = static::hashPassword($props['password']);
-		}
-
-		return [
-			...$props,
-			'content' => $content,
-			'model'   => $props['model'] ?? $role,
-			'role'    => $role
-		];
 	}
 
 	/**
@@ -355,12 +376,10 @@ trait UserActions
 		// set auth user data only if the current user is this user
 		if ($user->isLoggedIn() === true) {
 			$this->kirby()->auth()->setUser($user);
-
-			ModelState::update(
-				method: 'set',
-				current: $user,
-			);
 		}
+
+		// update the users collection
+		$user->kirby()->users()->set($user->id(), $user);
 
 		return $user;
 	}
@@ -376,10 +395,7 @@ trait UserActions
 			$credentials['email'] = Str::lower(trim($credentials['email']));
 		}
 
-		return $this->writeCredentials([
-			...$this->credentials(),
-			...$credentials
-		]);
+		return $this->writeCredentials(array_merge($this->credentials(), $credentials));
 	}
 
 	/**

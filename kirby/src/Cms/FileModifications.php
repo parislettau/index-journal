@@ -129,7 +129,7 @@ trait FileModifications
 			$sizes = $this->kirby()->option('thumbs.srcsets.' . $sizes, []);
 		}
 
-		if (is_array($sizes) === false || $sizes === []) {
+		if (is_array($sizes) === false || empty($sizes) === true) {
 			return null;
 		}
 
@@ -184,12 +184,11 @@ trait FileModifications
 
 		// fallback to content file options
 		if (($options['crop'] ?? false) === true) {
-			$options['crop'] = match (true) {
-				$this instanceof ModelWithContent
-					=> $this->focus()->value() ?? 'center',
-				default
-				=> 'center'
-			};
+			if ($this instanceof ModelWithContent === true) {
+				$options['crop'] = $this->focus()->value() ?? 'center';
+			} else {
+				$options['crop'] = 'center';
+			}
 		}
 
 		// fallback to global config options
@@ -207,9 +206,7 @@ trait FileModifications
 			$result instanceof File === false &&
 			$result instanceof Asset === false
 		) {
-			throw new InvalidArgumentException(
-				message: 'The file::version component must return a File, FileVersion or Asset object'
-			);
+			throw new InvalidArgumentException('The file::version component must return a File, FileVersion or Asset object');
 		}
 
 		return $result;

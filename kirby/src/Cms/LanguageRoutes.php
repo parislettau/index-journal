@@ -129,10 +129,11 @@ class LanguageRoutes
 
 				// if there's just one language,
 				// we take that to render the home page
-				$currentLanguage = match ($languages->count()) {
-					1       => $languages->first(),
-					default => $kirby->defaultLanguage()
-				};
+				if ($languages->count() === 1) {
+					$currentLanguage = $languages->first();
+				} else {
+					$currentLanguage = $kirby->defaultLanguage();
+				}
 
 				// language detection on the home page with / as URL
 				if ($kirby->url() !== $currentLanguage->url()) {

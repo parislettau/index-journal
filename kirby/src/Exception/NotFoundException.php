@@ -3,6 +3,7 @@
 namespace Kirby\Exception;
 
 /**
+ * NotFoundException
  * Thrown when something was not found
  *
  * @package   Kirby Exception

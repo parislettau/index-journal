@@ -33,15 +33,11 @@ class Section extends Component
 	public function __construct(string $type, array $attrs = [])
 	{
 		if (isset($attrs['model']) === false) {
-			throw new InvalidArgumentException(
-				message: 'Undefined section model'
-			);
+			throw new InvalidArgumentException('Undefined section model');
 		}
 
 		if ($attrs['model'] instanceof ModelWithContent === false) {
-			throw new InvalidArgumentException(
-				message: 'Invalid section model'
-			);
+			throw new InvalidArgumentException('Invalid section model');
 		}
 
 		// use the type as fallback for the name
@@ -96,12 +92,11 @@ class Section extends Component
 
 	public function toResponse(): array
 	{
-		return [
+		return array_merge([
 			'status' => 'ok',
 			'code'   => 200,
 			'name'   => $this->name,
-			'type'   => $this->type,
-			...$this->toArray()
-		];
+			'type'   => $this->type
+		], $this->toArray());
 	}
 }

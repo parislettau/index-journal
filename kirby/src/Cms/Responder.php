@@ -5,7 +5,6 @@ namespace Kirby\Cms;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Filesystem\Mime;
 use Kirby\Toolkit\Str;
-use Stringable;
 
 /**
  * Global response configuration
@@ -16,7 +15,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-class Responder implements Stringable
+class Responder
 {
 	/**
 	 * Timestamp when the response expires
@@ -135,7 +134,7 @@ class Responder implements Stringable
 	public function usesCookie(string $name): void
 	{
 		// only add unique names
-		if (in_array($name, $this->usesCookies, true) === false) {
+		if (in_array($name, $this->usesCookies) === false) {
 			$this->usesCookies[] = $name;
 		}
 	}
@@ -188,9 +187,7 @@ class Responder implements Stringable
 			$parsedExpires = strtotime($expires);
 
 			if (is_int($parsedExpires) !== true) {
-				throw new InvalidArgumentException(
-					message: 'Invalid time string "' . $expires . '"'
-				);
+				throw new InvalidArgumentException('Invalid time string "' . $expires . '"');
 			}
 
 			$expires = $parsedExpires;
@@ -296,7 +293,7 @@ class Responder implements Stringable
 			}
 
 			// lazily inject (never override custom headers)
-			return [...$injectedHeaders, ...$this->headers];
+			return array_merge($injectedHeaders, $this->headers);
 		}
 
 		$this->headers = $headers;

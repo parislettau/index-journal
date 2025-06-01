@@ -22,10 +22,10 @@ class FilePicker extends Picker
 	 */
 	public function defaults(): array
 	{
-		return [
-			...parent::defaults(),
-			'text' => '{{ file.filename }}'
-		];
+		$defaults = parent::defaults();
+		$defaults['text'] = '{{ file.filename }}';
+
+		return $defaults;
 	}
 
 	/**
@@ -59,9 +59,7 @@ class FilePicker extends Picker
 			$files instanceof User  => $files->files(),
 			$files instanceof Files => $files,
 
-			default => throw new InvalidArgumentException(
-				message: 'Your query must return a set of files'
-			)
+			default => throw new InvalidArgumentException('Your query must return a set of files')
 		};
 
 		// filter protected and hidden pages

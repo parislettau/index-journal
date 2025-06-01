@@ -287,13 +287,14 @@ class Header
 	 */
 	public static function download(array $params = []): void
 	{
-		$options = [
+		$defaults = [
 			'name'     => 'download',
 			'size'     => false,
 			'mime'     => 'application/force-download',
-			'modified' => time(),
-			...$params
+			'modified' => time()
 		];
+
+		$options = array_merge($defaults, $params);
 
 		header('Pragma: public');
 		header('Cache-Control: no-cache, no-store, must-revalidate');

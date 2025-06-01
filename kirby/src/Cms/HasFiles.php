@@ -43,11 +43,10 @@ trait HasFiles
 	 */
 	public function createFile(array $props, bool $move = false): File
 	{
-		$props = [
-			...$props,
+		$props = array_merge($props, [
 			'parent' => $this,
 			'url'    => null
-		];
+		]);
 
 		return File::create($props, $move);
 	}
@@ -76,7 +75,7 @@ trait HasFiles
 			return Uuid::for($filename, $this->$in())->model();
 		}
 
-		if (str_contains($filename, '/') === true) {
+		if (strpos($filename, '/') !== false) {
 			$path     = dirname($filename);
 			$filename = basename($filename);
 

@@ -27,7 +27,7 @@ class Email
 
 	/**
 	 * Props for the email object; will be passed to the
-	 * \Kirby\Email\Email class
+	 * Kirby\Email\Email class
 	 */
 	protected array $props;
 
@@ -42,7 +42,8 @@ class Email
 		$this->options = App::instance()->option('email', []);
 
 		// build a prop array based on preset and props
-		$this->props = [...$this->preset($preset), ...$props];
+		$preset = $this->preset($preset);
+		$this->props = array_merge($preset, $props);
 
 		// add transport settings
 		$this->props['transport'] ??= $this->options['transport'] ?? [];
@@ -78,10 +79,10 @@ class Email
 
 		// preset does not exist
 		if (isset($this->options['presets'][$preset]) !== true) {
-			throw new NotFoundException(
-				key: 'email.preset.notFound',
-				data: ['name' => $preset]
-			);
+			throw new NotFoundException([
+				'key'  => 'email.preset.notFound',
+				'data' => ['name' => $preset]
+			]);
 		}
 
 		return $this->options['presets'][$preset];
@@ -103,20 +104,20 @@ class Email
 			$html = $this->getTemplate($this->props['template'], 'html');
 			$text = $this->getTemplate($this->props['template'], 'text');
 
-			if ($html->exists() === true) {
-				$this->props['body'] = ['html' => $html->render($data)];
+			if ($html->exists()) {
+				$this->props['body'] = [
+					'html' => $html->render($data)
+				];
 
-				if ($text->exists() === true) {
+				if ($text->exists()) {
 					$this->props['body']['text'] = $text->render($data);
 				}
 
-			// fallback to single email text template
-			} elseif ($text->exists() === true) {
+				// fallback to single email text template
+			} elseif ($text->exists()) {
 				$this->props['body'] = $text->render($data);
 			} else {
-				throw new NotFoundException(
-					message: 'The email template "' . $this->props['template'] . '" cannot be found'
-				);
+				throw new NotFoundException('The email template "' . $this->props['template'] . '" cannot be found');
 			}
 		}
 	}
@@ -189,9 +190,7 @@ class Email
 				}
 			} else {
 				// invalid input
-				throw new InvalidArgumentException(
-					message: 'Invalid input for prop "' . $prop . '", expected string or "' . $class . '" object or collection'
-				);
+				throw new InvalidArgumentException('Invalid input for prop "' . $prop . '", expected string or "' . $class . '" object or collection');
 			}
 		}
 
@@ -236,11 +235,6 @@ class Email
 	 */
 	protected function transformUserMultiple(string $prop): void
 	{
-		$this->props[$prop] = $this->transformModel(
-			$prop,
-			User::class,
-			'name',
-			'email'
-		);
+		$this->props[$prop] = $this->transformModel($prop, User::class, 'name', 'email');
 	}
 }

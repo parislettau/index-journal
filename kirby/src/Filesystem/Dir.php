@@ -76,7 +76,7 @@ class Dir
 
 			if (
 				is_array($ignore) === true &&
-				in_array($root, $ignore, true) === true
+				in_array($root, $ignore) === true
 			) {
 				continue;
 			}
@@ -145,8 +145,8 @@ class Dir
 	/**
 	 * Read the directory and all subdirectories
 	 *
-	 * @todo Remove support for `$ignore = null` in v6
-	 * @param array|false|null $ignore Array of absolute file paths;
+	 * @todo Remove support for `$ignore = null` in a major release
+	 * @param array|false|null $ignore Array of absolut file paths;
 	 *                                 `false` to disable `Dir::$ignore` list
 	 *                                 (passing null is deprecated)
 	 */
@@ -165,7 +165,7 @@ class Dir
 
 			if (
 				is_array($ignore) === true &&
-				in_array($root, $ignore, true) === true
+				in_array($root, $ignore) === true
 			) {
 				continue;
 			}
@@ -189,7 +189,7 @@ class Dir
 	 */
 	public static function isEmpty(string $dir): bool
 	{
-		return static::read($dir) === [];
+		return count(static::read($dir)) === 0;
 	}
 
 	/**
@@ -247,10 +247,7 @@ class Dir
 		// loop through all directory items and collect all relevant information
 		foreach ($items as $item) {
 			// ignore all items with a leading dot or underscore
-			if (
-				str_starts_with($item, '.') ||
-				str_starts_with($item, '_')
-			) {
+			if (in_array(substr($item, 0, 1), ['.', '_']) === true) {
 				continue;
 			}
 
@@ -270,7 +267,7 @@ class Dir
 			$extension = pathinfo($item, PATHINFO_EXTENSION);
 
 			// don't track files with these extensions
-			if (in_array($extension, ['htm', 'html', 'php'], true) === true) {
+			if (in_array($extension, ['htm', 'html', 'php']) === true) {
 				continue;
 			}
 
@@ -322,7 +319,7 @@ class Dir
 		}
 
 		// determine the model
-		if (Page::$models !== []) {
+		if (empty(Page::$models) === false) {
 			if ($multilang === true) {
 				$code = App::instance()->defaultLanguage()->code();
 				$contentExtension = $code . '.' . $contentExtension;
@@ -453,10 +450,7 @@ class Dir
 				true  => filemtime($dir . '/' . $item),
 				false => static::modified($dir . '/' . $item)
 			};
-
-			if ($newModified > $modified) {
-				$modified = $newModified;
-			}
+			$modified = ($newModified > $modified) ? $newModified : $modified;
 		}
 
 		return Str::date($modified, $format, $handler);
@@ -521,7 +515,7 @@ class Dir
 
 		// create the ignore pattern
 		$ignore ??= static::$ignore;
-		$ignore   = [...$ignore, '.', '..'];
+		$ignore   = array_merge($ignore, ['.', '..']);
 
 		// scan for all files and dirs
 		$result = array_values((array)array_diff(scandir($dir), $ignore));
@@ -577,7 +571,7 @@ class Dir
 		}
 
 		foreach (scandir($dir) as $childName) {
-			if (in_array($childName, ['.', '..'], true) === true) {
+			if (in_array($childName, ['.', '..']) === true) {
 				continue;
 			}
 

@@ -99,9 +99,7 @@ class PHPMailer extends Email
 			$mailer = $beforeSend->call($this, $mailer) ?? $mailer;
 
 			if ($mailer instanceof Mailer === false) {
-				throw new InvalidArgumentException(
-					message: '"beforeSend" option return should be instance of PHPMailer\PHPMailer\PHPMailer class'
-				);
+				throw new InvalidArgumentException('"beforeSend" option return should be instance of PHPMailer\PHPMailer\PHPMailer class');
 			}
 		}
 

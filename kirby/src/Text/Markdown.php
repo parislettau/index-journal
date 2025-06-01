@@ -45,16 +45,14 @@ class Markdown
 	 */
 	public function __construct(array $options = [])
 	{
-		$this->options = [...$this->defaults(), ...$options];
+		$this->options = array_merge($this->defaults(), $options);
 	}
 
 	/**
 	 * Parses the given text and returns the HTML
 	 */
-	public function parse(
-		string|null $text = null,
-		bool $inline = false
-	): string {
+	public function parse(string|null $text = null, bool $inline = false): string
+	{
 		$parser = match ($this->options['extra']) {
 			true    => new ParsedownExtra(),
 			default => new Parsedown()

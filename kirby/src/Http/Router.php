@@ -63,9 +63,7 @@ class Router
 
 		foreach ($routes as $props) {
 			if (isset($props['pattern'], $props['action']) === false) {
-				throw new InvalidArgumentException(
-					message: 'Invalid route parameters'
-				);
+				throw new InvalidArgumentException('Invalid route parameters');
 			}
 
 			$patterns = A::wrap($props['pattern']);
@@ -165,10 +163,7 @@ class Router
 		array|null $ignore = null
 	): Route {
 		if (isset($this->routes[$method]) === false) {
-			throw new InvalidArgumentException(
-				message: 'Invalid routing method: ' . $method,
-				code: 400
-			);
+			throw new InvalidArgumentException('Invalid routing method: ' . $method, 400);
 		}
 
 		// remove leading and trailing slashes
@@ -180,17 +175,14 @@ class Router
 			if ($arguments !== false) {
 				if (
 					empty($ignore) === true ||
-					in_array($route, $ignore, true) === false
+					in_array($route, $ignore) === false
 				) {
 					return $this->route = $route;
 				}
 			}
 		}
 
-		throw new Exception(
-			code: 404,
-			message: 'No route found for path: "' . $path . '" and request method: "' . $method . '"',
-		);
+		throw new Exception('No route found for path: "' . $path . '" and request method: "' . $method . '"', 404);
 	}
 
 	/**

@@ -7,11 +7,8 @@ return [
 		 * Available layouts: `list`, `cardlets`, `cards`
 		 */
 		'layout' => function (string $layout = 'list') {
-			return match ($layout) {
-				'cards'    => 'cards',
-				'cardlets' => 'cardlets',
-				default    => 'list'
-			};
+			$layouts = ['list', 'cardlets', 'cards'];
+			return in_array($layout, $layouts) ? $layout : 'list';
 		},
 
 		/**

@@ -61,17 +61,13 @@ class Obj extends stdClass
 			$fallback ??= [];
 
 			if (is_array($fallback) === false) {
-				throw new InvalidArgumentException(
-					message: 'The fallback value must be an array when getting multiple properties'
-				);
+				throw new InvalidArgumentException('The fallback value must be an array when getting multiple properties');
 			}
 
 			$result = [];
-
 			foreach ($property as $key) {
 				$result[$key] = $this->$key ?? $fallback[$key] ?? null;
 			}
-
 			return $result;
 		}
 
@@ -86,12 +82,14 @@ class Obj extends stdClass
 		$result = [];
 
 		foreach ((array)$this as $key => $value) {
-			$result[$key] = match (true) {
-				is_object($value) === true && method_exists($value, 'toArray')
-					=> $value->toArray(),
-				default
-				=> $value
-			};
+			if (
+				is_object($value) === true &&
+				method_exists($value, 'toArray')
+			) {
+				$result[$key] = $value->toArray();
+			} else {
+				$result[$key] = $value;
+			}
 		}
 
 		return $result;

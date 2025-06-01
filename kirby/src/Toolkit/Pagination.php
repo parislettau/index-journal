@@ -63,9 +63,7 @@ class Pagination
 		// otherwise limit the page number to the bounds
 		if ($this->page < $min || $this->page > $max) {
 			if (static::$validate === true) {
-				throw new ErrorPageException(
-					message: 'Pagination page ' . $this->page . ' does not exist, expected ' . $min . '-' . $max
-				);
+				throw new ErrorPageException('Pagination page ' . $this->page . ' does not exist, expected ' . $min . '-' . $max);
 			}
 
 			$this->page = max(min($this->page, $max), $min);
@@ -337,9 +335,7 @@ class Pagination
 	protected function setLimit(int $limit = 20): static
 	{
 		if ($limit < 1) {
-			throw new Exception(
-				message: 'Invalid pagination limit: ' . $limit
-			);
+			throw new Exception('Invalid pagination limit: ' . $limit);
 		}
 
 		$this->limit = $limit;
@@ -354,9 +350,7 @@ class Pagination
 	protected function setTotal(int $total = 0): static
 	{
 		if ($total < 0) {
-			throw new Exception(
-				message: 'Invalid total number of items: ' . $total
-			);
+			throw new Exception('Invalid total number of items: ' . $total);
 		}
 
 		$this->total = $total;
@@ -375,9 +369,7 @@ class Pagination
 		// if $page is null, it is set to a default in the setProperties() method
 		if ($page !== null) {
 			if (is_numeric($page) !== true || $page < 0) {
-				throw new Exception(
-					message: 'Invalid page number: ' . $page
-				);
+				throw new Exception('Invalid page number: ' . $page);
 			}
 
 			$this->page = (int)$page;

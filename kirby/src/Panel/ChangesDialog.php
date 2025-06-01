@@ -2,77 +2,70 @@
 
 namespace Kirby\Panel;
 
-use Kirby\Cms\Collection;
-use Kirby\Content\Changes;
+use Kirby\Cms\App;
+use Kirby\Cms\Find;
+use Kirby\Http\Uri;
+use Kirby\Toolkit\Escape;
+use Throwable;
 
-/**
- * Manages the Panel dialog for content changes in
- * pages, users and files
- * @since 5.0.0
- *
- * @package   Kirby Panel
- * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      https://getkirby.com
- * @copyright Bastian Allgeier
- * @license   https://getkirby.com/license
- */
 class ChangesDialog
 {
-	public function __construct(
-		protected Changes $changes = new Changes()
-	) {
-	}
-
-	/**
-	 * Returns the item props for all changed files
-	 */
-	public function files(): array
+	public function changes(array $ids = []): array
 	{
-		return $this->items($this->changes->files());
-	}
+		$kirby     = App::instance();
+		$multilang = $kirby->multilang();
+		$changes   = [];
 
-	/**
-	 * Helper method to return item props for the given models
-	 */
-	public function items(Collection $models): array
-	{
-		return $models->values(
-			fn ($model) => $model->panel()->dropdownOption()
-		);
-	}
+		foreach ($ids as $id) {
+			try {
+				// parse the given ID to extract
+				// the path and an optional query
+				$uri   = new Uri($id);
+				$path  = $uri->path()->toString();
+				$query = $uri->query();
+				$model = Find::parent($path);
+				$item  = $model->panel()->dropdownOption();
 
-	/**
-	 * Returns the backend full definition for dialog
-	 */
-	public function load(): array
-	{
-		if ($this->changes->cacheExists() === false) {
-			$this->changes->generateCache();
+				// add the language to each option, if it is included in the query
+				// of the given ID and the language actually exists
+				if (
+					$multilang &&
+					$query->language &&
+					$language = $kirby->language($query->language)
+				) {
+					$item['text'] .= ' (' . $language->code() . ')';
+					$item['link'] .= '?language=' . $language->code();
+				}
+
+				$item['text'] = Escape::html($item['text']);
+
+				$changes[] = $item;
+			} catch (Throwable) {
+				continue;
+			}
 		}
 
+		return $changes;
+	}
+
+	public function load(): array
+	{
+		return $this->state();
+	}
+
+	public function state(bool $loading = true, array $changes = [])
+	{
 		return [
 			'component' => 'k-changes-dialog',
 			'props'     => [
-				'files' => $this->files(),
-				'pages' => $this->pages(),
-				'users' => $this->users(),
+				'changes' => $changes,
+				'loading' => $loading
 			]
 		];
 	}
 
-	/**
-	 * Returns the item props for all changed pages
-	 */
-	public function pages(): array
+	public function submit(array $ids): array
 	{
-		return $this->items($this->changes->pages());
-	}
-
-	/**
-	 * Returns the item props for all changed users
-	 */
-	public function users(): array
-	{
-		return $this->items($this->changes->users());
+		return $this->state(false, $this->changes($ids));
 	}
 }

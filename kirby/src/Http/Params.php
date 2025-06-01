@@ -4,7 +4,6 @@ namespace Kirby\Http;
 
 use Kirby\Toolkit\Obj;
 use Kirby\Toolkit\Str;
-use Stringable;
 
 /**
  * A wrapper around a URL params
@@ -17,7 +16,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class Params extends Obj implements Stringable
+class Params extends Obj
 {
 	public static string|null $separator = null;
 
@@ -49,7 +48,7 @@ class Params extends Obj implements Stringable
 		$slash = false;
 
 		if (is_string($path) === true) {
-			$slash = str_ends_with($path, '/') === true;
+			$slash = substr($path, -1, 1) === '/';
 			$path  = Str::split($path, '/');
 		}
 
@@ -58,7 +57,7 @@ class Params extends Obj implements Stringable
 			$separator = static::separator();
 
 			foreach ($path as $index => $p) {
-				if (str_contains($p, $separator) === false) {
+				if (strpos($p, $separator) === false) {
 					continue;
 				}
 
@@ -138,7 +137,7 @@ class Params extends Obj implements Stringable
 			}
 		}
 
-		if ($params === []) {
+		if (empty($params) === true) {
 			return '';
 		}
 

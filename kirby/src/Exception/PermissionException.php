@@ -3,6 +3,7 @@
 namespace Kirby\Exception;
 
 /**
+ * PermissionException
  * Thrown when the current user has insufficient
  * permissions for the action
  *

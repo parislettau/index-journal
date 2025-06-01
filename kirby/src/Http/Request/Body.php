@@ -2,8 +2,6 @@
 
 namespace Kirby\Http\Request;
 
-use Stringable;
-
 /**
  * The Body class parses the
  * request body and provides a nice
@@ -16,7 +14,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class Body implements Stringable
+class Body
 {
 	use Data;
 
@@ -86,7 +84,7 @@ class Body implements Stringable
 			return $this->data = $json;
 		}
 
-		if (str_contains($contents, '=') === true) {
+		if (strstr($contents, '=') !== false) {
 			// try to parse the body as query string
 			parse_str($contents, $parsed);
 

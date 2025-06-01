@@ -102,14 +102,12 @@ class Snippet extends Tpl
 		// is only supported if the snippet has
 		// been started before
 		if ($this->open === false) {
-			throw new LogicException(
-				message: 'The snippet has not been opened'
-			);
+			throw new LogicException('The snippet has not been opened');
 		}
 
 		// create a default slot for the content
 		// that has been captured between start and end
-		if ($this->slots === []) {
+		if (empty($this->slots) === true) {
 			$this->slots['default'] = new Slot('default');
 			$this->slots['default']->content = ob_get_clean();
 		} else {
@@ -293,21 +291,19 @@ class Snippet extends Tpl
 	): array {
 		// initialize a dummy slots object and cache it for better performance
 		$slots ??= static::$dummySlots ??= new Slots([]);
-		$data    = [...App::instance()->data, ...$data];
+
+		$data = array_merge(App::instance()->data, $data);
 
 		if (
 			array_key_exists('slot', $data) === true ||
 			array_key_exists('slots', $data) === true
 		) {
-			throw new InvalidArgumentException(
-				message: 'Passing the $slot or $slots variables to snippets is not supported.'
-			);
+			throw new InvalidArgumentException('Passing the $slot or $slots variables to snippets is not supported.');
 		}
 
-		return [
-			...$data,
+		return array_merge($data, [
 			'slot'  => $slots->default,
 			'slots' => $slots,
-		];
+		]);
 	}
 }

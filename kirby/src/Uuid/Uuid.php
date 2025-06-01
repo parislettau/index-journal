@@ -14,7 +14,6 @@ use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\LogicException;
 use Kirby\Exception\NotFoundException;
 use Kirby\Toolkit\Str;
-use Stringable;
 
 /**
  * The `Uuid` classes provide an interface to connect
@@ -23,7 +22,7 @@ use Stringable;
  * It also provides methods to cache these connections
  * for faster lookup.
  *
- * ```php
+ * ```
  * // get UUID string
  * $model->uuid()->toString();
  *
@@ -42,7 +41,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-abstract class Uuid implements Stringable
+abstract class Uuid
 {
 	protected const TYPE = 'uuid';
 
@@ -68,9 +67,7 @@ abstract class Uuid implements Stringable
 	) {
 		// throw exception when globally disabled
 		if (Uuids::enabled() === false) {
-			throw new LogicException(
-				message: 'UUIDs have been disabled via the `content.uuid` config option.'
-			);
+			throw new LogicException('UUIDs have been disabled via the `content.uuid` config option.');
 		}
 
 
@@ -86,9 +83,7 @@ abstract class Uuid implements Stringable
 			// in the rare case that both model and ID string
 			// got passed, make sure they match
 			if ($uuid && $uuid !== $this->uri->toString()) {
-				throw new LogicException(
-					message: 'UUID: can\'t create new instance from both model and UUID string that do not match'
-				);
+				throw new LogicException('UUID: can\'t create new instance from both model and UUID string that do not match');
 			}
 		} elseif ($uuid) {
 			$this->uri = new Uri($uuid);
@@ -138,9 +133,7 @@ abstract class Uuid implements Stringable
 	 */
 	protected function findByCache(): Identifiable|null
 	{
-		throw new LogicException(
-			message: 'UUID class needs to implement the ::findByCache() method'
-		);
+		throw new LogicException('UUID class needs to implement the ::findByCache() method');
 	}
 
 	/**
@@ -152,9 +145,7 @@ abstract class Uuid implements Stringable
 	 */
 	protected function findByIndex(): Identifiable|null
 	{
-		throw new LogicException(
-			message: 'UUID class needs to implement the ::findByIndex() method'
-		);
+		throw new LogicException('UUID class needs to implement the ::findByIndex() method');
 	}
 
 	/**
@@ -181,9 +172,7 @@ abstract class Uuid implements Stringable
 					// TODO: activate for uuid-block-structure-support
 					// 'block'  => new BlockUuid(uuid: $seed, context: $context),
 					// 'struct' => new StructureUuid(uuid: $seed, context: $context),
-					default  => throw new InvalidArgumentException(
-						message: 'Invalid UUID URI: ' . $seed
-					)
+					default  => throw new InvalidArgumentException('Invalid UUID URI: ' . $seed)
 				};
 			}
 
@@ -197,9 +186,7 @@ abstract class Uuid implements Stringable
 				);
 			}
 
-			throw new InvalidArgumentException(
-				message: 'Invalid UUID string: ' . $seed
-			);
+			throw new InvalidArgumentException('Invalid UUID string: ' . $seed);
 		}
 
 		// for model object
@@ -217,9 +204,8 @@ abstract class Uuid implements Stringable
 			// 	=> new BlockUuid(model: $seed, context: $context),
 			// $seed instanceof StructureObject
 			// 	=> new StructureUuid(model: $seed, context: $context),
-			default => throw new InvalidArgumentException(
-				message: 'UUID not supported for: ' . $seed::class
-			)
+			default
+			=> throw new InvalidArgumentException('UUID not supported for: ' . get_class($seed))
 		};
 	}
 
@@ -242,7 +228,7 @@ abstract class Uuid implements Stringable
 			return Str::uuid();
 		}
 
-		return Str::lower(Str::random($length, 'alphaNum'));
+		return Str::random($length, 'alphaNum');
 	}
 
 	/**
@@ -354,9 +340,7 @@ abstract class Uuid implements Stringable
 
 		if ($lazy === false) {
 			if (App::instance()->option('content.uuid.index') === false) {
-				throw new NotFoundException(
-					message: 'Model for UUID ' . $this->uri->toString() . ' could not be found without searching in the site index'
-				);
+				throw new NotFoundException('Model for UUID ' . $this->uri->toString() . ' could not be found without searching in the site index');
 			}
 
 			if ($this->model = $this->findByIndex()) {
@@ -418,7 +402,7 @@ abstract class Uuid implements Stringable
 	}
 
 	/**
-	 * @see self::render()
+	 * @see ::render
 	 */
 	public function __toString(): string
 	{

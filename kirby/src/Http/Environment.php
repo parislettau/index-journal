@@ -112,7 +112,7 @@ class Environment
 
 	/**
 	 * Returns the server's IP address
-	 * @see self::ip()
+	 * @see ::ip
 	 */
 	public function address(): string|null
 	{
@@ -156,13 +156,13 @@ class Environment
 		array|null $options = null,
 		array|null $info = null
 	): array {
-		$options = [
+		$defaults = [
 			'cli'     => null,
-			'allowed' => null,
-			...$options ?? []
+			'allowed' => null
 		];
 
-		$info ??= $_SERVER;
+		$info  ??= $_SERVER;
+		$options = array_merge($defaults, $options ?? []);
 
 		$this->info          = static::sanitize($info);
 		$this->cli           = $this->detectCli($options['cli']);
@@ -178,11 +178,11 @@ class Environment
 		if ($options['allowed'] === '*' || $options['allowed'] === ['*']) {
 			$this->detectAuto(true);
 
-		// fixed environments
+			// fixed environments
 		} elseif (empty($options['allowed']) === false) {
 			$this->detectAllowed($options['allowed']);
 
-		// secure auto-detection
+			// secure auto-detection
 		} else {
 			$this->detectAuto();
 		}
@@ -211,9 +211,7 @@ class Environment
 			$baseUrl = A::first($allowed);
 
 			if (is_string($baseUrl) === false) {
-				throw new InvalidArgumentException(
-					message: 'Invalid allow list setup for base URLs'
-				);
+				throw new InvalidArgumentException('Invalid allow list setup for base URLs');
 			}
 
 			$uri = new Uri($baseUrl, ['slash' => false]);
@@ -250,9 +248,7 @@ class Environment
 			}
 		}
 
-		throw new InvalidArgumentException(
-			message: 'The environment is not allowed'
-		);
+		throw new InvalidArgumentException('The environment is not allowed');
 	}
 
 	/**
@@ -334,7 +330,7 @@ class Environment
 		$term = getenv('TERM');
 
 		if (
-			str_starts_with($sapi, 'cgi') === true &&
+			substr($sapi, 0, 3) === 'cgi' &&
 			$term &&
 			$term !== 'unknown'
 		) {
@@ -533,7 +529,7 @@ class Environment
 
 		$protocols = ['https', 'https, http'];
 
-		return in_array(strtolower($protocol), $protocols, true) === true;
+		return in_array(strtolower($protocol), $protocols) === true;
 	}
 
 	/**
@@ -638,13 +634,13 @@ class Environment
 	/**
 	 * Gets a value from the server environment array
 	 *
-	 * ```php
-	 * // sample output: /var/www/kirby
+	 * <code>
 	 * $server->get('document_root');
+	 * // sample output: /var/www/kirby
 	 *
-	 * // returns the whole server array
 	 * $server->get();
-	 * ```
+	 * // returns the whole server array
+	 * </code>
 	 *
 	 * @param string|false|null $key The key to look for. Pass `false` or `null`
 	 *                               to return the entire server array.
@@ -775,13 +771,13 @@ class Environment
 		$ips = array_unique(array_filter($ips));
 
 		// no known ip? Better not assume it's local
-		if ($ips === []) {
+		if (empty($ips) === true) {
 			return false;
 		}
 
 		// stop as soon as a non-local ip is found
 		foreach ($ips as $ip) {
-			if (in_array($ip, ['::1', '127.0.0.1'], true) === false) {
+			if (in_array($ip, ['::1', '127.0.0.1']) === false) {
 				return false;
 			}
 		}

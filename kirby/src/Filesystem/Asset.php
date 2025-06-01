@@ -27,7 +27,7 @@ class Asset
 	/**
 	 * Relative file path
 	 */
-	protected string $path;
+	protected string|null $path;
 
 
 	/**
@@ -38,12 +38,8 @@ class Asset
 		$this->root = $this->kirby()->root('index') . '/' . $path;
 		$this->url  = $this->kirby()->url('base') . '/' . $path;
 
-		// set relative file path
-		$this->path = dirname($path);
-
-		if ($this->path === '.') {
-			$this->path = '';
-		}
+		$path = dirname($path);
+		$this->path = $path === '.' ? '' : $path;
 	}
 
 	/**
@@ -68,9 +64,7 @@ class Asset
 			return $this->callMethod($method, $arguments);
 		}
 
-		throw new BadMethodCallException(
-			message: 'The method: "' . $method . '" does not exist'
-		);
+		throw new BadMethodCallException('The method: "' . $method . '" does not exist');
 	}
 
 	/**
@@ -79,16 +73,6 @@ class Asset
 	public function id(): string
 	{
 		return $this->root();
-	}
-
-	/**
-	 * Returns the absolute path to the media folder for the file and its versions
-	 * @internal
-	 * @since 5.0.0
-	 */
-	public function mediaDir(): string
-	{
-		return dirname($this->mediaRoot());
 	}
 
 	/**
@@ -102,26 +86,25 @@ class Asset
 	/**
 	 * Returns the relative path starting at the media folder
 	 */
-	public function mediaPath(string|null $filename = null): string
+	public function mediaPath(): string
 	{
-		$filename ??= $this->filename();
-		return 'assets/' . $this->path() . '/' . $this->mediaHash() . '/' . $filename;
+		return 'assets/' . $this->path() . '/' . $this->mediaHash() . '/' . $this->filename();
 	}
 
 	/**
 	 * Returns the absolute path to the file in the public media folder
 	 */
-	public function mediaRoot(string|null $filename = null): string
+	public function mediaRoot(): string
 	{
-		return $this->kirby()->root('media') . '/' . $this->mediaPath($filename);
+		return $this->kirby()->root('media') . '/' . $this->mediaPath();
 	}
 
 	/**
 	 * Returns the absolute Url to the file in the public media folder
 	 */
-	public function mediaUrl(string|null $filename = null): string
+	public function mediaUrl(): string
 	{
-		return $this->kirby()->url('media') . '/' . $this->mediaPath($filename);
+		return $this->kirby()->url('media') . '/' . $this->mediaPath();
 	}
 
 	/**

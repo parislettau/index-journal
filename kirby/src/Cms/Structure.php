@@ -15,8 +15,6 @@ namespace Kirby\Cms;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
- *
- * @extends \Kirby\Cms\Items<\Kirby\Cms\StructureObject>
  */
 class Structure extends Items
 {

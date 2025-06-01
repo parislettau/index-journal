@@ -55,10 +55,9 @@ class Api extends BaseApi
 	 */
 	public function clone(array $props = []): static
 	{
-		return parent::clone([
-			'kirby' => $this->kirby,
-			...$props
-		]);
+		return parent::clone(array_merge([
+			'kirby' => $this->kirby
+		], $props));
 	}
 
 	/**
@@ -195,9 +194,7 @@ class Api extends BaseApi
 		string|null $path = null
 	): mixed {
 		if (!$section = $model->blueprint()?->section($name)) {
-			throw new NotFoundException(
-				message: 'The section "' . $name . '" could not be found'
-			);
+			throw new NotFoundException('The section "' . $name . '" could not be found');
 		}
 
 		$sectionApi = $this->clone([
@@ -219,7 +216,9 @@ class Api extends BaseApi
 	 */
 	public function session(array $options = []): Session
 	{
-		return $this->kirby->session(['detect' => true, ...$options]);
+		return $this->kirby->session(array_merge([
+			'detect' => true
+		], $options));
 	}
 
 	/**
@@ -235,6 +234,7 @@ class Api extends BaseApi
 	 * returns the current authenticated user if no
 	 * id is passed
 	 *
+	 * @param string|null $id User's id
 	 * @throws \Kirby\Exception\NotFoundException if the user for the given id cannot be found
 	 */
 	public function user(string|null $id = null): User|null

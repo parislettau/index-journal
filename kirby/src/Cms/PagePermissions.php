@@ -13,15 +13,7 @@ namespace Kirby\Cms;
  */
 class PagePermissions extends ModelPermissions
 {
-	protected const CATEGORY = 'pages';
-
-	/**
-	 * Used to cache once determined permissions in memory
-	 */
-	protected static function cacheKey(ModelWithContent|Language $model): string
-	{
-		return $model->intendedTemplate()->name();
-	}
+	protected string $category = 'pages';
 
 	protected function canChangeSlug(): bool
 	{

@@ -37,7 +37,6 @@ class Permissions
 			'list'           => true,
 			'read'           => true,
 			'replace'        => true,
-			'sort'           => true,
 			'update'         => true
 		],
 		'languages' => [
@@ -96,9 +95,7 @@ class Permissions
 		// dynamically register the extended actions
 		foreach (static::$extendedActions as $key => $actions) {
 			if (isset($this->actions[$key]) === true) {
-				throw new InvalidArgumentException(
-					message: 'The action ' . $key . ' is already a core action'
-				);
+				throw new InvalidArgumentException('The action ' . $key . ' is already a core action');
 			}
 
 			$this->actions[$key] = $actions;
@@ -180,14 +177,14 @@ class Permissions
 	 */
 	protected function setCategories(array $settings): static
 	{
-		foreach ($settings as $name => $actions) {
-			if (is_bool($actions) === true) {
-				$this->setCategory($name, $actions);
+		foreach ($settings as $categoryName => $categoryActions) {
+			if (is_bool($categoryActions) === true) {
+				$this->setCategory($categoryName, $categoryActions);
 			}
 
-			if (is_array($actions) === true) {
-				foreach ($actions as $action => $setting) {
-					$this->setAction($name, $action, $setting);
+			if (is_array($categoryActions) === true) {
+				foreach ($categoryActions as $actionName => $actionSetting) {
+					$this->setAction($categoryName, $actionName, $actionSetting);
 				}
 			}
 		}
@@ -202,13 +199,11 @@ class Permissions
 	protected function setCategory(string $category, bool $setting): static
 	{
 		if ($this->hasCategory($category) === false) {
-			throw new InvalidArgumentException(
-				message: 'Invalid permissions category'
-			);
+			throw new InvalidArgumentException('Invalid permissions category');
 		}
 
-		foreach ($this->actions[$category] as $action => $actionSetting) {
-			$this->actions[$category][$action] = $setting;
+		foreach ($this->actions[$category] as $actionName => $actionSetting) {
+			$this->actions[$category][$actionName] = $setting;
 		}
 
 		return $this;

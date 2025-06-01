@@ -167,7 +167,7 @@ class Visitor
 	{
 		foreach ($this->acceptedMimeTypes() as $acceptedMime) {
 			// look for direct matches
-			if (in_array($acceptedMime->type(), $mimeTypes, true)) {
+			if (in_array($acceptedMime->type(), $mimeTypes)) {
 				return $acceptedMime->type();
 			}
 

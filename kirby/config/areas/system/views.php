@@ -1,7 +1,6 @@
 <?php
 
 use Kirby\Cms\App;
-use Kirby\Panel\Ui\Buttons\ViewButtons;
 use Kirby\Toolkit\I18n;
 
 return [
@@ -60,12 +59,11 @@ return [
 
 				return [
 					'author'  => empty($authors) ? '–' : $authors,
-					'license' => $plugin->license()->toArray(),
+					'license' => $plugin->license() ?? '–',
 					'name'    => [
 						'text' => $plugin->name() ?? '–',
 						'href' => $plugin->link(),
 					],
-					'status'  => $plugin->license()->status()->toArray(),
 					'version' => $version,
 				];
 			});
@@ -124,14 +122,12 @@ return [
 			return [
 				'component' => 'k-system-view',
 				'props'     => [
-					'buttons'     => fn () =>
-						ViewButtons::view('system')->render(),
 					'environment' => $environment,
 					'exceptions'  => $debugMode ? $exceptions : [],
 					'info'        => $system->info(),
 					'plugins'     => $plugins,
 					'security'    => $security,
-					'urls'        => $sensitive ?? []
+					'urls'        => $sensitive ?? null
 				]
 			];
 		}

@@ -1,6 +1,5 @@
 <?php
 
-use Kirby\Cms\Helpers;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Field\FieldOptions;
 use Kirby\Toolkit\A;
@@ -25,10 +24,8 @@ return [
 		 * The CSS format (hex, rgb, hsl) to display and store the value
 		 */
 		'format' => function (string $format = 'hex'): string {
-			if (in_array($format, ['hex', 'hsl', 'rgb'], true) === false) {
-				throw new InvalidArgumentException(
-					message: 'Unsupported format for color field (supported: hex, rgb, hsl)'
-				);
+			if (in_array($format, ['hex', 'hsl', 'rgb']) === false) {
+				throw new InvalidArgumentException('Unsupported format for color field (supported: hex, rgb, hsl)');
 			}
 
 			return $format;
@@ -38,10 +35,8 @@ return [
 		 * show the `options` as toggles
 		 */
 		'mode' => function (string $mode = 'picker'): string {
-			if (in_array($mode, ['picker', 'input', 'options'], true) === false) {
-				throw new InvalidArgumentException(
-					message: 'Unsupported mode for color field (supported: picker, input, options)'
-				);
+			if (in_array($mode, ['picker', 'input', 'options']) === false) {
+				throw new InvalidArgumentException('Unsupported mode for color field (supported: picker, input, options)');
 			}
 
 			return $mode;
@@ -74,33 +69,30 @@ return [
 				return [];
 			}
 
-			if (
-				is_numeric($options[0]['value']) ||
-				$options[0]['value'] === $options[0]['text']
-			) {
+			$options = match (true) {
 				// simple array of values
 				// or value=text (from Options class)
-				$options = A::map($options, fn ($option) => [
-					'value' => $option['text']
-				]);
+				is_numeric($options[0]['value']) ||
+				$options[0]['value'] === $options[0]['text']
+					=> A::map($options, fn ($option) => [
+						'value' => $option['text']
+					]),
 
-			} elseif ($this->isColor($options[0]['text'])) {
-				// @deprecated 4.0.0
-				// TODO: Remove in Kirby 6
+				// deprecated: name => value, flipping
+				// TODO: start throwing in warning in v5
+				$this->isColor($options[0]['text'])
+					=> A::map($options, fn ($option) => [
+						'value' => $option['text'],
+						// ensure that any HTML in the new text is escaped
+						'text'  => Escape::html($option['value'])
+					]),
 
-				Helpers::deprecated('Color field "' . $this->name . '": the text => value notation for options has been deprecated and will be removed in Kirby 6. Please rewrite your options as value => text.');
-
-				$options = A::map($options, fn ($option) => [
-					'value' => $option['text'],
-					// ensure that any HTML in the new text is escaped
-					'text'  => Escape::html($option['value'])
-				]);
-			} else {
-				$options = A::map($options, fn ($option) => [
+				default
+				=> A::map($options, fn ($option) => [
 					'value' => $option['value'],
 					'text'  => $option['text']
-				]);
-			}
+				]),
+			};
 
 			return $options;
 		}
@@ -129,24 +121,24 @@ return [
 			}
 
 			if ($this->format === 'hex' && $this->isHex($value) === false) {
-				throw new InvalidArgumentException(
-					key: 'validation.color',
-					data: ['format' => 'hex']
-				);
+				throw new InvalidArgumentException([
+					'key'  => 'validation.color',
+					'data' => ['format' => 'hex']
+				]);
 			}
 
 			if ($this->format === 'rgb' && $this->isRgb($value) === false) {
-				throw new InvalidArgumentException(
-					key: 'validation.color',
-					data: ['format' => 'rgb']
-				);
+				throw new InvalidArgumentException([
+					'key'  => 'validation.color',
+					'data' => ['format' => 'rgb']
+				]);
 			}
 
 			if ($this->format === 'hsl' && $this->isHsl($value) === false) {
-				throw new InvalidArgumentException(
-					key: 'validation.color',
-					data: ['format' => 'hsl']
-				);
+				throw new InvalidArgumentException([
+					'key'  => 'validation.color',
+					'data' => ['format' => 'hsl']
+				]);
 			}
 		}
 	]

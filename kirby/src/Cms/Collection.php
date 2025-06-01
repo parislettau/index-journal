@@ -22,40 +22,46 @@ use Kirby\Uuid\Uuid;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
- *
- * @template TValue
- * @extends \Kirby\Toolkit\Collection<TValue>
  */
 class Collection extends BaseCollection
 {
 	use HasMethods;
 
 	/**
-	 * @var \Kirby\Cms\Pagination|null
+	 * Stores the parent object, which is needed
+	 * in some collections to get the finder methods right.
+	 *
+	 * @var object
 	 */
-	protected $pagination;
+	protected $parent;
 
 	/**
-	 * Creates a new Collection with the given objects
+	 * Magic getter function
 	 *
-	 * @param object|null $parent Stores the parent object,
-	 *                            which is needed in some collections
-	 *                            to get the finder methods right
+	 * @param string $key
+	 * @param mixed $arguments
+	 * @return mixed
 	 */
-	public function __construct(
-		iterable $objects = [],
-		protected object|null $parent = null
-	) {
-		foreach ($objects as $object) {
-			$this->add($object);
-		}
-	}
-
 	public function __call(string $key, $arguments)
 	{
 		// collection methods
 		if ($this->hasMethod($key) === true) {
 			return $this->callMethod($key, $arguments);
+		}
+	}
+
+	/**
+	 * Creates a new Collection with the given objects
+	 *
+	 * @param array $objects
+	 * @param object|null $parent
+	 */
+	public function __construct($objects = [], $parent = null)
+	{
+		$this->parent = $parent;
+
+		foreach ($objects as $object) {
+			$this->add($object);
 		}
 	}
 
@@ -66,7 +72,7 @@ class Collection extends BaseCollection
 	 * child classes can override it again to add validation
 	 * and custom behavior depending on the object type
 	 *
-	 * @param TValue $object
+	 * @param object $object
 	 */
 	public function __set(string $id, $object): void
 	{
@@ -78,7 +84,7 @@ class Collection extends BaseCollection
 	 * override from the Toolkit Collection is needed to
 	 * make the CMS collections case-sensitive
 	 */
-	public function __unset(string $id)
+	public function __unset($id)
 	{
 		unset($this->data[$id]);
 	}
@@ -88,13 +94,12 @@ class Collection extends BaseCollection
 	 * an entire second collection to the
 	 * current collection
 	 *
-	 * @param static|TValue|array $object
-	 * @return $this
+	 * @param mixed $object
 	 */
-	public function add($object): static
+	public function add($object)
 	{
 		if ($object instanceof self) {
-			$this->data = [...$this->data, ...$object->data];
+			$this->data = array_merge($this->data, $object->data);
 		} elseif (
 			is_object($object) === true &&
 			method_exists($object, 'id') === true
@@ -110,15 +115,12 @@ class Collection extends BaseCollection
 	/**
 	 * Appends an element to the data array
 	 *
-	 * ```php
-	 * $collection->append($object);
-	 * $collection->append('key', $object);
-	 * ```
-	 *
-	 * @param string|TValue ...$args
-	 * @return $this
+	 * @param mixed ...$args
+	 * @param mixed $key Optional collection key, will be determined from the item if not given
+	 * @param mixed $item
+	 * @return \Kirby\Cms\Collection
 	 */
-	public function append(...$args): static
+	public function append(...$args)
 	{
 		if (count($args) === 1) {
 			// try to determine the key from the provided item
@@ -138,7 +140,8 @@ class Collection extends BaseCollection
 	/**
 	 * Find a single element by an attribute and its value
 	 *
-	 * @return TValue|null
+	 * @param mixed $value
+	 * @return mixed|null
 	 */
 	public function findBy(string $attribute, $value)
 	{
@@ -155,31 +158,28 @@ class Collection extends BaseCollection
 	 * Groups the items by a given field or callback. Returns a collection
 	 * with an item for each group and a collection for each group.
 	 *
-	 * @param string|\Closure $field
+	 * @param string|Closure $field
 	 * @param bool $caseInsensitive Ignore upper/lowercase for group names
+	 * @return \Kirby\Cms\Collection
 	 * @throws \Kirby\Exception\Exception
 	 */
-	public function group(
-		$field,
-		bool $caseInsensitive = true
-	): self {
-		$groups = new self(parent: $this->parent());
-
+	public function group($field, bool $caseInsensitive = true)
+	{
 		if (is_string($field) === true) {
+			$groups = new Collection([], $this->parent());
+
 			foreach ($this->data as $key => $item) {
 				$value = $this->getAttribute($item, $field);
 
 				// make sure that there's always a proper value to group by
 				if (!$value) {
-					throw new InvalidArgumentException(
-						message: 'Invalid grouping value for key: ' . $key
-					);
+					throw new InvalidArgumentException('Invalid grouping value for key: ' . $key);
 				}
 
 				$value = (string)$value;
 
 				// ignore upper/lowercase for group names
-				if ($caseInsensitive) {
+				if ($caseInsensitive === true) {
 					$value = Str::lower($value);
 				}
 
@@ -195,17 +195,14 @@ class Collection extends BaseCollection
 			return $groups;
 		}
 
-		// use the parent method but unwrap the Toolkit collection
-		// and rewrap it as a Cms\Collection instance
-		$groups->data = parent::group($field, $caseInsensitive)->data;
-		return $groups;
+		return parent::group($field, $caseInsensitive);
 	}
 
 	/**
 	 * Checks if the given object or id
 	 * is in the collection
 	 *
-	 * @param string|TValue $key
+	 * @param string|object $key
 	 */
 	public function has($key): bool
 	{
@@ -221,7 +218,7 @@ class Collection extends BaseCollection
 	 * The method will automatically detect objects
 	 * or ids and then search accordingly.
 	 *
-	 * @param string|TValue $needle
+	 * @param string|object $needle
 	 */
 	public function indexOf($needle): int|false
 	{
@@ -235,10 +232,10 @@ class Collection extends BaseCollection
 	/**
 	 * Returns a Collection without the given element(s)
 	 *
-	 * @param string|array|object ...$keys any number of keys,
-	 *                                     passed as individual arguments
+	 * @param mixed ...$keys any number of keys, passed as individual arguments
+	 * @return \Kirby\Cms\Collection
 	 */
-	public function not(string|array|object ...$keys): static
+	public function not(...$keys)
 	{
 		$collection = $this->clone();
 
@@ -262,9 +259,10 @@ class Collection extends BaseCollection
 	/**
 	 * Add pagination and return a sliced set of data.
 	 *
+	 * @param mixed ...$arguments
 	 * @return $this|static
 	 */
-	public function paginate(...$arguments): static
+	public function paginate(...$arguments)
 	{
 		$this->pagination = Pagination::for($this, ...$arguments);
 
@@ -276,9 +274,11 @@ class Collection extends BaseCollection
 	}
 
 	/**
-	 * Get the previously added pagination object
+	 * Get the pagination object
+	 *
+	 * @return \Kirby\Cms\Pagination|null
 	 */
-	public function pagination(): Pagination|null
+	public function pagination()
 	{
 		return $this->pagination;
 	}
@@ -286,7 +286,7 @@ class Collection extends BaseCollection
 	/**
 	 * Returns the parent model
 	 */
-	public function parent(): object|null
+	public function parent()
 	{
 		return $this->parent;
 	}
@@ -294,15 +294,12 @@ class Collection extends BaseCollection
 	/**
 	 * Prepends an element to the data array
 	 *
-	 * ```php
-	 * $collection->prepend($object);
-	 * $collection->prepend('key', $object);
-	 * ```
-	 *
-	 * @param string|TValue ...$args
-	 * @return $this
+	 * @param mixed ...$args
+	 * @param mixed $key Optional collection key, will be determined from the item if not given
+	 * @param mixed $item
+	 * @return \Kirby\Cms\Collection
 	 */
-	public function prepend(...$args): static
+	public function prepend(...$args)
 	{
 		if (count($args) === 1) {
 			// try to determine the key from the provided item
@@ -323,8 +320,10 @@ class Collection extends BaseCollection
 	 * Runs a combination of filter, sort, not,
 	 * offset, limit, search and paginate on the collection.
 	 * Any part of the query is optional.
+	 *
+	 * @return static
 	 */
-	public function query(array $arguments = []): static
+	public function query(array $arguments = [])
 	{
 		$paginate = $arguments['paginate'] ?? null;
 		$search   = $arguments['search'] ?? null;
@@ -334,13 +333,11 @@ class Collection extends BaseCollection
 		$result = parent::query($arguments);
 
 		if (empty($search) === false) {
-			$result = match (true) {
-				is_array($search) => $result->search(
-					$search['query'] ?? null,
-					$search['options'] ?? []
-				),
-				default => $result->search($search)
-			};
+			if (is_array($search) === true) {
+				$result = $result->search($search['query'] ?? null, $search['options'] ?? []);
+			} else {
+				$result = $result->search($search);
+			}
 		}
 
 		if (empty($paginate) === false) {
@@ -353,9 +350,9 @@ class Collection extends BaseCollection
 	/**
 	 * Removes an object
 	 *
-	 * @param string|TValue $key the name of the key
+	 * @param mixed $key the name of the key
 	 */
-	public function remove(string|object $key): static
+	public function remove($key)
 	{
 		if (is_object($key) === true) {
 			$key = $key->id();
@@ -381,22 +378,6 @@ class Collection extends BaseCollection
 	 */
 	public function toArray(Closure|null $map = null): array
 	{
-		return parent::toArray(
-			$map ?? fn ($object) => $object->toArray()
-		);
-	}
-
-	/**
-	 * Updates an object in the collection
-	 *
-	 * @return $this
-	 */
-	public function update(string|object $key, $object = null): static
-	{
-		if (is_object($key) === true) {
-			return $this->update($key->id(), $key);
-		}
-
-		return $this->set($key, $object);
+		return parent::toArray($map ?? fn ($object) => $object->toArray());
 	}
 }

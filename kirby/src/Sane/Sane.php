@@ -5,7 +5,6 @@ namespace Kirby\Sane;
 use Kirby\Exception\LogicException;
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
-use Kirby\Toolkit\A;
 
 /**
  * The `Sane` class validates that files
@@ -72,9 +71,7 @@ class Sane
 			return null;
 		}
 
-		throw new NotFoundException(
-			message: 'Missing handler for type: "' . $type . '"'
-		);
+		throw new NotFoundException('Missing handler for type: "' . $type . '"');
 	}
 
 	/**
@@ -84,11 +81,8 @@ class Sane
 	 * @param bool $isExternal Whether the string is from an external file
 	 *                         that may be accessed directly
 	 */
-	public static function sanitize(
-		string $string,
-		string $type,
-		bool $isExternal = false
-	): string {
+	public static function sanitize(string $string, string $type, bool $isExternal = false): string
+	{
 		return static::handler($type)->sanitize($string, $isExternal);
 	}
 
@@ -129,9 +123,10 @@ class Sane
 			default:
 				// more than one matching handler;
 				// sanitizing with all handlers will not leave much in the output
+				$handlerNames = array_map('get_class', $handlers);
 				throw new LogicException(
 					'Cannot sanitize file as more than one handler applies: ' .
-					implode(', ', A::map($handlers, fn ($handler) => $handler::class))
+					implode(', ', $handlerNames)
 				);
 		}
 	}
@@ -199,12 +194,12 @@ class Sane
 
 		foreach ($options as $option) {
 			$handler      = static::handler($option, $lazy);
-			$handlerClass = $handler ? $handler::class : null;
+			$handlerClass = $handler ? get_class($handler) : null;
 
 			// ensure that each handler class is only returned once
 			if (
 				$handler &&
-				in_array($handlerClass, $handlerClasses, true) === false
+				in_array($handlerClass, $handlerClasses) === false
 			) {
 				$handlers[]       = $handler;
 				$handlerClasses[] = $handlerClass;

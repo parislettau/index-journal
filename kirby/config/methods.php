@@ -2,7 +2,6 @@
 
 use Kirby\Cms\App;
 use Kirby\Cms\Blocks;
-use Kirby\Cms\Collection;
 use Kirby\Cms\File;
 use Kirby\Cms\Files;
 use Kirby\Cms\Html;
@@ -81,9 +80,7 @@ return function (App $app) {
 					$message .= ' on parent "' . $parent->title() . '"';
 				}
 
-				throw new InvalidArgumentException(
-					message: $message
-				);
+				throw new InvalidArgumentException($message);
 			}
 		},
 
@@ -131,18 +128,6 @@ return function (App $app) {
 			}
 
 			return Str::date($time, $format);
-		},
-
-		/**
-		 * Parse yaml entries data and convert it to a
-		 * collection of field objects
-		 */
-		'toEntries' => function (Field $field): Collection {
-			$entries = new Collection(parent: $field->parent());
-			foreach ($field->yaml() as $index => $entry) {
-				$entries->append(new Field($field->parent(), $index, $entry));
-			}
-			return $entries;
 		},
 
 		/**
@@ -281,9 +266,7 @@ return function (App $app) {
 					$message .= ' on parent "' . $parent->id() . '"';
 				}
 
-				throw new InvalidArgumentException(
-					message: $message
-				);
+				throw new InvalidArgumentException($message);
 			}
 		},
 

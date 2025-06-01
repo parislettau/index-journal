@@ -2,7 +2,6 @@
 
 use Kirby\Cms\App;
 use Kirby\Cms\Find;
-use Kirby\Panel\Ui\Buttons\ViewButtons;
 use Kirby\Toolkit\Escape;
 
 return [
@@ -19,11 +18,7 @@ return [
 			return [
 				'component' => 'k-users-view',
 				'props'     => [
-					'buttons' => fn () =>
-						ViewButtons::view('users')
-							->defaults('create')
-							->bind(['role' => $role])
-							->render(),
+					'canCreate' => $kirby->roles()->canBeCreated()->count() > 0,
 					'role' => function () use ($roles, $role) {
 						if ($role) {
 							return $roles[$role] ?? null;

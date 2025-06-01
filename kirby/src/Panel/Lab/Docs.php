@@ -54,7 +54,7 @@ class Docs
 				return [
 					'image' => [
 						'icon' => 'book',
-						'back' => 'light-dark(white, var(--color-gray-800))',
+						'back' => 'white',
 					],
 					'text' => $component,
 					'link' => '/lab/docs/' . $component,
@@ -116,21 +116,14 @@ class Docs
 		return [];
 	}
 
-	public static function exists(string $name): bool
-	{
-		return
-			file_exists(static::file($name, 'dist')) ||
-			file_exists(static::file($name, 'dev'));
-	}
-
-	public static function file(string $name, string $context): string
+	public function file(string $context): string
 	{
 		$root = match ($context) {
-			'dev'  => App::instance()->root('panel') . '/tmp',
-			'dist' => App::instance()->root('panel') . '/dist/ui',
+			'dev'  => $this->kirby->root('panel') . '/tmp',
+			'dist' => $this->kirby->root('panel') . '/dist/ui',
 		};
 
-		$name = Str::after($name, 'k-');
+		$name = Str::after($this->name, 'k-');
 		$name = Str::kebabToCamel($name);
 		return $root . '/' . $name . '.json';
 	}
@@ -140,14 +133,9 @@ class Docs
 		return 'https://github.com/getkirby/kirby/tree/main/panel/' . $this->json['sourceFile'];
 	}
 
-	public static function isInstalled(): bool
+	public static function installed(): bool
 	{
 		return Dir::exists(static::root()) === true;
-	}
-
-	public function isInternal(): bool
-	{
-		return $this->json['tags']['internal']['description'] ?? false;
 	}
 
 	protected function kt(string $text, bool $inline = false): string
@@ -288,10 +276,10 @@ class Docs
 
 	protected function read(): array
 	{
-		$file = static::file($this->name, 'dev');
+		$file = $this->file('dev');
 
 		if (file_exists($file) === false) {
-			$file = static::file($this->name, 'dist');
+			$file = $this->file('dist');
 		}
 
 		return Data::read($file);

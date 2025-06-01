@@ -14,8 +14,6 @@ use Kirby\Toolkit\Collection;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
- *
- * @extends \Kirby\Toolkit\Collection<\Kirby\Query\Argument>
  */
 class Arguments extends Collection
 {

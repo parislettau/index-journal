@@ -2,10 +2,10 @@
 
 namespace Kirby\Exception;
 
+use Kirby\Cms\App;
 use Kirby\Http\Environment;
 use Kirby\Toolkit\I18n;
 use Kirby\Toolkit\Str;
-use Throwable;
 
 /**
  * Exception
@@ -17,8 +17,6 @@ use Throwable;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
- *
- * @todo remove $arg array once all exception throws have been refactored
  */
 class Exception extends \Exception
 {
@@ -28,14 +26,14 @@ class Exception extends \Exception
 	protected array $data;
 
 	/**
-	 * Additional details that are not included in the exception message
-	 */
-	protected array $details;
-
-	/**
 	 * HTTP code that corresponds with the exception
 	 */
 	protected int $httpCode;
+
+	/**
+	 * Additional details that are not included in the exception message
+	 */
+	protected array $details;
 
 	/**
 	 * Whether the exception message could be translated
@@ -58,88 +56,78 @@ class Exception extends \Exception
 	 */
 	private static string $prefix = 'error';
 
-	public function __construct(
-		array|string $args = [], // @deprecated
+	/**
+	 * Class constructor
+	 *
+	 * @param array|string $args Full option array ('key', 'translate', 'fallback',
+	 *                           'data', 'httpCode', 'details' and 'previous') or
+	 *                           just the message string
+	 */
+	public function __construct(array|string $args = [])
+	{
+		// set data and httpCode from provided arguments or defaults
+		$this->data     = $args['data']     ?? static::$defaultData;
+		$this->httpCode = $args['httpCode'] ?? static::$defaultHttpCode;
+		$this->details  = $args['details']  ?? static::$defaultDetails;
 
-		string|null $key = null,
-		array|null $data = null,
-		array|null $details = null,
-		string|null $fallback = null,
-		int|null $httpCode = null,
-		string|null $message = null,
-		Throwable|null $previous = null,
-		bool $translate = true
-	) {
-		$key      ??= $args['key'] ?? null;
-		$fallback ??= $args['fallback'] ?? null;
-		$previous ??= $args['previous'] ?? null;
+		// define the Exception key
+		$key = $args['key'] ?? static::$defaultKey;
 
-		$this->data =
-			$data ??
-			$args['data'] ??
-			static::$defaultData;
-
-		$this->httpCode =
-			$httpCode ??
-			$args['httpCode'] ??
-			static::$defaultHttpCode;
-
-		$this->details =
-			$details ??
-			$args['details'] ??
-			static::$defaultDetails;
-
-		// set the Exception code to the key
-		$this->code = $key ?? static::$defaultKey;
-
-		if (Str::startsWith($this->code, self::$prefix . '.') === false) {
-			$this->code = self::$prefix . '.' . $this->code;
+		if (Str::startsWith($key, self::$prefix . '.') === false) {
+			$key = self::$prefix . '.' . $key;
 		}
 
 		if (is_string($args) === true) {
-			$message ??= $args;
-		}
-
-		if ($message !== null) {
 			$this->isTranslated = false;
-			parent::__construct($message);
-			return;
+			parent::__construct($args);
+		} else {
+			// define whether message can/should be translated
+			$translate =
+				($args['translate'] ?? true) === true &&
+				class_exists(App::class) === true;
+
+			// fallback waterfall for message string
+			$message = null;
+
+			if ($translate === true) {
+				// 1. translation for provided key in current language
+				// 2. translation for provided key in default language
+				if (isset($args['key']) === true) {
+					$message = I18n::translate(self::$prefix . '.' . $args['key']);
+					$this->isTranslated = true;
+				}
+			}
+
+			// 3. provided fallback message
+			if ($message === null) {
+				$message = $args['fallback'] ?? null;
+				$this->isTranslated = false;
+			}
+
+			if ($translate === true) {
+				// 4. translation for default key in current language
+				// 5. translation for default key in default language
+				if ($message === null) {
+					$message = I18n::translate(self::$prefix . '.' . static::$defaultKey);
+					$this->isTranslated = true;
+				}
+			}
+
+			// 6. default fallback message
+			if ($message === null) {
+				$message = static::$defaultFallback;
+				$this->isTranslated = false;
+			}
+
+			// format message with passed data
+			$message = Str::template($message, $this->data, ['fallback' => '-']);
+
+			// handover to Exception parent class constructor
+			parent::__construct($message, 0, $args['previous'] ?? null);
 		}
 
-		// define whether message can/should be translated
-		$translate = $args['translate'] ?? $translate;
-
-		// a. translation for provided key in current language
-		// b. translation for provided key in default language
-		if ($translate === true && $key !== null) {
-			$message = I18n::translate(self::$prefix . '.' . $key);
-			$this->isTranslated = true;
-		}
-
-		// c. provided fallback message
-		if ($message === null) {
-			$message = $fallback;
-			$this->isTranslated = false;
-		}
-
-		// d. translation for default key in current language
-		// e. translation for default key in default language
-		if ($translate === true && $message === null) {
-			$message = I18n::translate(self::$prefix . '.' . static::$defaultKey);
-			$this->isTranslated = true;
-		}
-
-		// f. default fallback message
-		if ($message === null) {
-			$message = static::$defaultFallback;
-			$this->isTranslated = false;
-		}
-
-		// format message with passed data
-		$message = Str::template($message, $this->data, ['fallback' => '-']);
-
-		// hand over to native Exception class constructor
-		parent::__construct($message, 0, $previous);
+		// set the Exception code to the key
+		$this->code = $key;
 	}
 
 	/**
@@ -148,14 +136,14 @@ class Exception extends \Exception
 	 */
 	final public function getFileRelative(): string
 	{
-		$file = $this->getFile();
-		$root = Environment::getGlobally('DOCUMENT_ROOT');
+		$file    = $this->getFile();
+		$docRoot = Environment::getGlobally('DOCUMENT_ROOT');
 
-		if (empty($root) === true) {
-			return $file;
+		if (empty($docRoot) === false) {
+			$file = ltrim(Str::after($file, $docRoot), '/');
 		}
 
-		return ltrim(Str::after($file, $root), '/');
+		return $file;
 	}
 
 	/**
@@ -172,18 +160,7 @@ class Exception extends \Exception
 	 */
 	final public function getDetails(): array
 	{
-		$details = $this->details;
-
-		foreach ($details as $key => $detail) {
-			if ($detail instanceof Throwable) {
-				$details[$key] = [
-					'label'   => $key,
-					'message' => $detail->getMessage(),
-				];
-			}
-		}
-
-		return $details;
+		return $this->details;
 	}
 
 	/**

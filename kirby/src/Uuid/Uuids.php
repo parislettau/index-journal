@@ -93,9 +93,7 @@ class Uuids
 	public static function generate(string $type = 'all'): void
 	{
 		if (static::enabled() === false) {
-			throw new LogicException(
-				message: 'UUIDs have been disabled via the `content.uuid` config option.'
-			);
+			throw new LogicException('UUIDs have been disabled via the `content.uuid` config option.');
 		}
 
 		static::each(
@@ -113,9 +111,7 @@ class Uuids
 	public static function populate(string $type = 'all'): void
 	{
 		if (static::enabled() === false) {
-			throw new LogicException(
-				message: 'UUIDs have been disabled via the `content.uuid` config option.'
-			);
+			throw new LogicException('UUIDs have been disabled via the `content.uuid` config option.');
 		}
 
 		static::each(

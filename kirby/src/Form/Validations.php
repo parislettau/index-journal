@@ -24,11 +24,11 @@ class Validations
 	 */
 	public static function boolean($field, $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			if (is_bool($value) === false) {
-				throw new InvalidArgumentException(
-					key: 'validation.boolean'
-				);
+				throw new InvalidArgumentException([
+					'key' => 'validation.boolean'
+				]);
 			}
 		}
 
@@ -42,10 +42,10 @@ class Validations
 	 */
 	public static function date(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			if (V::date($value) !== true) {
 				throw new InvalidArgumentException(
-					message: V::message('date', $value)
+					V::message('date', $value)
 				);
 			}
 		}
@@ -60,10 +60,10 @@ class Validations
 	 */
 	public static function email(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			if (V::email($value) === false) {
 				throw new InvalidArgumentException(
-					message: V::message('email', $value)
+					V::message('email', $value)
 				);
 			}
 		}
@@ -79,12 +79,12 @@ class Validations
 	public static function max(Field|FieldClass $field, mixed $value): bool
 	{
 		if (
-			$field->isEmptyValue($value) === false &&
+			$field->isEmpty($value) === false &&
 			$field->max() !== null
 		) {
 			if (V::max($value, $field->max()) === false) {
 				throw new InvalidArgumentException(
-					message: V::message('max', $value, $field->max())
+					V::message('max', $value, $field->max())
 				);
 			}
 		}
@@ -100,12 +100,12 @@ class Validations
 	public static function maxlength(Field|FieldClass $field, mixed $value): bool
 	{
 		if (
-			$field->isEmptyValue($value) === false &&
+			$field->isEmpty($value) === false &&
 			$field->maxlength() !== null
 		) {
 			if (V::maxLength($value, $field->maxlength()) === false) {
 				throw new InvalidArgumentException(
-					message: V::message('maxlength', $value, $field->maxlength())
+					V::message('maxlength', $value, $field->maxlength())
 				);
 			}
 		}
@@ -121,12 +121,12 @@ class Validations
 	public static function min(Field|FieldClass $field, mixed $value): bool
 	{
 		if (
-			$field->isEmptyValue($value) === false &&
+			$field->isEmpty($value) === false &&
 			$field->min() !== null
 		) {
 			if (V::min($value, $field->min()) === false) {
 				throw new InvalidArgumentException(
-					message: V::message('min', $value, $field->min())
+					V::message('min', $value, $field->min())
 				);
 			}
 		}
@@ -142,12 +142,12 @@ class Validations
 	public static function minlength(Field|FieldClass $field, mixed $value): bool
 	{
 		if (
-			$field->isEmptyValue($value) === false &&
+			$field->isEmpty($value) === false &&
 			$field->minlength() !== null
 		) {
 			if (V::minLength($value, $field->minlength()) === false) {
 				throw new InvalidArgumentException(
-					message: V::message('minlength', $value, $field->minlength())
+					V::message('minlength', $value, $field->minlength())
 				);
 			}
 		}
@@ -162,7 +162,7 @@ class Validations
 	 */
 	public static function pattern(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			if ($pattern = $field->pattern()) {
 				// ensure that that pattern needs to match the whole
 				// input value from start to end, not just a partial match
@@ -171,7 +171,7 @@ class Validations
 
 				if (V::match($value, '/' . $pattern . '/i') === false) {
 					throw new InvalidArgumentException(
-						message: V::message('match')
+						V::message('match')
 					);
 				}
 			}
@@ -188,13 +188,13 @@ class Validations
 	public static function required(Field|FieldClass $field, mixed $value): bool
 	{
 		if (
-			$field->hasValue() === true &&
 			$field->isRequired() === true &&
-			$field->isEmptyValue($value) === true
+			$field->save() === true &&
+			$field->isEmpty($value) === true
 		) {
-			throw new InvalidArgumentException(
-				key: 'validation.required'
-			);
+			throw new InvalidArgumentException([
+				'key' => 'validation.required'
+			]);
 		}
 
 		return true;
@@ -207,13 +207,13 @@ class Validations
 	 */
 	public static function option(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			$values = array_column($field->options(), 'value');
 
 			if (in_array($value, $values, true) !== true) {
-				throw new InvalidArgumentException(
-					key: 'validation.option'
-				);
+				throw new InvalidArgumentException([
+					'key' => 'validation.option'
+				]);
 			}
 		}
 
@@ -227,13 +227,13 @@ class Validations
 	 */
 	public static function options(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			$values = array_column($field->options(), 'value');
 			foreach ($value as $val) {
 				if (in_array($val, $values, true) === false) {
-					throw new InvalidArgumentException(
-						key: 'validation.option'
-					);
+					throw new InvalidArgumentException([
+						'key' => 'validation.option'
+					]);
 				}
 			}
 		}
@@ -248,10 +248,10 @@ class Validations
 	 */
 	public static function time(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			if (V::time($value) !== true) {
 				throw new InvalidArgumentException(
-					message: V::message('time', $value)
+					V::message('time', $value)
 				);
 			}
 		}
@@ -266,10 +266,10 @@ class Validations
 	 */
 	public static function url(Field|FieldClass $field, mixed $value): bool
 	{
-		if ($field->isEmptyValue($value) === false) {
+		if ($field->isEmpty($value) === false) {
 			if (V::url($value) === false) {
 				throw new InvalidArgumentException(
-					message: V::message('url', $value)
+					V::message('url', $value)
 				);
 			}
 		}

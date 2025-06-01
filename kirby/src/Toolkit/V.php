@@ -39,10 +39,7 @@ class V
 	): array {
 		$errors = static::value($input, $rules, $messages, false);
 
-		return match ($errors) {
-			true    => [],
-			default => $errors
-		};
+		return $errors === true ? [] : $errors;
 	}
 
 	/**
@@ -96,8 +93,7 @@ class V
 						continue;
 					}
 				} else {
-					// If a field is not required and not filled,
-					// no validation should be done.
+					// If a field is not required and not filled, no validation should be done.
 					continue;
 				}
 
@@ -150,11 +146,7 @@ class V
 			$arguments[$parameter->getName()] = $value;
 		}
 
-		return I18n::template(
-			$translationKey,
-			'The "' . $validatorName . '" validation failed',
-			$arguments
-		);
+		return I18n::template($translationKey, 'The "' . $validatorName . '" validation failed', $arguments);
 	}
 
 	/**
@@ -178,33 +170,29 @@ class V
 	): bool|array {
 		$errors = [];
 
-		foreach ($rules as $validator => $options) {
-			if (is_int($validator) === true) {
-				$validator = $options;
-				$options   = [];
+		foreach ($rules as $validatorName => $validatorOptions) {
+			if (is_int($validatorName)) {
+				$validatorName    = $validatorOptions;
+				$validatorOptions = [];
 			}
 
-			if (is_array($options) === false) {
-				$options = [$options];
+			if (is_array($validatorOptions) === false) {
+				$validatorOptions = [$validatorOptions];
 			}
 
-			$validator = strtolower($validator);
+			$validatorName = strtolower($validatorName);
 
-			if (static::$validator($value, ...$options) === false) {
-				$errors[$validator] =
-					$messages[$validator] ??
-					static::message($validator, $value, ...$options);
+			if (static::$validatorName($value, ...$validatorOptions) === false) {
+				$message = $messages[$validatorName] ?? static::message($validatorName, $value, ...$validatorOptions);
+				$errors[$validatorName] = $message;
 
 				if ($fail === true) {
-					throw new Exception($errors[$validator]);
+					throw new Exception($message);
 				}
 			}
 		}
 
-		return match ($errors) {
-			[]      => true,
-			default => $errors
-		};
+		return empty($errors) === true ? true : $errors;
 	}
 
 	/**
@@ -214,29 +202,29 @@ class V
 	 */
 	public static function input(array $input, array $rules): bool
 	{
-		foreach ($rules as $field => $rules) {
-			$value = $input[$field] ?? null;
+		foreach ($rules as $fieldName => $fieldRules) {
+			$fieldValue = $input[$fieldName] ?? null;
 
 			// first check for required fields
 			if (
-				($rules['required'] ?? false) === true &&
-				$value === null
+				($fieldRules['required'] ?? false) === true &&
+				$fieldValue === null
 			) {
-				throw new Exception(sprintf('The "%s" field is missing', $field));
+				throw new Exception(sprintf('The "%s" field is missing', $fieldName));
 			}
 
 			// remove the required rule
-			unset($rules['required']);
+			unset($fieldRules['required']);
 
 			// skip validation for empty fields
-			if ($value === null) {
+			if ($fieldValue === null) {
 				continue;
 			}
 
 			try {
-				static::value($value, $rules);
+				static::value($fieldValue, $fieldRules);
 			} catch (Exception $e) {
-				throw new Exception(sprintf($e->getMessage() . ' for field "%s"', $field));
+				throw new Exception(sprintf($e->getMessage() . ' for field "%s"', $fieldName));
 			}
 		}
 
@@ -347,9 +335,7 @@ V::$validators = [
 			'>='  => $value >= $test,
 			'=='  => $value === $test,
 
-			default => throw new InvalidArgumentException(
-				message: 'Invalid date comparison operator: "' . $operator . '". Allowed operators: "==", "!=", "<", "<=", ">", ">="'
-			)
+			default => throw new InvalidArgumentException('Invalid date comparison operator: "' . $operator . '". Allowed operators: "==", "!=", "<", "<=", ">", ">="')
 		};
 	},
 
@@ -581,19 +567,23 @@ V::$validators = [
 			$value = $value->value();
 		}
 
-		$count = match (true) {
-			is_numeric($value) => $value,
-			is_string($value)  => Str::length(trim($value)),
-			is_array($value)   => count($value),
-			is_object($value)  => match (true) {
-				$value instanceof Countable    => count($value),
-				method_exists($value, 'count') => $value->count(),
-
-				default => throw new Exception('$value is an uncountable object')
-			},
-
-			default => throw new Exception('$value is of type without size')
-		};
+		if (is_numeric($value) === true) {
+			$count = $value;
+		} elseif (is_string($value) === true) {
+			$count = Str::length(trim($value));
+		} elseif (is_array($value) === true) {
+			$count = count($value);
+		} elseif (is_object($value) === true) {
+			if ($value instanceof Countable) {
+				$count = count($value);
+			} elseif (method_exists($value, 'count') === true) {
+				$count = $value->count();
+			} else {
+				throw new Exception('$value is an uncountable object');
+			}
+		} else {
+			throw new Exception('$value is of type without size');
+		}
 
 		return match ($operator) {
 			'<'     => $count < $size,

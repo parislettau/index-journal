@@ -14,8 +14,6 @@ use Kirby\Toolkit\Str;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
- *
- * @extends \Kirby\Toolkit\Collection<string>
  */
 class Path extends Collection
 {
@@ -37,7 +35,7 @@ class Path extends Collection
 		bool $leadingSlash = false,
 		bool $trailingSlash = false
 	): string {
-		if ($this->data === []) {
+		if (empty($this->data) === true) {
 			return '';
 		}
 

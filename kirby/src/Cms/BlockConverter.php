@@ -51,7 +51,7 @@ class BlockConverter
 
 	public static function editorBlocks(array $blocks = []): array
 	{
-		if ($blocks === []) {
+		if (empty($blocks) === true) {
 			return $blocks;
 		}
 
@@ -63,7 +63,7 @@ class BlockConverter
 		$listStart = null;
 
 		foreach ($blocks as $index => $block) {
-			if (in_array($block['type'], ['ul', 'ol'], true) === true) {
+			if (in_array($block['type'], ['ul', 'ol']) === true) {
 				$prev = $blocks[$index - 1] ?? null;
 				$next = $blocks[$index + 1] ?? null;
 
@@ -132,10 +132,12 @@ class BlockConverter
 	public static function editorCustom(array $params): array
 	{
 		return [
-			'content' => [
-				...$params['attrs'] ?? [],
-				'body' => $params['content'] ?? null
-			],
+			'content' => array_merge(
+				$params['attrs'] ?? [],
+				[
+					'body' => $params['content'] ?? null
+				]
+			),
 			'type' => $params['type'] ?? 'unknown'
 		];
 	}

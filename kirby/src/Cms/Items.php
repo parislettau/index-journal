@@ -15,9 +15,6 @@ use Kirby\Exception\InvalidArgumentException;
  * @link      https://getkirby.com
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
- *
- * @template TValue of \Kirby\Cms\Item
- * @extends \Kirby\Cms\Collection<TValue>
  */
 class Items extends Collection
 {
@@ -35,7 +32,7 @@ class Items extends Collection
 	/**
 	 * @var \Kirby\Cms\ModelWithContent
 	 */
-	protected object|null $parent = null;
+	protected $parent;
 
 	public function __construct($objects = [], array $options = [])
 	{
@@ -59,7 +56,7 @@ class Items extends Collection
 		}
 
 		if (is_array($params) === false) {
-			throw new InvalidArgumentException(message: 'Invalid item options');
+			throw new InvalidArgumentException('Invalid item options');
 		}
 
 		// create a new collection of blocks
@@ -67,9 +64,7 @@ class Items extends Collection
 
 		foreach ($items as $item) {
 			if (is_array($item) === false) {
-				throw new InvalidArgumentException(
-					message: 'Invalid data for ' . static::ITEM_CLASS
-				);
+				throw new InvalidArgumentException('Invalid data for ' . static::ITEM_CLASS);
 			}
 
 			// inject properties from the parent

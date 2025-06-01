@@ -2,7 +2,6 @@
 
 namespace Kirby\Cms;
 
-use Kirby\Filesystem\Asset;
 use Kirby\Filesystem\IsFile;
 
 /**
@@ -19,7 +18,7 @@ class FileVersion
 	use IsFile;
 
 	protected array $modifications;
-	protected File|Asset $original;
+	protected $original;
 
 	public function __construct(array $props)
 	{
@@ -109,10 +108,10 @@ class FileVersion
 	 */
 	public function toArray(): array
 	{
-		$array = [
-			...$this->asset()->toArray(),
-			'modifications' => $this->modifications()
-		];
+		$array = array_merge(
+			$this->asset()->toArray(),
+			['modifications' => $this->modifications()]
+		);
 
 		ksort($array);
 

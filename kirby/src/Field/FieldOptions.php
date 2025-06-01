@@ -2,6 +2,7 @@
 
 namespace Kirby\Field;
 
+use Kirby\Blueprint\Node;
 use Kirby\Cms\ModelWithContent;
 use Kirby\Option\Options;
 use Kirby\Option\OptionsApi;
@@ -17,14 +18,14 @@ use Kirby\Option\OptionsQuery;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class FieldOptions
+class FieldOptions extends Node
 {
 	public function __construct(
 		/**
 		 * The option source, either a fixed collection or
 		 * a dynamic provider
 		 */
-		public Options|OptionsProvider $options = new Options(),
+		public Options|OptionsProvider|null $options = null,
 
 		/**
 		 * Whether to escape special HTML characters in
@@ -33,6 +34,13 @@ class FieldOptions
 		 */
 		public bool $safeMode = true
 	) {
+	}
+
+	public function defaults(): static
+	{
+		$this->options ??= new Options();
+
+		return parent::defaults();
 	}
 
 	public static function factory(array $props, bool $safeMode = true): static
@@ -59,7 +67,7 @@ class FieldOptions
 					OptionsQuery::polyfill($props['query'] ?? null),
 
 				default =>
-					['type' => 'query', 'query' => $props['options']]
+					[ 'type' => 'query', 'query' => $props['options']]
 			};
 		}
 
@@ -79,18 +87,22 @@ class FieldOptions
 		return $props;
 	}
 
+	public function resolve(ModelWithContent $model): Options
+	{
+		// apply default values
+		$this->defaults();
+
+		// already Options, return
+		if (is_a($this->options, Options::class) === true) {
+			return $this->options;
+		}
+
+		// resolve OptionsProvider (OptionsApi or OptionsQuery) to Options
+		return $this->options = $this->options->resolve($model, $this->safeMode);
+	}
+
 	public function render(ModelWithContent $model): array
 	{
 		return $this->resolve($model)->render($model);
-	}
-
-	public function resolve(ModelWithContent $model): Options
-	{
-		// resolve OptionsProvider (OptionsApi or OptionsQuery) to Options
-		if ($this->options instanceof OptionsProvider) {
-			return $this->options->resolve($model, $this->safeMode);
-		}
-
-		return $this->options;
 	}
 }

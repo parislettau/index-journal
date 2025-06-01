@@ -19,11 +19,16 @@ use Closure;
 class Ingredients
 {
 	/**
+	 * @var array
+	 */
+	protected $ingredients = [];
+
+	/**
 	 * Creates a new ingredient collection
 	 */
-	public function __construct(
-		protected array $ingredients = []
-	) {
+	public function __construct(array $ingredients)
+	{
+		$this->ingredients = $ingredients;
 	}
 
 	/**

@@ -3,6 +3,7 @@
 namespace Kirby\Exception;
 
 /**
+ * LogicException
  * Thrown for invalid requests that can't work out
  *
  * @package   Kirby Exception

@@ -8,7 +8,6 @@ use Kirby\Cms\Blocks as BlocksCollection;
 use Kirby\Cms\Fieldset;
 use Kirby\Cms\Fieldsets;
 use Kirby\Cms\ModelWithContent;
-use Kirby\Data\Json;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\NotFoundException;
 use Kirby\Form\FieldClass;
@@ -48,11 +47,10 @@ class BlocksField extends FieldClass
 
 	public function blocksToValues(
 		array $blocks,
-		string $to = 'toFormValues'
+		string $to = 'values'
 	): array {
 		$result = [];
 		$fields = [];
-		$forms  = [];
 
 		foreach ($blocks as $block) {
 			try {
@@ -60,10 +58,12 @@ class BlocksField extends FieldClass
 
 				// get and cache fields at the same time
 				$fields[$type] ??= $this->fields($block['type']);
-				$forms[$type]  ??= $this->form($fields[$type]);
 
 				// overwrite the block content with form values
-				$block['content'] = $forms[$type]->reset()->fill(input: $block['content'])->$to();
+				$block['content'] = $this->form(
+					$fields[$type],
+					$block['content']
+				)->$to();
 
 				// create id if not exists
 				$block['id'] ??= Str::uuid();
@@ -101,29 +101,24 @@ class BlocksField extends FieldClass
 	public function fieldsetGroups(): array|null
 	{
 		$groups = $this->fieldsets()->groups();
-		return $groups === [] ? null : $groups;
+		return empty($groups) === true ? null : $groups;
 	}
 
-	/**
-	 * @psalm-suppress MethodSignatureMismatch
-	 * @todo Remove psalm suppress after https://github.com/vimeo/psalm/issues/8673 is fixed
-	 */
-	public function fill(mixed $value): static
+	public function fill(mixed $value = null): void
 	{
 		$value  = BlocksCollection::parse($value);
 		$blocks = BlocksCollection::factory($value)->toArray();
 		$this->value = $this->blocksToValues($blocks);
-
-		return $this;
 	}
 
-	public function form(array $fields): Form
+	public function form(array $fields, array $input = []): Form
 	{
-		return new Form(
-			fields: $fields,
-			model: $this->model,
-			language: 'current'
-		);
+		return new Form([
+			'fields' => $fields,
+			'model'  => $this->model,
+			'strict' => true,
+			'values' => $input,
+		]);
 	}
 
 	public function isEmpty(): bool
@@ -203,13 +198,12 @@ class BlocksField extends FieldClass
 				'action'  => function (
 					string $fieldsetType
 				) use ($field): array {
-					$fields = $field->fields($fieldsetType);
-					$form   = $field->form($fields);
-
-					$form->fill(input: $form->defaults());
+					$fields   = $field->fields($fieldsetType);
+					$defaults = $field->form($fields, [])->data(true);
+					$content  = $field->form($fields, $defaults)->values();
 
 					return Block::factory([
-						'content' => $form->toFormValues(),
+						'content' => $content,
 						'type'    => $fieldsetType
 					])->toArray();
 				}
@@ -227,10 +221,10 @@ class BlocksField extends FieldClass
 
 					$fieldApi = $this->clone([
 						'routes' => $field->api(),
-						'data'   => [
-							...$this->data(),
-							'field' => $field
-						]
+						'data'   => array_merge(
+							$this->data(),
+							['field' => $field]
+						)
 					]);
 
 					return $fieldApi->call(
@@ -241,6 +235,19 @@ class BlocksField extends FieldClass
 				}
 			],
 		];
+	}
+
+	public function store(mixed $value): mixed
+	{
+		$blocks = $this->blocksToValues((array)$value, 'content');
+
+		// returns empty string to avoid storing empty array as string `[]`
+		// and to consistency work with `$field->isEmpty()`
+		if (empty($blocks) === true) {
+			return '';
+		}
+
+		return $this->valueToJson($blocks, $this->pretty());
 	}
 
 	protected function setDefault(mixed $default = null): void
@@ -279,80 +286,61 @@ class BlocksField extends FieldClass
 		$this->pretty = $pretty;
 	}
 
-	public function toStoredValue(bool $default = false): mixed
-	{
-		$value  = $this->toFormValue($default);
-		$blocks = $this->blocksToValues((array)$value, 'toStoredValues');
-
-		// returns empty string to avoid storing empty array as string `[]`
-		// and to consistency work with `$field->isEmpty()`
-		if ($blocks === []) {
-			return '';
-		}
-
-		return Json::encode($blocks, pretty: $this->pretty());
-	}
-
 	public function validations(): array
 	{
 		return [
 			'blocks' => function ($value) {
 				if ($this->min && count($value) < $this->min) {
-					throw new InvalidArgumentException(
-						key: match ($this->min) {
-							1       => 'blocks.min.singular',
-							default => 'blocks.min.plural'
-						},
-						data: ['min' => $this->min]
-					);
+					throw new InvalidArgumentException([
+						'key'  => 'blocks.min.' . ($this->min === 1 ? 'singular' : 'plural'),
+						'data' => [
+							'min' => $this->min
+						]
+					]);
 				}
 
 				if ($this->max && count($value) > $this->max) {
-					throw new InvalidArgumentException(
-						key: match ($this->max) {
-							1       => 'blocks.max.singular',
-							default => 'blocks.max.plural'
-						},
-						data: ['max' => $this->max]
-					);
+					throw new InvalidArgumentException([
+						'key'  => 'blocks.max.' . ($this->max === 1 ? 'singular' : 'plural'),
+						'data' => [
+							'max' => $this->max
+						]
+					]);
 				}
 
-				$forms  = [];
+				$fields = [];
 				$index  = 0;
 
 				foreach ($value as $block) {
 					$index++;
 					$type = $block['type'];
 
-					// create the form for the block
-					// and cache it for later use
-					if (isset($forms[$type]) === false) {
-						try {
-							$fieldset     = $this->fieldset($type);
-							$fields       = $fieldset->fields() ?? [];
-							$forms[$type] = $this->form($fields);
-						} catch (Throwable) {
-							// skip invalid blocks
-							continue;
-						}
+					try {
+						$fieldset    = $this->fieldset($type);
+						$blockFields = $fields[$type] ?? $fieldset->fields() ?? [];
+					} catch (Throwable) {
+						// skip invalid blocks
+						continue;
 					}
 
-					// overwrite the content with the serialized form
-					$form = $forms[$type]->reset()->fill($block['content']);
+					// store the fields for the next round
+					$fields[$type] = $blockFields;
 
+					// overwrite the content with the serialized form
+					$form = $this->form($blockFields, $block['content']);
 					foreach ($form->fields() as $field) {
 						$errors = $field->errors();
 
 						// rough first validation
-						if (count($errors) > 0) {
-							throw new InvalidArgumentException(
-								key:'blocks.validation',
-								data: [
+						if (empty($errors) === false) {
+							throw new InvalidArgumentException([
+								'key' => 'blocks.validation',
+								'data' => [
 									'field'    => $field->label(),
 									'fieldset' => $fieldset->name(),
 									'index'    => $index
 								]
-							);
+							]);
 						}
 					}
 				}

@@ -114,9 +114,7 @@ class PageCreateDialog
 		$slug  = $this->blueprint()->create()['slug'] ?? null;
 
 		if ($title === false || $slug === false) {
-			throw new InvalidArgumentException(
-				message: 'Page create dialog: title and slug must not be false'
-			);
+			throw new InvalidArgumentException('Page create dialog: title and slug must not be false');
 		}
 
 		// title field
@@ -160,21 +158,15 @@ class PageCreateDialog
 
 		foreach ($blueprint->create()['fields'] ?? [] as $name) {
 			if (!$field = ($fields[$name] ?? null)) {
-				throw new InvalidArgumentException(
-					message: 'Unknown field  "' . $name . '" in create dialog'
-				);
+				throw new InvalidArgumentException('Unknown field  "' . $name . '" in create dialog');
 			}
 
-			if (in_array($field['type'], static::$fieldTypes, true) === false) {
-				throw new InvalidArgumentException(
-					message: 'Field type "' . $field['type'] . '" not supported in create dialog'
-				);
+			if (in_array($field['type'], static::$fieldTypes) === false) {
+				throw new InvalidArgumentException('Field type "' . $field['type'] . '" not supported in create dialog');
 			}
 
-			if (in_array($name, $ignore, true) === true) {
-				throw new InvalidArgumentException(
-					message: 'Field name "' . $name . '" not allowed as custom field in create dialog'
-				);
+			if (in_array($name, $ignore) === true) {
+				throw new InvalidArgumentException('Field name "' . $name . '" not allowed as custom field in create dialog');
 			}
 
 			// switch all fields to 1/1
@@ -186,12 +178,13 @@ class PageCreateDialog
 
 		// create form so that field props, options etc.
 		// can be properly resolved
-		$form = new Form(
-			fields: $custom,
-			model: $this->model()
-		);
+		$form = new Form([
+			'fields' => $custom,
+			'model'  => $this->model(),
+			'strict' => true
+		]);
 
-		return $form->fields()->toProps();
+		return $form->fields()->toArray();
 	}
 
 	/**
@@ -227,7 +220,7 @@ class PageCreateDialog
 		);
 
 		// immediately submit the dialog if there is no editable field
-		if ($visible === [] && count($blueprints) < 2) {
+		if (count($visible) === 0 && count($blueprints) < 2) {
 			$input    = $this->value();
 			$response = $this->submit($input);
 			$response['redirect'] ??= $this->parent->panel()->url(true);
@@ -255,6 +248,7 @@ class PageCreateDialog
 	 */
 	public function model(): Page
 	{
+		// TODO: use actual in-memory page in v5
 		return $this->model ??= Page::factory([
 			'slug'     => '__new__',
 			'template' => $this->template,
@@ -304,7 +298,7 @@ class PageCreateDialog
 
 		// create temporary form to sanitize the input
 		// and add default values
-		$form = Form::for($this->model())->fill(input: $content);
+		$form = Form::for($this->model(), ['values' => $content]);
 
 		return [
 			'content'  => $form->strings(true),
@@ -357,12 +351,12 @@ class PageCreateDialog
 		// ensure that all field validations are met
 		if ($status !== 'draft') {
 			// create temporary form to validate the input
-			$form = Form::for($this->model())->fill(input: $input['content']);
+			$form = Form::for($this->model(), ['values' => $input['content']]);
 
 			if ($form->isInvalid() === true) {
-				throw new InvalidArgumentException(
-					key: 'page.changeStatus.incomplete'
-				);
+				throw new InvalidArgumentException([
+					'key' => 'page.changeStatus.incomplete'
+				]);
 			}
 		}
 

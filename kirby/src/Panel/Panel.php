@@ -3,7 +3,6 @@
 namespace Kirby\Panel;
 
 use Closure;
-use Kirby\Api\Upload;
 use Kirby\Cms\App;
 use Kirby\Cms\Url as CmsUrl;
 use Kirby\Cms\User;
@@ -14,7 +13,6 @@ use Kirby\Http\Response;
 use Kirby\Http\Router;
 use Kirby\Http\Uri;
 use Kirby\Http\Url;
-use Kirby\Toolkit\A;
 use Kirby\Toolkit\Str;
 use Kirby\Toolkit\Tpl;
 use Throwable;
@@ -102,20 +100,6 @@ class Panel
 	}
 
 	/**
-	 * Collect all registered buttons from areas
-	 * @since 5.0.0
-	 */
-	public static function buttons(): array
-	{
-		return array_merge(...array_values(
-			A::map(
-				Panel::areas(),
-				fn ($area) => $area['buttons'] ?? []
-			)
-		));
-	}
-
-	/**
 	 * Check for access permissions
 	 */
 	public static function firewall(
@@ -124,9 +108,7 @@ class Panel
 	): bool {
 		// a user has to be logged in
 		if ($user === null) {
-			throw new PermissionException(
-				key: 'access.panel'
-			);
+			throw new PermissionException(['key' => 'access.panel']);
 		}
 
 		// get all access permissions for the user role
@@ -134,9 +116,7 @@ class Panel
 
 		// check for general panel access
 		if (($permissions['panel'] ?? true) !== true) {
-			throw new PermissionException(
-				key: 'access.panel'
-			);
+			throw new PermissionException(['key' => 'access.panel']);
 		}
 
 		// don't check if the area is not defined
@@ -151,29 +131,12 @@ class Panel
 
 		// no access
 		if ($permissions[$areaId] !== true) {
-			throw new PermissionException(
-				key: 'access.view'
-			);
+			throw new PermissionException(['key' => 'access.view']);
 		}
 
 		return true;
 	}
 
-	/**
-	 * Garbage collection which runs with a probability
-	 * of 10% on each Panel request
-	 *
-	 * @since 5.0.0
-	 * @codeCoverageIgnore
-	 */
-	protected static function garbage(): void
-	{
-		// run garbage collection with a chance of 10%;
-		if (mt_rand(1, 10000) <= 0.1 * 10000) {
-			// clean up leftover upload chunks
-			Upload::cleanTmpDir();
-		}
-	}
 
 	/**
 	 * Redirect to a Panel url
@@ -270,11 +233,9 @@ class Panel
 
 		// interpret missing/empty results as not found
 		if ($result === null || $result === false) {
-			$result = new NotFoundException(
-				message: 'The data could not be found'
-			);
+			$result = new NotFoundException('The data could not be found');
 
-		// interpret strings as errors
+			// interpret strings as errors
 		} elseif (is_string($result) === true) {
 			$result = new Exception($result);
 		}
@@ -301,9 +262,6 @@ class Panel
 			return null;
 		}
 
-		// run garbage collection
-		static::garbage();
-
 		// set the translation for Panel UI before
 		// gathering areas and routes, so that the
 		// `t()` helper can already be used
@@ -328,7 +286,8 @@ class Panel
 				// trigger hook
 				$route = $kirby->apply(
 					'panel.route:before',
-					compact('route', 'path', 'method')
+					compact('route', 'path', 'method'),
+					'route'
 				);
 
 				// check for access before executing area routes
@@ -378,15 +337,15 @@ class Panel
 
 		// register all routes from areas
 		foreach ($areas as $areaId => $area) {
-			$routes = [
-				...$routes,
-				...static::routesForViews($areaId, $area),
-				...static::routesForSearches($areaId, $area),
-				...static::routesForDialogs($areaId, $area),
-				...static::routesForDrawers($areaId, $area),
-				...static::routesForDropdowns($areaId, $area),
-				...static::routesForRequests($areaId, $area),
-			];
+			$routes = array_merge(
+				$routes,
+				static::routesForViews($areaId, $area),
+				static::routesForSearches($areaId, $area),
+				static::routesForDialogs($areaId, $area),
+				static::routesForDrawers($areaId, $area),
+				static::routesForDropdowns($areaId, $area),
+				static::routesForRequests($areaId, $area),
+			);
 		}
 
 		// if the Panel is already installed and/or the
@@ -421,15 +380,12 @@ class Panel
 		$routes  = [];
 
 		foreach ($dialogs as $dialogId => $dialog) {
-			$routes = [
-				...$routes,
-				...Dialog::routes(
-					id: $dialogId,
-					areaId: $areaId,
-					prefix: 'dialogs',
-					options: $dialog
-				)
-			];
+			$routes = array_merge($routes, Dialog::routes(
+				id: $dialogId,
+				areaId: $areaId,
+				prefix: 'dialogs',
+				options: $dialog
+			));
 		}
 
 		return $routes;
@@ -444,15 +400,12 @@ class Panel
 		$routes  = [];
 
 		foreach ($drawers as $drawerId => $drawer) {
-			$routes = [
-				...$routes,
-				...Drawer::routes(
-					id: $drawerId,
-					areaId: $areaId,
-					prefix: 'drawers',
-					options: $drawer
-				)
-			];
+			$routes = array_merge($routes, Drawer::routes(
+				id: $drawerId,
+				areaId: $areaId,
+				prefix: 'drawers',
+				options: $drawer
+			));
 		}
 
 		return $routes;
@@ -467,15 +420,12 @@ class Panel
 		$routes    = [];
 
 		foreach ($dropdowns as $dropdownId => $dropdown) {
-			$routes = [
-				...$routes,
-				...Dropdown::routes(
-					id: $dropdownId,
-					areaId: $areaId,
-					prefix: 'dropdowns',
-					options: $dropdown
-				)
-			];
+			$routes = array_merge($routes, Dropdown::routes(
+				id: $dropdownId,
+				areaId: $areaId,
+				prefix: 'dropdowns',
+				options: $dropdown
+			));
 		}
 
 		return $routes;

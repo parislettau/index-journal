@@ -70,6 +70,7 @@ abstract class Cache
 		return $this->expired($key) === false;
 	}
 
+
 	/**
 	 * Calculates the expiration timestamp
 	 */
@@ -131,13 +132,13 @@ abstract class Cache
 	/**
 	 * Gets an item from the cache
 	 *
-	 * ```php
-	 * // get an item from the cache driver
-	 * $value = $cache->get('value');
+	 * <code>
+	 *   // get an item from the cache driver
+	 *   $value = $cache->get('value');
 	 *
-	 * // return a default value if the requested item isn't cached
-	 * $value = $cache->get('value', 'default value');
-	 * ```
+	 *   // return a default value if the requested item isn't cached
+	 *   $value = $cache->get('value', 'default value');
+	 * </code>
 	 */
 	public function get(string $key, $default = null)
 	{
@@ -228,10 +229,10 @@ abstract class Cache
 	 * returns whether the operation was successful;
 	 * this needs to be defined by the driver
 	 *
-	 * ```php
-	 * // put an item in the cache for 15 minutes
-	 * $cache->set('value', 'my value', 15);
-	 * ```
+	 * <code>
+	 *   // put an item in the cache for 15 minutes
+	 *   $cache->set('value', 'my value', 15);
+	 * </code>
 	 */
 	abstract public function set(string $key, $value, int $minutes = 0): bool;
 }

@@ -34,9 +34,7 @@ class Example
 		$this->root = $this->parent->root() . '/' . $this->id;
 
 		if ($this->exists() === false) {
-			throw new NotFoundException(
-				message: 'The example could not be found'
-			);
+			throw new NotFoundException('The example could not be found');
 		}
 
 		$this->tabs = $this->collectTabs();
@@ -45,7 +43,7 @@ class Example
 
 	public function collectTab(string|null $tab): string|null
 	{
-		if ($this->tabs === []) {
+		if (empty($this->tabs) === true) {
 			return null;
 		}
 
@@ -173,7 +171,7 @@ class Example
 		return [
 			'image' => [
 				'icon' => $this->parent->icon(),
-				'back' => 'light-dark(white, var(--color-gray-800))',
+				'back' => 'white',
 			],
 			'text' => $this->title(),
 			'link' => $this->url()

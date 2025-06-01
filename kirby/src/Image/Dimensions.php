@@ -3,7 +3,6 @@
 namespace Kirby\Image;
 
 use Kirby\Toolkit\Str;
-use Stringable;
 
 /**
  * The Dimension class is used to provide additional
@@ -17,7 +16,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class Dimensions implements Stringable
+class Dimensions
 {
 	public function __construct(
 		public int $width,
@@ -70,7 +69,8 @@ class Dimensions implements Stringable
 	/**
 	 * Recalculates the width and height to fit into the given box.
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * $dimensions = new Dimensions(1200, 768);
 	 * $dimensions->fit(500);
 	 *
@@ -79,7 +79,8 @@ class Dimensions implements Stringable
 	 *
 	 * echo $dimensions->height();
 	 * // output: 320
-	 * ```
+	 *
+	 * </code>
 	 *
 	 * @param int $box the max width and/or height
 	 * @param bool $force If true, the dimensions will be
@@ -120,7 +121,8 @@ class Dimensions implements Stringable
 	/**
 	 * Recalculates the width and height to fit the given height
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * $dimensions = new Dimensions(1200, 768);
 	 * $dimensions->fitHeight(500);
 	 *
@@ -129,7 +131,8 @@ class Dimensions implements Stringable
 	 *
 	 * echo $dimensions->height();
 	 * // output: 500
-	 * ```
+	 *
+	 * </code>
 	 *
 	 * @param int|null $fit the max height
 	 * @param bool $force If true, the dimensions will be
@@ -176,7 +179,8 @@ class Dimensions implements Stringable
 	/**
 	 * Recalculates the width and height to fit the given width
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * $dimensions = new Dimensions(1200, 768);
 	 * $dimensions->fitWidth(500);
 	 *
@@ -185,7 +189,8 @@ class Dimensions implements Stringable
 	 *
 	 * echo $dimensions->height();
 	 * // output: 320
-	 * ```
+	 *
+	 * </code>
 	 *
 	 * @param int|null $fit the max width
 	 * @param bool $force If true, the dimensions will be
@@ -233,21 +238,14 @@ class Dimensions implements Stringable
 	/**
 	 * Detect the dimensions for an image file
 	 */
-	public static function forImage(Image $image): static
+	public static function forImage(string $root): static
 	{
-		if ($image->exists() === false) {
+		if (file_exists($root) === false) {
 			return new static(0, 0);
 		}
 
-		$orientation = $image->exif()->orientation();
-		$size        = $image->imagesize();
-
-		return match ($orientation) {
-			// 5-8 = rotated
-			5, 6, 7, 8 => new static($size[1] ?? 1, $size[0] ?? 0),
-			// 1 = normal; 2-4 = flipped
-			default    => new static($size[0] ?? 0, $size[1] ?? 1)
-		};
+		$size = getimagesize($root);
+		return new static($size[0] ?? 0, $size[1] ?? 1);
 	}
 
 	/**
@@ -331,11 +329,13 @@ class Dimensions implements Stringable
 	/**
 	 * Calculates and returns the ratio
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * $dimensions = new Dimensions(1200, 768);
 	 * echo $dimensions->ratio();
 	 * // output: 1.5625
-	 * ```
+	 *
+	 * </code>
 	 */
 	public function ratio(): float
 	{

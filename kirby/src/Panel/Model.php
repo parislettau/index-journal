@@ -4,10 +4,9 @@ namespace Kirby\Panel;
 
 use Closure;
 use Kirby\Cms\File as CmsFile;
-use Kirby\Cms\Language;
 use Kirby\Cms\ModelWithContent;
 use Kirby\Filesystem\Asset;
-use Kirby\Form\Fields;
+use Kirby\Form\Form;
 use Kirby\Http\Uri;
 use Kirby\Toolkit\A;
 
@@ -29,18 +28,11 @@ abstract class Model
 	}
 
 	/**
-	 * Returns header button names which should be displayed
-	 */
-	abstract public function buttons(): array;
-
-	/**
 	 * Get the content values for the model
-	 *
-	 * @deprecated 5.0.0 Use `self::versions()` instead
 	 */
 	public function content(): array
 	{
-		return $this->versions()['changes'];
+		return Form::for($this->model)->values();
 	}
 
 	/**
@@ -71,7 +63,7 @@ abstract class Model
 	 *
 	 * @param string|null $type (`auto`|`kirbytext`|`markdown`)
 	 */
-	public function dragTextType(string|null $type = 'auto'): string
+	public function dragTextType(string|null $type = null): string
 	{
 		$type ??= 'auto';
 
@@ -140,11 +132,11 @@ abstract class Model
 		}
 
 		// merge with defaults and blueprint option
-		$settings = [
-			...$this->imageDefaults(),
-			...$settings ?? [],
-			...$blueprint ?? [],
-		];
+		$settings = array_merge(
+			$this->imageDefaults(),
+			$settings ?? [],
+			$blueprint ?? [],
+		);
 
 		if ($image = $this->imageSource($settings['query'] ?? null)) {
 			// main url
@@ -239,12 +231,8 @@ abstract class Model
 		// for card layouts with `cover: true` provide
 		// crops based on the card ratio
 		if ($layout === 'cards') {
-			$ratio = $settings['ratio'] ?? '1/1';
-
-			if (is_numeric($ratio) === false) {
-				$ratio = explode('/', $ratio);
-				$ratio = $ratio[0] / $ratio[1];
-			}
+			$ratio = explode('/', $settings['ratio'] ?? '1/1');
+			$ratio = $ratio[0] / $ratio[1];
 
 			return $image->srcset([
 				$sizes[0] . 'w' => [
@@ -299,12 +287,14 @@ abstract class Model
 	}
 
 	/**
-	 * Returns the corresponding model object
-	 * @since 5.0.0
+	 * Returns lock info for the Panel
+	 *
+	 * @return array|false array with lock info,
+	 *                     false if locking is not supported
 	 */
-	public function model(): ModelWithContent
+	public function lock(): array|false
 	{
-		return $this->model;
+		return $this->model->lock()?->toArray() ?? false;
 	}
 
 	/**
@@ -318,9 +308,9 @@ abstract class Model
 	{
 		$options = $this->model->permissions()->toArray();
 
-		if ($this->model->lock()->isLocked() === true) {
+		if ($this->model->isLocked()) {
 			foreach ($options as $key => $value) {
-				if (in_array($key, $unlock, true)) {
+				if (in_array($key, $unlock)) {
 					continue;
 				}
 
@@ -364,25 +354,14 @@ abstract class Model
 	public function props(): array
 	{
 		$blueprint = $this->model->blueprint();
-		$link      = $this->url(true);
 		$request   = $this->model->kirby()->request();
 		$tabs      = $blueprint->tabs();
 		$tab       = $blueprint->tab($request->get('tab')) ?? $tabs[0] ?? null;
-		$versions  = $this->versions();
 
 		$props = [
-			'api'         => $link,
-			'buttons'     => fn () => $this->buttons(),
-			'id'          => $this->model->id(),
-			'link'        => $link,
-			'lock'        => $this->model->lock()->toArray(),
+			'lock'        => $this->lock(),
 			'permissions' => $this->model->permissions()->toArray(),
 			'tabs'        => $tabs,
-			'uuid'        => fn () => $this->model->uuid()?->toString(),
-			'versions'    => [
-				'latest'  => (object)$versions['latest'],
-				'changes' => (object)$versions['changes']
-			]
 		];
 
 		// only send the tab if it exists
@@ -449,36 +428,6 @@ abstract class Model
 		}
 
 		return $this->model->kirby()->url('panel') . '/' . $this->path();
-	}
-
-	/**
-	 * Creates an array with two versions of the content:
-	 * `latest` and `changes`.
-	 *
-	 * The content is passed through the Fields class
-	 * to ensure that the content is in the correct format
-	 * for the Panel. If there's no `changes` version, the `latest`
-	 * version is used for both.
-	 */
-	public function versions(): array
-	{
-		$language = Language::ensure('current');
-		$fields   = Fields::for($this->model, $language);
-
-		$latestVersion  = $this->model->version('latest');
-		$changesVersion = $this->model->version('changes');
-
-		$latestContent  = $latestVersion->content($language)->toArray();
-		$changesContent = $latestContent;
-
-		if ($changesVersion->exists($language) === true) {
-			$changesContent = $changesVersion->content($language)->toArray();
-		}
-
-		return [
-			'latest'  => $fields->reset()->fill($latestContent)->toFormValues(),
-			'changes' => $fields->reset()->fill($changesContent)->toFormValues()
-		];
 	}
 
 	/**

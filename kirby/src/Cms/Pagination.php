@@ -24,18 +24,24 @@ class Pagination extends BasePagination
 {
 	/**
 	 * Pagination method (param, query, none)
+	 *
+	 * @var string
 	 */
-	protected string $method;
+	protected $method;
 
 	/**
 	 * The base URL
+	 *
+	 * @var string
 	 */
-	protected Uri $url;
+	protected $url;
 
 	/**
 	 * Variable name for query strings
+	 *
+	 * @var string
 	 */
-	protected string $variable;
+	protected $variable;
 
 	/**
 	 * Creates the pagination object. As a new
@@ -72,11 +78,11 @@ class Pagination extends BasePagination
 			]);
 		}
 
-		$params['page'] ??= match ($params['method']) {
-			'query' => $params['url']->query()->get($params['variable']),
-			'param' => $params['url']->params()->get($params['variable']),
-			default => null
-		};
+		if ($params['method'] === 'query') {
+			$params['page'] ??= $params['url']->query()->get($params['variable']);
+		} elseif ($params['method'] === 'param') {
+			$params['page'] ??= $params['url']->params()->get($params['variable']);
+		}
 
 		parent::__construct($params);
 
@@ -128,21 +134,19 @@ class Pagination extends BasePagination
 		$url      = clone $this->url;
 		$variable = $this->variable;
 
-		if (
-			$this->hasPage($page) === false ||
-			in_array($this->method, ['query', 'param'], true) === false
-		) {
+		if ($this->hasPage($page) === false) {
 			return null;
 		}
 
-		if ($page === 1) {
-			$page = null;
-		}
+		$pageValue = $page === 1 ? null : $page;
 
-		match ($this->method) {
-			'query' => $url->query->$variable  = $page,
-			'param' => $url->params->$variable = $page
-		};
+		if ($this->method === 'query') {
+			$url->query->$variable = $pageValue;
+		} elseif ($this->method === 'param') {
+			$url->params->$variable = $pageValue;
+		} else {
+			return null;
+		}
 
 		return $url->toString();
 	}

@@ -216,18 +216,14 @@ return [
 			// if url is empty, throw exception or link to the error page
 			if ($tag->value === null) {
 				if ($tag->kirby()->option('debug', false) === true) {
-					$error = 'The linked page cannot be found';
-
 					if (empty($tag->text) === false) {
-						$error .= ' for the link text "' . $tag->text . '"';
+						throw new NotFoundException('The linked page cannot be found for the link text "' . $tag->text . '"');
+					} else {
+						throw new NotFoundException('The linked page cannot be found');
 					}
-
-					throw new NotFoundException(
-						message: $error
-					);
+				} else {
+					$tag->value = Url::to($tag->kirby()->site()->errorPageId());
 				}
-
-				$tag->value = Url::to($tag->kirby()->site()->errorPageId());
 			}
 
 			return Html::a($tag->value, $tag->text, [

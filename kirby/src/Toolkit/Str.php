@@ -139,8 +139,7 @@ class Str
 			// check for the q param ("quality" of the type)
 			foreach ($parts as $param) {
 				$param = static::split($param, '=');
-
-				if (A::get($param, 0) === 'q' && empty($param[1]) === false) {
+				if (A::get($param, 0) === 'q' && !empty($param[1])) {
 					$quality = $param[1];
 				}
 			}
@@ -276,7 +275,7 @@ class Str
 	 *
 	 * @param string $value The string to convert
 	 */
-	public static function camel(string|null $value): string
+	public static function camel(string|null $value = null): string
 	{
 		return lcfirst(static::studly($value));
 	}
@@ -287,10 +286,9 @@ class Str
 	 *
 	 * @param string $value The string to convert
 	 */
-	public static function camelToKebab(string|null $value): string
+	public static function camelToKebab(string|null $value = null): string
 	{
-		$value = preg_replace('!([a-z0-9])([A-Z])!', '$1-$2', $value);
-		return static::lower($value);
+		return static::lower(preg_replace('!([a-z0-9])([A-Z])!', '$1-$2', $value));
 	}
 
 	/**
@@ -305,11 +303,7 @@ class Str
 			return true;
 		}
 
-		$method = match ($caseInsensitive) {
-			true  => 'stripos',
-			false => 'strpos'
-		};
-
+		$method = $caseInsensitive === true ? 'stripos' : 'strpos';
 		return call_user_func($method, $string ?? '', $needle) !== false;
 	}
 
@@ -321,7 +315,7 @@ class Str
 	 *                                               for the globally configured one
 	 */
 	public static function date(
-		int|null $time,
+		int|null $time = null,
 		string|IntlDateFormatter|null $format = null,
 		string|null $handler = null
 	): string|int|false {
@@ -513,8 +507,9 @@ class Str
 	 * Convert the value to a float with a decimal
 	 * point, no matter what the locale setting is
 	 */
-	public static function float(string|int|float|null $value): string
-	{
+	public static function float(
+		string|int|float|null $value = null
+	): string {
 		// make sure $value is not null
 		$value ??= '';
 
@@ -522,7 +517,7 @@ class Str
 		$value = (string)$value;
 
 		// Convert exponential to decimal, 1e-8 as 0.00000001
-		if (str_contains(strtolower($value), 'e') === true) {
+		if (strpos(strtolower($value), 'e') !== false) {
 			$value = rtrim(sprintf('%.16f', (float)$value), '0');
 		}
 
@@ -579,7 +574,7 @@ class Str
 	/**
 	 * Convert a string to kebab case.
 	 */
-	public static function kebab(string|null $value): string
+	public static function kebab(string|null $value = null): string
 	{
 		return static::snake($value, '-');
 	}
@@ -587,7 +582,7 @@ class Str
 	/**
 	 * Convert a kebab case string to camel case.
 	 */
-	public static function kebabToCamel(string|null $value): string
+	public static function kebabToCamel(string|null $value = null): string
 	{
 		return ucfirst(preg_replace_callback(
 			'/-(.)/',
@@ -599,7 +594,7 @@ class Str
 	/**
 	 * A UTF-8 safe version of strlen()
 	 */
-	public static function length(string|null $string): int
+	public static function length(string|null $string = null): int
 	{
 		return mb_strlen($string ?? '', 'UTF-8');
 	}
@@ -607,7 +602,7 @@ class Str
 	/**
 	 * A UTF-8 safe version of strtolower()
 	 */
-	public static function lower(string|null $string): string
+	public static function lower(string|null $string = null): string
 	{
 		return mb_strtolower($string ?? '', 'UTF-8');
 	}
@@ -636,10 +631,7 @@ class Str
 		int $offset = 0
 	): array|null {
 		$result = preg_match($pattern, $string, $matches, $flags, $offset);
-		return match ($result) {
-			1       => $matches,
-			default => null
-		};
+		return ($result === 1) ? $matches : null;
 	}
 
 	/**
@@ -676,10 +668,7 @@ class Str
 		int $offset = 0
 	): array|null {
 		$result = preg_match_all($pattern, $string, $matches, $flags, $offset);
-		return match ($result > 0) {
-			true  => $matches,
-			false => null
-		};
+		return ($result > 0) ? $matches : null;
 	}
 
 	/**
@@ -693,7 +682,7 @@ class Str
 			$pool = [];
 
 			foreach ($type as $t) {
-				$pool = [...$pool, ...static::pool($t)];
+				$pool = array_merge($pool, static::pool($t));
 			}
 		} else {
 			$pool = match (strtolower($type)) {
@@ -702,8 +691,8 @@ class Str
 				'alpha'      => static::pool(['alphaLower', 'alphaUpper']),
 				'num'        => range(0, 9),
 				'alphanum'   => static::pool(['alpha', 'num']),
-				'base32'     => [...static::pool('alphaUpper'), ...range(2, 7)],
-				'base32hex'  => [...range(0, 9), ...range('A', 'V')],
+				'base32'     => array_merge(static::pool('alphaUpper'), range(2, 7)),
+				'base32hex'  => array_merge(range(0, 9), range('A', 'V')),
 				default      => []
 			};
 		}
@@ -723,9 +712,7 @@ class Str
 		bool $caseInsensitive = false
 	): int|false {
 		if ($needle === '') {
-			throw new InvalidArgumentException(
-				message: 'The needle must not be empty'
-			);
+			throw new InvalidArgumentException('The needle must not be empty');
 		}
 
 		if ($caseInsensitive === true) {
@@ -891,9 +878,7 @@ class Str
 			return [compact('search', 'replace', 'limit')];
 		}
 
-		throw new InvalidArgumentException(
-			message: 'Invalid combination of $search, $replace and $limit params.'
-		);
+		throw new InvalidArgumentException('Invalid combination of $search, $replace and $limit params.');
 	}
 
 	/**
@@ -912,9 +897,7 @@ class Str
 		// behavior is identical to the official PHP str_replace()
 		foreach ($replacements as $replacement) {
 			if (is_int($replacement['limit']) === false) {
-				throw new Exception(
-					message: 'Invalid limit "' . $replacement['limit'] . '".'
-				);
+				throw new Exception('Invalid limit "' . $replacement['limit'] . '".');
 			}
 
 			if ($replacement['limit'] === -1) {
@@ -984,7 +967,7 @@ class Str
 	 * @return string The filled-in and partially escaped string
 	 */
 	public static function safeTemplate(
-		string|null $string,
+		string|null $string = null,
 		array $data = [],
 		array $options = []
 	): string {
@@ -1023,13 +1006,15 @@ class Str
 	/**
 	 * Shortens a string and adds an ellipsis if the string is too long
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * echo Str::short('This is a very, very, very long string', 10);
 	 * // output: This is a…
 	 *
 	 * echo Str::short('This is a very, very, very long string', 10, '####');
 	 * // output: This i####
-	 * ```
+	 *
+	 * </code>
 	 *
 	 * @param string $string The string to be shortened
 	 * @param int $length The final number of characters the
@@ -1039,7 +1024,7 @@ class Str
 	 * @return string The shortened string
 	 */
 	public static function short(
-		string|null $string,
+		string|null $string = null,
 		int $length = 0,
 		string $appendix = '…'
 	): string {
@@ -1144,7 +1129,7 @@ class Str
 	 * @return string The safe string
 	 */
 	public static function slug(
-		string|null $string,
+		string|null $string = null,
 		string|null $separator = null,
 		string|null $allowed = null,
 		int|false $maxlength = 128
@@ -1191,7 +1176,7 @@ class Str
 	 * Convert a string to snake case.
 	 */
 	public static function snake(
-		string|null $value,
+		string|null $value = null,
 		string $delimiter = '_'
 	): string {
 		if (ctype_lower($value) === false) {
@@ -1262,7 +1247,7 @@ class Str
 	 *
 	 * @param string $value The string to convert
 	 */
-	public static function studly(string|null $value): string
+	public static function studly(string|null $value = null): string
 	{
 		$value = str_replace(['-', '_'], ' ', $value);
 		$value = ucwords($value);
@@ -1273,7 +1258,7 @@ class Str
 	 * A UTF-8 safe version of substr()
 	 */
 	public static function substr(
-		string|null $string,
+		string|null $string = null,
 		int $start = 0,
 		int|null $length = null
 	): string {
@@ -1283,10 +1268,12 @@ class Str
 	/**
 	 * Replaces placeholders in string with values from the data array
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * echo Str::template('From {{ b }} to {{ a }}', ['a' => 'there', 'b' => 'here']);
 	 * // output: From here to there
-	 * ```
+	 *
+	 * </code>
 	 *
 	 * @param string|null $string The string with placeholders
 	 * @param array $data Associative array with placeholders as
@@ -1300,7 +1287,7 @@ class Str
 	 * @return string The filled-in string
 	 */
 	public static function template(
-		string|null $string,
+		string|null $string = null,
 		array $data = [],
 		array $options = []
 	): string {
@@ -1397,17 +1384,17 @@ class Str
 	/**
 	 * A UTF-8 safe version of ucfirst()
 	 */
-	public static function ucfirst(string|null $string): string
+	public static function ucfirst(string|null $string = null): string
 	{
 		$first = static::substr($string, 0, 1);
 		$rest  = static::substr($string, 1);
-		return static::upper($first) . $rest;
+		return static::upper($first) . static::lower($rest);
 	}
 
 	/**
 	 * A UTF-8 safe version of ucwords()
 	 */
-	public static function ucwords(string|null $string): string
+	public static function ucwords(string|null $string = null): string
 	{
 		return mb_convert_case($string ?? '', MB_CASE_TITLE, 'UTF-8');
 	}
@@ -1415,12 +1402,14 @@ class Str
 	/**
 	 * Removes all html tags and encoded chars from a string
 	 *
-	 * ```php
+	 * <code>
+	 *
 	 * echo str::unhtml('some <em>crazy</em> stuff');
 	 * // output: some uber crazy stuff
-	 * ```
+	 *
+	 * </code>
 	 */
-	public static function unhtml(string|null $string): string
+	public static function unhtml(string|null $string = null): string
 	{
 		return Html::decode($string);
 	}
@@ -1445,7 +1434,7 @@ class Str
 	/**
 	 * A UTF-8 safe version of strotoupper()
 	 */
-	public static function upper(string|null $string): string
+	public static function upper(string|null $string = null): string
 	{
 		return mb_strtoupper($string ?? '', 'UTF-8');
 	}
@@ -1483,7 +1472,7 @@ class Str
 	 * typographical widows at the end of a paragraph –
 	 * that's a single word in the last line
 	 */
-	public static function widont(string|null $string): string
+	public static function widont(string|null $string = null): string
 	{
 		// make sure $string is string
 		$string ??= '';

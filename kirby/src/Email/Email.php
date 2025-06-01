@@ -53,9 +53,7 @@ class Email
 	{
 		foreach (['body', 'from', 'to', 'subject'] as $required) {
 			if (isset($props[$required]) === false) {
-				throw new InvalidArgumentException(
-					message: 'The property "' . $required . '" is required'
-				);
+				throw new InvalidArgumentException('The property "' . $required . '" is required');
 			}
 		}
 

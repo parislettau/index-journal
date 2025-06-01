@@ -2,8 +2,6 @@
 
 namespace Kirby\Image;
 
-use Stringable;
-
 /**
  * Small class which hold info about the camera
  *
@@ -13,7 +11,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class Camera implements Stringable
+class Camera
 {
 	protected string|null $make;
 	protected string|null $model;

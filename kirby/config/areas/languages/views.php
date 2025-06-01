@@ -2,7 +2,6 @@
 
 use Kirby\Cms\App;
 use Kirby\Cms\Find;
-use Kirby\Panel\Ui\Buttons\ViewButtons;
 use Kirby\Toolkit\Escape;
 use Kirby\Toolkit\I18n;
 
@@ -20,9 +19,9 @@ return [
 			$foundation   = $kirby->defaultLanguage()->translations();
 			$translations = $language->translations();
 
-			// TODO: update following line and adapt for update and
-			// delete options when `languageVariables.*` permissions available
-			$canUpdate = $kirby->role()?->permissions()->for('languages', 'update') === true;
+			// TODO: update following line and adapt for update and delete options
+			// when new `languageVariables.*` permissions available
+			$canUpdate = $kirby->user()?->role()->permissions()->for('languages', 'update') === true;
 
 			ksort($foundation);
 
@@ -74,10 +73,6 @@ return [
 					]
 				],
 				'props'      => [
-					'buttons' => fn () =>
-						ViewButtons::view('language', model: $language)
-							->defaults('open', 'settings', 'delete')
-							->render(),
 					'deletable'    => $language->isDeletable(),
 					'code'         => Escape::html($language->code()),
 					'default'      => $language->isDefault(),
@@ -118,10 +113,6 @@ return [
 			return [
 				'component' => 'k-languages-view',
 				'props'     => [
-					'buttons' => fn () =>
-						ViewButtons::view('languages')
-							->defaults('create')
-							->render(),
 					'languages' => $kirby->languages()->values(fn ($language) => [
 						'deletable' => $language->isDeletable(),
 						'default'   => $language->isDefault(),

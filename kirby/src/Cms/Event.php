@@ -3,10 +3,8 @@
 namespace Kirby\Cms;
 
 use Closure;
-use Kirby\Content\ImmutableMemoryStorage;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\Controller;
-use Stringable;
 
 /**
  * The Event object is created whenever the `$kirby->trigger()`
@@ -21,8 +19,14 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-class Event implements Stringable
+class Event
 {
+	/**
+	 * The full event name
+	 * (e.g. `page.create:after`)
+	 */
+	protected string $name;
+
 	/**
 	 * The event type
 	 * (e.g. `page` in `page.create:after`)
@@ -42,15 +46,18 @@ class Event implements Stringable
 	protected string|null $state;
 
 	/**
+	 * The event arguments
+	 */
+	protected array $arguments = [];
+
+	/**
 	 * Class constructor
 	 *
-	 * @param string $name Full event name (e.g. `page.create:after`)
+	 * @param string $name Full event name
 	 * @param array $arguments Associative array of named event arguments
 	 */
-	public function __construct(
-		protected string $name,
-		protected array $arguments = []
-	) {
+	public function __construct(string $name, array $arguments = [])
+	{
 		// split the event name into `$type.$action:$state`
 		// $action and $state are optional;
 		// if there is more than one dot, $type will be greedy
@@ -123,11 +130,9 @@ class Event implements Stringable
 	 */
 	public function call(object|null $bind, Closure $hook): mixed
 	{
-		// collect the list of possible event arguments
-		$data = [
-			...$this->arguments(),
-			'event' => $this
-		];
+		// collect the list of possible hook arguments
+		$data = $this->arguments();
+		$data['event'] = $this;
 
 		// magically call the hook with the arguments it requested
 		$hook = new Controller($hook);
@@ -240,37 +245,7 @@ class Event implements Stringable
 	public function updateArgument(string $name, $value): void
 	{
 		if (array_key_exists($name, $this->arguments) !== true) {
-			throw new InvalidArgumentException(
-				message: 'The argument ' . $name . ' does not exist'
-			);
-		}
-
-		// no new value has been supplied by the apply hook
-		if ($value === null) {
-
-			// To support legacy model modification
-			// in hooks without return values, we need to
-			// check the state of the updated argument.
-			// If the argument is an instance of ModelWithContent
-			// and the storage is an instance of ImmutableMemoryStorage,
-			// we can replace the argument with its clone to achieve
-			// the same effect as if the hook returned the modified model.
-			$state = $this->arguments[$name];
-
-			if ($state instanceof ModelWithContent) {
-				$storage = $state->storage();
-
-				if (
-					$storage instanceof ImmutableMemoryStorage &&
-					$storage->nextModel() !== null
-				) {
-					$this->arguments[$name] = $storage->nextModel();
-				}
-			}
-
-			// Otherwise, there's no need to update the argument
-			// if no new value is provided
-			return;
+			throw new InvalidArgumentException('The argument ' . $name . ' does not exist');
 		}
 
 		$this->arguments[$name] = $value;

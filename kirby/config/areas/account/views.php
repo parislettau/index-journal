@@ -26,9 +26,6 @@ return [
 				[
 					'label' => I18n::translate('view.resetPassword')
 				]
-			],
-			'props' => [
-				'requirePassword' => App::instance()->session()->get('kirby.resetPassword') !== true
 			]
 		]
 	]

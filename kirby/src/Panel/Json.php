@@ -75,7 +75,7 @@ abstract class Json
 			return static::error('Invalid response', 500);
 		}
 
-		if ($data === []) {
+		if (empty($data) === true) {
 			return static::error('The response is empty', 404);
 		}
 

@@ -4,7 +4,6 @@ namespace Kirby\Toolkit;
 
 use Exception;
 use Kirby\Filesystem\F;
-use Stringable;
 use Throwable;
 
 /**
@@ -16,7 +15,7 @@ use Throwable;
  * @copyright Bastian Allgeier
  * @license   https://opensource.org/licenses/MIT
  */
-class View implements Stringable
+class View
 {
 	/**
 	 * Creates a new view object
@@ -80,7 +79,7 @@ class View implements Stringable
 		$content = ob_get_contents();
 		ob_end_clean();
 
-		if (isset($exception) === true) {
+		if (($exception ?? null) !== null) {
 			throw $exception;
 		}
 
@@ -88,7 +87,7 @@ class View implements Stringable
 	}
 
 	/**
-	 * @see self::render()
+	 * @see ::render()
 	 */
 	public function toString(): string
 	{
@@ -99,7 +98,7 @@ class View implements Stringable
 	 * Magic string converter to enable
 	 * converting view objects to string
 	 *
-	 * @see self::render()
+	 * @see ::render()
 	 */
 	public function __toString(): string
 	{

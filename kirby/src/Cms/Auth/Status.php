@@ -5,7 +5,7 @@ namespace Kirby\Cms\Auth;
 use Kirby\Cms\App;
 use Kirby\Cms\User;
 use Kirby\Exception\InvalidArgumentException;
-use Stringable;
+use Kirby\Toolkit\Properties;
 
 /**
  * Information container for the
@@ -18,7 +18,7 @@ use Stringable;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-class Status implements Stringable
+class Status
 {
 	/**
 	 * Type of the active challenge
@@ -42,12 +42,6 @@ class Status implements Stringable
 	protected App $kirby;
 
 	/**
-	 * Purpose of the challenge:
-	 * `login|password-reset|2fa`
-	 */
-	protected string|null $mode;
-
-	/**
 	 * Authentication status:
 	 * `active|impersonated|pending|inactive`
 	 */
@@ -55,24 +49,25 @@ class Status implements Stringable
 
 	/**
 	 * Class constructor
+	 *
+	 * @param array $props
 	 */
 	public function __construct(array $props)
 	{
-		if (in_array($props['status'], ['active', 'impersonated', 'pending', 'inactive'], true) !== true) {
-			throw new InvalidArgumentException(
-				data: [
+		if (in_array($props['status'], ['active', 'impersonated', 'pending', 'inactive']) !== true) {
+			throw new InvalidArgumentException([
+				'data' => [
 					'argument' => '$props[\'status\']',
 					'method'   => 'Status::__construct'
 				]
-			);
+			]);
 		}
 
-		$this->kirby             = $props['kirby'];
-		$this->challenge         = $props['challenge'] ?? null;
+		$this->kirby 		 	 = $props['kirby'];
+		$this->challenge 		 = $props['challenge'] ?? null;
 		$this->challengeFallback = $props['challengeFallback'] ?? null;
-		$this->email             = $props['email'] ?? null;
-		$this->mode              = $props['mode'] ?? null;
-		$this->status            = $props['status'];
+		$this->email 		 	 = $props['email'] ?? null;
+		$this->status 			 = $props['status'];
 	}
 
 	/**
@@ -111,11 +106,11 @@ class Status implements Stringable
 	public function clone(array $props = []): static
 	{
 		return new static(array_replace_recursive([
-			'kirby'             => $this->kirby,
-			'challenge'         => $this->challenge,
+			'kirby' 			=> $this->kirby,
+			'challenge' 		=> $this->challenge,
 			'challengeFallback' => $this->challengeFallback,
-			'email'             => $this->email,
-			'status'            => $this->status,
+			'email' 			=> $this->email,
+			'status' 			=> $this->status,
 		], $props));
 	}
 
@@ -125,16 +120,6 @@ class Status implements Stringable
 	public function email(): string|null
 	{
 		return $this->email;
-	}
-
-	/**
-	 * Returns the purpose of the challenge
-	 *
-	 * @return string `login|password-reset|2fa`
-	 */
-	public function mode(): string|null
-	{
-		return $this->mode;
 	}
 
 	/**
@@ -155,7 +140,6 @@ class Status implements Stringable
 		return [
 			'challenge' => $this->challenge(),
 			'email'     => $this->email(),
-			'mode'      => $this->mode(),
 			'status'    => $this->status()
 		];
 	}
@@ -167,7 +151,7 @@ class Status implements Stringable
 	{
 		// for security, only return the user if they are
 		// already logged in
-		if (in_array($this->status(), ['active', 'impersonated'], true) !== true) {
+		if (in_array($this->status(), ['active', 'impersonated']) !== true) {
 			return null;
 		}
 

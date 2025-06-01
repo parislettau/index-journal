@@ -2,9 +2,7 @@
 
 namespace Kirby\Parsley;
 
-use DOMComment;
 use DOMDocument;
-use DOMDocumentType;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -125,7 +123,7 @@ class Parsley
 	 */
 	public function endInlineBlock(): void
 	{
-		if ($this->inline === []) {
+		if (empty($this->inline) === true) {
 			return;
 		}
 
@@ -195,7 +193,7 @@ class Parsley
 			}
 
 			$marks = array_column($this->marks, 'tag');
-			return in_array($element->tagName, $marks, true);
+			return in_array($element->tagName, $marks);
 		}
 
 		return false;
@@ -214,7 +212,7 @@ class Parsley
 		) {
 			$this->blocks[$lastIndex]['content']['text'] .= ' ' . $block['content']['text'];
 
-		// append
+			// append
 		} else {
 			$this->blocks[] = $block;
 		}
@@ -226,11 +224,10 @@ class Parsley
 	 */
 	public function parseNode(DOMNode $element): bool
 	{
+		$skip = ['DOMComment', 'DOMDocumentType'];
+
 		// unwanted element types
-		if (
-			$element instanceof DOMComment ||
-			$element instanceof DOMDocumentType
-		) {
+		if (in_array(get_class($element), $skip) === true) {
 			return false;
 		}
 
@@ -242,13 +239,12 @@ class Parsley
 
 		$this->endInlineBlock();
 
-
 		// known block nodes
 		if ($this->isBlock($element) === true) {
 			/**
 			 * @var DOMElement $element
 			 */
-			if ($parser = $this->nodes[$element->tagName]['parse'] ?? null) {
+			if ($parser = ($this->nodes[$element->tagName]['parse'] ?? null)) {
 				if ($result = $parser(new Element($element, $this->marks))) {
 					$this->blocks[] = $result;
 				}
@@ -261,7 +257,7 @@ class Parsley
 			/**
 			 * @var DOMElement $element
 			 */
-			if (in_array($element->tagName, $this->skip, true) === true) {
+			if (in_array($element->tagName, $this->skip) === true) {
 				return false;
 			}
 
@@ -274,7 +270,7 @@ class Parsley
 			// wrapper elements should never be converted
 			// to a simple fallback block. Their children
 			// have to be parsed individually.
-			if (in_array($element->tagName, $wrappers, true) === false) {
+			if (in_array($element->tagName, $wrappers) === false) {
 				$node = new Element($element, $this->marks);
 
 				if ($block = $this->fallback($node)) {

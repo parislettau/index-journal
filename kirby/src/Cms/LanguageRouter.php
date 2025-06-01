@@ -60,7 +60,7 @@ class LanguageRouter
 			$languages = Str::split(strtolower($route['language']), '|');
 
 			// validate the language
-			return in_array($language->code(), $languages, true) === true;
+			return in_array($language->code(), $languages) === true;
 		}));
 
 		// add the page-scope if necessary
@@ -80,9 +80,7 @@ class LanguageRouter
 					$routes[$index]['pattern'] = $patterns;
 					$routes[$index]['page']    = $page;
 				} else {
-					throw new NotFoundException(
-						message: 'The page "' . $pageId . '" does not exist'
-					);
+					throw new NotFoundException('The page "' . $pageId . '" does not exist');
 				}
 			}
 		}

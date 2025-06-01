@@ -35,4 +35,16 @@ tabs:
             extends: fields/viewcount
           lastvisited:
             extends: fields/lastvisited
-  seo: seo/site
+    tools:
+      sections:
+        tools:
+          type: fields
+          fields:
+            exportDocx:
+              type: button
+              text: Download DOCX
+              icon: download
+              url: /download-docx/{{ page.id }}
+              open: true
+              theme: positive
+    seo: seo/site

@@ -19,7 +19,7 @@
         <li><strong>Editors:</strong>
             <ul>
                 <?php foreach ($issueData['editors'] as $e): ?>
-                    <li><?= esc($e['name'] ?? '') ?></li>
+                    <li><?= esc($e['name'] ?? (($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? ''))) ?></li>
                 <?php endforeach ?>
             </ul>
         </li>
@@ -51,10 +51,23 @@
         </details>
     <?php endforeach ?>
 
-    <form action="<?= url('submit-crossref/' . $issue->id()) ?>" method="post" style="display:flex;gap:.5rem;margin-top:2rem">
+    <form action="<?= url('submit-crossref/' . $issue->id()) ?>" method="post" style="display:flex;gap:.5rem;margin-top:2rem" id="crossref-submit-form">
         <?= csrf() ?>
         <input type="hidden" name="confirm" value="1">
-        <button type="submit" class="k-button k-button--filled">Confirm</button>
+        <button type="submit" class="k-button k-button--filled" id="crossref-submit-btn">Confirm</button>
         <a href="<?= $issue->panelUrl() ?>" class="k-button">Cancel</a>
     </form>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('crossref-submit-form');
+        if (!form) return;
+        form.addEventListener('submit', function () {
+            var btn = document.getElementById('crossref-submit-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Submitting…';
+            }
+        });
+    });
+    </script>
 </section>

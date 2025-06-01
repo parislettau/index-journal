@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fcda893b3aed9df6e16e86b188a2b389",
+    "content-hash": "93d8eaaf31c7ace2f2fb7a0ebef3c661",
     "packages": [
         {
             "name": "bnomei/kirby3-janitor",
@@ -1715,6 +1715,54 @@
                 "source": "https://github.com/mustangostang/spyc/tree/0.6.3"
             },
             "time": "2019-09-10T13:16:29+00:00"
+        },
+        {
+            "name": "pechente/kirby-admin-bar",
+            "version": "2.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Pechente/kirby-admin-bar.git",
+                "reference": "9d83256c39d0e43c44f97c7c20e50c1c86e100fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Pechente/kirby-admin-bar/zipball/9d83256c39d0e43c44f97c7c20e50c1c86e100fe",
+                "reference": "9d83256c39d0e43c44f97c7c20e50c1c86e100fe",
+                "shasum": ""
+            },
+            "require": {
+                "getkirby/cms": ">=4.0.0",
+                "getkirby/composer-installer": "^1.2",
+                "php": ">=8.0.0"
+            },
+            "type": "kirby-plugin",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "René Henrich",
+                    "email": "contact@rene-henrich.de"
+                }
+            ],
+            "description": "Kirby Admin Bar",
+            "homepage": "https://github.com/Pechente/kirby-admin-bar",
+            "keywords": [
+                "admin",
+                "frontend",
+                "kirby-cms",
+                "kirby-plugin",
+                "kirby4",
+                "kirby5",
+                "panel"
+            ],
+            "support": {
+                "docs": "https://github.com/Pechente/kirby-admin-bar/blob/main/README.md",
+                "issues": "https://github.com/Pechente/kirby-admin-bar/issues",
+                "source": "https://github.com/Pechente/kirby-admin-bar"
+            },
+            "time": "2025-05-27T16:40:21+00:00"
         },
         {
             "name": "phpmailer/phpmailer",

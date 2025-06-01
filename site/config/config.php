@@ -20,7 +20,13 @@ $base = dirname(__DIR__, 2);
 return [
   'url' => env('URL'),
 
-
+  'ready' => function ($kirby) {
+    return [
+      'pechente.kirby-admin-bar' => [
+        'active' => $kirby->user() !== null
+      ]
+    ];
+  },
   // 'floriankarsten.plausible' => [
   //   'sharedLink' => env('PLAUSIBLE_SHARED_LINK'),
   //   // 'domain' => 'test.com' // not required if not set it will be taken from $site->url

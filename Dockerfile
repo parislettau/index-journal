@@ -26,7 +26,8 @@ RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install --no-install-re
     php-json \
     php-mbstring \
     php-xml \
-    php-zip && \
+    php-zip \
+    pandoc && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install imagemagick and utilities

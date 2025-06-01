@@ -25,7 +25,7 @@ return array(
     'League\\ColorExtractor\\' => array($vendorDir . '/league/color-extractor/src'),
     'League\\CLImate\\' => array($vendorDir . '/league/climate/src'),
     'Laminas\\Escaper\\' => array($vendorDir . '/laminas/laminas-escaper/src'),
-    'Kirby\\' => array($baseDir . '/kirby/src', $vendorDir . '/getkirby/cli/src', $vendorDir . '/getkirby/cli/tests', $vendorDir . '/getkirby/composer-installer/src'),
+    'Kirby\\' => array($vendorDir . '/getkirby/cli/src', $vendorDir . '/getkirby/cli/tests', $baseDir . '/kirby/src', $vendorDir . '/getkirby/composer-installer/src'),
     'JohannSchopplich\\' => array($baseDir . '/site/plugins/kirby-helpers/classes/JohannSchopplich'),
     'Jaybizzle\\CrawlerDetect\\' => array($vendorDir . '/jaybizzle/crawler-detect/src'),
     'Hananils\\' => array($baseDir . '/site/plugins/kirby-colors/lib'),

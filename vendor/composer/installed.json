@@ -1231,6 +1231,64 @@
             "install-path": "../../site/plugins/kirby-blurry-placeholder"
         },
         {
+            "name": "johannschopplich/kirby-deploy-trigger",
+            "version": "1.0.6",
+            "version_normalized": "1.0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/johannschopplich/kirby-deploy-trigger.git",
+                "reference": "94a9888947768342d8c260c6007e2c15ae5ac2af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/johannschopplich/kirby-deploy-trigger/zipball/94a9888947768342d8c260c6007e2c15ae5ac2af",
+                "reference": "94a9888947768342d8c260c6007e2c15ae5ac2af",
+                "shasum": ""
+            },
+            "require": {
+                "getkirby/composer-installer": "^1"
+            },
+            "require-dev": {
+                "getkirby/cms": "^4",
+                "vlucas/phpdotenv": "^5"
+            },
+            "time": "2025-04-07T13:52:30+00:00",
+            "type": "kirby-plugin",
+            "extra": {
+                "kirby-cms-path": false
+            },
+            "installation-source": "dist",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Johann Schopplich",
+                    "email": "hello@johannschopplich.com",
+                    "homepage": "https://johannschopplich.com"
+                }
+            ],
+            "description": "Kirby Panel plugin to trigger deployments on any platform",
+            "homepage": "https://github.com/johannschopplich/kirby-deploy-trigger#readme",
+            "keywords": [
+                "deployment",
+                "kirby",
+                "vercel"
+            ],
+            "support": {
+                "issues": "https://github.com/johannschopplich/kirby-deploy-trigger/issues",
+                "source": "https://github.com/johannschopplich/kirby-deploy-trigger/tree/v1.0.6"
+            },
+            "funding": [
+                {
+                    "url": "https://kirby.tools",
+                    "type": "custom"
+                }
+            ],
+            "install-path": "../../site/plugins/kirby-deploy-trigger"
+        },
+        {
             "name": "johannschopplich/kirby-helpers",
             "version": "4.2.1",
             "version_normalized": "4.2.1.0",

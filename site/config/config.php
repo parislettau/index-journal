@@ -64,6 +64,10 @@ return [
 
   'panel.install' => true,
 
+  'auth' => [
+    'methods' => ['password', 'code']
+  ],
+
   'diesdasdigital.meta-knight' => [
     'siteTitleAfterPageTitle' => true,
   ],

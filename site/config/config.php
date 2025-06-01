@@ -145,9 +145,5 @@ return [
     ]
   ],
 
-  'johannschopplich.deploy-trigger' => [
-    'deployUrl' => 'https://example.com/deploy'
-  ],
-
 
 ];

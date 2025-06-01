@@ -1,6 +1,5 @@
 title: Issue
 
-
 tabs:
   content:
     sections:
@@ -14,6 +13,15 @@ tabs:
           #   url: /generate-xml/{{ page.id }}
             # theme: positive
             # width: 1/2
+          crossrefSubmit:
+            type: button
+            label: Submit to Crossref
+            text: Send XML to Crossref
+            url: /submit-crossref/{{ page.id }}
+            # theme: positive
+            open: true
+            width: 1
+
 
       builder:
         headline: Builder

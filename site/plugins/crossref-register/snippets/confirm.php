@@ -19,7 +19,7 @@
         <li><strong>Editors:</strong>
             <ul>
                 <?php foreach ($issueData['editors'] as $e): ?>
-                    <li><?= esc($e['name'] ?? '') ?></li>
+                    <li><?= esc($e['name'] ?? (($e['first_name'] ?? '') . ' ' . ($e['last_name'] ?? ''))) ?></li>
                 <?php endforeach ?>
             </ul>
         </li>

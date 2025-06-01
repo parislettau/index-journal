@@ -124,20 +124,6 @@ return [
 
   ],
 
-  'crossref' => [
-    'username' => env('CROSSREF_USERNAME'),
-    'password' => env('CROSSREF_PASSWORD'),
-    'token'    => env('CROSSREF_TOKEN'),
-    'apiUrl'   => env('CROSSREF_API_URL', 'https://api.crossref.org/deposits')
-  ],
-
-  'crossref' => [
-    'apiUrl'   => 'https://api.crossref.org/v2/deposits',
-    'username' => 'indj', // e.g. 'indj/editor'
-    'password' => 'Index4Lyf',
-    'journalTitle' => 'Index Journal',
-    'issn' => '2652-4740'
-  ],
 
 
   # https://getkirby.com/docs/reference/system/options/email

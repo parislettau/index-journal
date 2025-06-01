@@ -2,6 +2,26 @@
 
 use Kirby\Cms\Response;
 
+function validateCrossrefSettings(array $opts): ?Response
+{
+    $required = [
+        'username'     => 'Crossref username',
+        'password'     => 'Crossref password',
+        'apiUrl'       => 'Crossref API URL',
+        'journalTitle' => 'Journal title',
+        'issn'         => 'Journal ISSN'
+    ];
+
+    foreach ($required as $key => $label) {
+        if (empty($opts[$key])) {
+            return new Response("Missing required Crossref setting: {$label}", 'text/plain', 400);
+        }
+    }
+
+    return null;
+}
+
+
 Kirby::plugin('custom/crossref', [
     'routes' => [
         [
@@ -79,9 +99,15 @@ function collectIssueData($issue): array
  */
 function generateXML(array $issue, array $essays): string
 {
-    $opts   = kirby()->option('crossref', []);
-    $issn   = $opts['issn']   ?? '0000-0000';
-    $journalTitle = $opts['journalTitle'] ?? 'Example Journal';
+
+    $site = kirby()->site();
+    $opts = [
+        'journalTitle' => $site->crossref_journalTitle()->value(),
+        'issn'         => $site->crossref_issn()->value(),
+    ];
+
+    $issn   = $opts['issn'];
+    $journalTitle = $opts['journalTitle'];
 
     $esc = fn($s) => htmlspecialchars($s ?? '', ENT_XML1 | ENT_COMPAT, 'UTF-8');
 
@@ -149,10 +175,19 @@ function generateBatchId(): string
  */
 function sendToCrossref(string $xml): string
 {
-    $opt   = kirby()->option('crossref', []);
+    $site = kirby()->site();
+
+    $opt = [
+        'apiUrl'   => $site->crossref_apiUrl()->or('https://api.crossref.org/v2/deposits')->value(),
+        'username' => $site->crossref_username()->value(),
+        'password' => $site->crossref_password()->value(),
+    ];
+
     $url   = $opt['apiUrl']   ?? 'https://doi.crossref.org/servlet/deposit';
     $user  = $opt['username'] ?? '';
     $pass  = $opt['password'] ?? '';
+
+
 
     // 1. temp file and multipart/form-data POST
     $tmp = tempnam(sys_get_temp_dir(), 'cr_');

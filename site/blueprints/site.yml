@@ -94,5 +94,41 @@ tabs:
             command: 'janitor:thumbs --site'
             label:  Thumbs
             icon: images
+
+          
+          crossref_section:
+            type: headline
+            label: Crossref Settings
+
+          crossref_username:
+            label: Username
+            type: text
+            width: 1/2
+
+          crossref_password:
+            label: Password
+            type: text
+            width: 1/2
+
+          crossref_prefix:
+            label: DOI Prefix
+            type: text
+            help: e.g. 10.38030
+
+          crossref_issn:
+            label: ISSN
+            type: text
+            width: 1/2
+
+          crossref_journalTitle:
+            label: Journal Title
+            type: text
+            width: 1/2
+
+          crossref_apiUrl:
+            label: API Endpoint
+            type: url
+            default: https://api.crossref.org/v2/deposits
+          
 #  seotab: seo
   seo: seo/site

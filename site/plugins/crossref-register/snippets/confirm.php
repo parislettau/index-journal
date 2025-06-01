@@ -4,7 +4,7 @@
 /** @var array $issueData */
 /** @var array $essaysData */
 ?>
-<section style="max-width:48rem;margin:2rem auto;font-family:system-ui">
+<section style="">
     <h1 style="font-size:1.5rem;margin-bottom:1rem">
         Confirm Crossref submission for “<?= html($issueData['issue_title']) ?>”
     </h1>
@@ -58,16 +58,16 @@
         <a href="<?= $issue->panelUrl() ?>" class="k-button">Cancel</a>
     </form>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var form = document.getElementById('crossref-submit-form');
-        if (!form) return;
-        form.addEventListener('submit', function () {
-            var btn = document.getElementById('crossref-submit-btn');
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = 'Submitting…';
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('crossref-submit-form');
+            if (!form) return;
+            form.addEventListener('submit', function() {
+                var btn = document.getElementById('crossref-submit-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Submitting…';
+                }
+            });
         });
-    });
     </script>
 </section>

@@ -14,7 +14,7 @@ function crossrefOptions(): array
     ];
 }
 
-function validateCrossrefSettings(array $opts, array $keys = null): ?Response
+function validateCrossrefSettings(array $opts, ?array $keys = null): ?Response
 {
     $labels = [
         'username'     => 'Crossref username',
@@ -196,7 +196,7 @@ function generateBatchId(): string
  * POST the XML to Crossref and return a detailed result object.
  * Uses the correct multipart/form-data payload.
  */
-function sendToCrossref(string $xml, array $opt = null): string
+function sendToCrossref(string $xml, ?array $opt = null): string
 {
     $opt ??= crossrefOptions();
 

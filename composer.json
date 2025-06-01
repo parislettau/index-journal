@@ -33,8 +33,7 @@
     "johannschopplich/kirby-helpers": "^4.0",
     "moritzebeling/kirby-panel-button": "^1.0",
     "bnomei/kirby3-pageviewcounter": "^1.7",
-    "tobimori/kirby-seo": "^1.1",
-    "johannschopplich/kirby-deploy-trigger": "^1.0"
+    "tobimori/kirby-seo": "^1.1"
   },
   "scripts": {
     "start": [

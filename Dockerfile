@@ -17,10 +17,19 @@ RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install --no-install-re
     ca-certificates \
     pandoc \
     imagemagick \
+    # Libraries required for PHP extensions
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libzip-dev \
+    libicu-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install required PHP extensions
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install \
     curl \
     dom \
     gd \

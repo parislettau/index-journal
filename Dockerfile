@@ -1,5 +1,5 @@
-# Use latest offical ubuntu image
-FROM ubuntu:latest
+# Use PHP 8.4 with Apache as base image
+FROM php:8.4-apache
 
 # Set timezone environment variable
 ENV TZ=Australia/Melbourne
@@ -11,29 +11,24 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Remove annoying messages during package installation
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install packages: web server Apache, PHP and extensions
+# Install packages and PHP extensions
 RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install --no-install-recommends -y \
-    apache2 \
-    apache2-utils \
-    ca-certificates \
     git \
-    php \
-    libapache2-mod-php \
-    php-curl \
-    php-dom \
-    php-gd \
-    php-intl \
-    php-json \
-    php-mbstring \
-    php-xml \
-    php-zip \
-    pandoc && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    pandoc \
+    imagemagick \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install imagemagick and utilities
-RUN apt-get update -o Acquire::ForceIPv4=true && \
-    apt-get install -y --no-install-recommends apt-utils imagemagick --fix-missing && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install required PHP extensions
+RUN docker-php-ext-install \
+    curl \
+    dom \
+    gd \
+    intl \
+    mbstring \
+    xml \
+    zip
+
 # Copy virtual host configuration from current path onto existing 000-default.conf
 COPY default.conf /etc/apache2/sites-available/000-default.conf
 

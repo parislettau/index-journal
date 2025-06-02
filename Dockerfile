@@ -22,6 +22,7 @@ RUN apt-get update -o Acquire::ForceIPv4=true && apt-get install --no-install-re
     libxml2-dev \
     libzip-dev \
     libicu-dev \
+    libonig-dev \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \

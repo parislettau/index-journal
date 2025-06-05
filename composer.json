@@ -23,7 +23,7 @@
   },
   "require": {
     "php": ">= 8.4.0",
-    "getkirby/cms": "^4.0",
+    "getkirby/cms": "^5.0.0-rc.3",
     "johannschopplich/kirby-blurry-placeholder": "^2.0",
     "medienbaecker/autoresize": "^2.1",
     "hananils/kirby-colors": "^1.7",
@@ -31,6 +31,7 @@
     "getkirby/cli": "^1.1",
     "bnomei/kirby3-janitor": "^3.9",
     "johannschopplich/kirby-helpers": "^4.0",
+    "moritzebeling/kirby-panel-button": "^1.0",
     "bnomei/kirby3-pageviewcounter": "^1.7",
     "tobimori/kirby-seo": "^1.1.2",
     "pechente/kirby-admin-bar": "^2.2"

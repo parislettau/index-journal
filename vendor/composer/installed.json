@@ -523,17 +523,17 @@
         },
         {
             "name": "getkirby/cms",
-            "version": "4.8.0",
-            "version_normalized": "4.8.0.0",
+            "version": "5.0.0-rc.3",
+            "version_normalized": "5.0.0.0-RC3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getkirby/kirby.git",
-                "reference": "5292c17832dd34b0e5f3e98dea837a357ef037b6"
+                "reference": "6dac5cd0e1d579685509d4306b2561962e06f013"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getkirby/kirby/zipball/5292c17832dd34b0e5f3e98dea837a357ef037b6",
-                "reference": "5292c17832dd34b0e5f3e98dea837a357ef037b6",
+                "url": "https://api.github.com/repos/getkirby/kirby/zipball/6dac5cd0e1d579685509d4306b2561962e06f013",
+                "reference": "6dac5cd0e1d579685509d4306b2561962e06f013",
                 "shasum": ""
             },
             "require": {
@@ -555,11 +555,11 @@
                 "getkirby/composer-installer": "^1.2.1",
                 "laminas/laminas-escaper": "2.17.0",
                 "michelf/php-smartypants": "1.8.1",
-                "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "php": "~8.2.0 || ~8.3.0 || ~8.4.0",
                 "phpmailer/phpmailer": "6.10.0",
                 "symfony/polyfill-intl-idn": "1.32.0",
                 "symfony/polyfill-mbstring": "1.32.0",
-                "symfony/yaml": "6.4.21"
+                "symfony/yaml": "7.3.0"
             },
             "replace": {
                 "symfony/polyfill-php72": "*"
@@ -571,11 +571,12 @@
                 "ext-fileinfo": "Improved mime type detection for files",
                 "ext-intl": "Improved i18n number formatting",
                 "ext-memcached": "Support for the Memcached cache driver",
+                "ext-redis": "Support for the Redis cache driver",
                 "ext-sodium": "Support for the crypto class and more robust session handling",
                 "ext-zip": "Support for ZIP archive file functions",
                 "ext-zlib": "Sanitization and validation for svgz files"
             },
-            "time": "2025-06-03T09:52:03+00:00",
+            "time": "2025-06-03T11:50:31+00:00",
             "type": "kirby-cms",
             "extra": {
                 "unused": [
@@ -1672,6 +1673,59 @@
                 "source": "https://github.com/michelf/php-smartypants/tree/1.8.1"
             },
             "install-path": "../michelf/php-smartypants"
+        },
+        {
+            "name": "moritzebeling/kirby-panel-button",
+            "version": "v1.0.0",
+            "version_normalized": "1.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moritzebeling/kirby-panel-button.git",
+                "reference": "d3e77a00fd641ad01a8777fccf879de46ee229bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moritzebeling/kirby-panel-button/zipball/d3e77a00fd641ad01a8777fccf879de46ee229bf",
+                "reference": "d3e77a00fd641ad01a8777fccf879de46ee229bf",
+                "shasum": ""
+            },
+            "require": {
+                "getkirby/composer-installer": "^1.1",
+                "php": ">=7.4.0"
+            },
+            "time": "2023-01-23T17:32:37+00:00",
+            "type": "kirby-plugin",
+            "installation-source": "dist",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Moritz Ebeling",
+                    "homepage": "https://moritzebeling.com"
+                }
+            ],
+            "description": "Kirby panel button field to open or trigger some URL or webhook",
+            "homepage": "https://github.com/moritzebeling/kirby-panel-button",
+            "keywords": [
+                "blueprint",
+                "button",
+                "field",
+                "kirby",
+                "kirby-cms",
+                "kirby-plugin",
+                "panel",
+                "php",
+                "plugin",
+                "trigger",
+                "webhook"
+            ],
+            "support": {
+                "issues": "https://github.com/moritzebeling/kirby-panel-button/issues",
+                "source": "https://github.com/moritzebeling/kirby-panel-button"
+            },
+            "install-path": "../../site/plugins/kirby-panel-button"
         },
         {
             "name": "mustangostang/spyc",
@@ -2945,31 +2999,31 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v6.4.21",
-            "version_normalized": "6.4.21.0",
+            "version": "v7.3.0",
+            "version_normalized": "7.3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "f01987f45676778b474468aa266fe2eda1f2bc7e"
+                "reference": "cea40a48279d58dc3efee8112634cb90141156c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/f01987f45676778b474468aa266fe2eda1f2bc7e",
-                "reference": "f01987f45676778b474468aa266fe2eda1f2bc7e",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/cea40a48279d58dc3efee8112634cb90141156c2",
+                "reference": "cea40a48279d58dc3efee8112634cb90141156c2",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
-                "symfony/deprecation-contracts": "^2.5|^3",
+                "php": ">=8.2",
+                "symfony/deprecation-contracts": "^2.5|^3.0",
                 "symfony/polyfill-ctype": "^1.8"
             },
             "conflict": {
-                "symfony/console": "<5.4"
+                "symfony/console": "<6.4"
             },
             "require-dev": {
-                "symfony/console": "^5.4|^6.0|^7.0"
+                "symfony/console": "^6.4|^7.0"
             },
-            "time": "2025-04-04T09:48:44+00:00",
+            "time": "2025-04-04T10:10:33+00:00",
             "bin": [
                 "Resources/bin/yaml-lint"
             ],
@@ -3000,7 +3054,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v6.4.21"
+                "source": "https://github.com/symfony/yaml/tree/v7.3.0"
             },
             "funding": [
                 {

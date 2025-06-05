@@ -1674,59 +1674,6 @@
             "install-path": "../michelf/php-smartypants"
         },
         {
-            "name": "moritzebeling/kirby-panel-button",
-            "version": "v1.0.0",
-            "version_normalized": "1.0.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/moritzebeling/kirby-panel-button.git",
-                "reference": "d3e77a00fd641ad01a8777fccf879de46ee229bf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/moritzebeling/kirby-panel-button/zipball/d3e77a00fd641ad01a8777fccf879de46ee229bf",
-                "reference": "d3e77a00fd641ad01a8777fccf879de46ee229bf",
-                "shasum": ""
-            },
-            "require": {
-                "getkirby/composer-installer": "^1.1",
-                "php": ">=7.4.0"
-            },
-            "time": "2023-01-23T17:32:37+00:00",
-            "type": "kirby-plugin",
-            "installation-source": "dist",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Moritz Ebeling",
-                    "homepage": "https://moritzebeling.com"
-                }
-            ],
-            "description": "Kirby panel button field to open or trigger some URL or webhook",
-            "homepage": "https://github.com/moritzebeling/kirby-panel-button",
-            "keywords": [
-                "blueprint",
-                "button",
-                "field",
-                "kirby",
-                "kirby-cms",
-                "kirby-plugin",
-                "panel",
-                "php",
-                "plugin",
-                "trigger",
-                "webhook"
-            ],
-            "support": {
-                "issues": "https://github.com/moritzebeling/kirby-panel-button/issues",
-                "source": "https://github.com/moritzebeling/kirby-panel-button"
-            },
-            "install-path": "../../site/plugins/kirby-panel-button"
-        },
-        {
             "name": "mustangostang/spyc",
             "version": "0.6.3",
             "version_normalized": "0.6.3.0",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f387d7d9bd764f3014308bbc48f3b866",
+    "content-hash": "7c938b664aea8278e0cff1d1259a4286",
     "packages": [
         {
             "name": "bnomei/kirby3-janitor",
@@ -1611,56 +1611,6 @@
                 "source": "https://github.com/michelf/php-smartypants/tree/1.8.1"
             },
             "time": "2016-12-13T01:01:17+00:00"
-        },
-        {
-            "name": "moritzebeling/kirby-panel-button",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/moritzebeling/kirby-panel-button.git",
-                "reference": "d3e77a00fd641ad01a8777fccf879de46ee229bf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/moritzebeling/kirby-panel-button/zipball/d3e77a00fd641ad01a8777fccf879de46ee229bf",
-                "reference": "d3e77a00fd641ad01a8777fccf879de46ee229bf",
-                "shasum": ""
-            },
-            "require": {
-                "getkirby/composer-installer": "^1.1",
-                "php": ">=7.4.0"
-            },
-            "type": "kirby-plugin",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Moritz Ebeling",
-                    "homepage": "https://moritzebeling.com"
-                }
-            ],
-            "description": "Kirby panel button field to open or trigger some URL or webhook",
-            "homepage": "https://github.com/moritzebeling/kirby-panel-button",
-            "keywords": [
-                "blueprint",
-                "button",
-                "field",
-                "kirby",
-                "kirby-cms",
-                "kirby-plugin",
-                "panel",
-                "php",
-                "plugin",
-                "trigger",
-                "webhook"
-            ],
-            "support": {
-                "issues": "https://github.com/moritzebeling/kirby-panel-button/issues",
-                "source": "https://github.com/moritzebeling/kirby-panel-button"
-            },
-            "time": "2023-01-23T17:32:37+00:00"
         },
         {
             "name": "mustangostang/spyc",

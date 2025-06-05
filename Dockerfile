@@ -42,8 +42,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
 # Copy virtual host configuration from current path onto existing 000-default.conf
 COPY default.conf /etc/apache2/sites-available/000-default.conf
 
-# Remove default content (existing index.html)
-RUN rm /var/www/html/*
+# Ensure document root exists and remove any default files
+RUN mkdir -p /var/www/html && rm -rf /var/www/html/*
 
 # copy the Kirby site
 WORKDIR /var/www/html

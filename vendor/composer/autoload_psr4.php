@@ -14,7 +14,6 @@ return array(
     'Symfony\\Polyfill\\Intl\\Idn\\' => array($vendorDir . '/symfony/polyfill-intl-idn'),
     'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
-    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
     'Spatie\\SchemaOrg\\' => array($vendorDir . '/spatie/schema-org/src'),
     'Seld\\CliPrompt\\' => array($vendorDir . '/seld/cli-prompt/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
@@ -36,6 +35,6 @@ return array(
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'DeviceDetector\\' => array($vendorDir . '/matomo/device-detector'),
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
-    'Bnomei\\' => array($baseDir . '/site/plugins/kirby3-pageviewcounter/classes', $baseDir . '/site/plugins/kirby3-janitor/classes'),
+    'Bnomei\\' => array($baseDir . '/site/plugins/kirby3-pageviewcounter/classes'),
     'Base32\\' => array($vendorDir . '/christian-riesen/base32/src'),
 );

@@ -57,7 +57,6 @@
   <?= js('assets/js/script.js?v=' . sha1_file('assets/js/script.js')) ?>
 
   <!-- google analytics -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="REP3FyJ9Bqjr3A2K2owDTv9toyWnGTjnoPxmUs6vGT4" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139982363-1"></script>
   <script>

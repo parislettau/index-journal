@@ -26,6 +26,15 @@
     <?php if ($page->doi()->isNotEmpty()) : ?>
       <meta name="citation_doi" content="<?= $page->doi() ?>">
     <?php endif ?>
+    <?php if ($page->abstract()->isNotEmpty()) : ?>
+      <meta name="citation_abstract" content="<?= $page->abstract()->kirbytextinline() ?>">
+    <?php endif ?>
+    <?php if ($page->keywords()->isNotEmpty()) : ?>
+      <meta name="citation_keywords" content="<?= $page->keywords()->value() ?>">
+    <?php endif ?>
+    <?php if ($site->crossref_issn()->isNotEmpty()) : ?>
+      <meta name="citation_issn" content="<?= $site->crossref_issn() ?>">
+    <?php endif ?>
   <?php endif ?>
 
   <!-- plausible -->

@@ -11,7 +11,7 @@ uploads the data to DOAJ's API when confirmed.
 ```php
 return [
     'doaj.apiKey' => env('DOAJ_API_KEY'),
-    // optional: 'doaj.apiUrl' => 'https://doaj.org/api/v2/articles'
+    // optional: 'doaj.apiUrl' => 'https://doaj.org/api/articles'
 ];
 ```
 

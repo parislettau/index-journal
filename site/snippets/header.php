@@ -7,6 +7,7 @@
 
   <!-- https://plugins.andkindness.com/seo/docs/get-started/installation-setup -->
   <?php snippet('seo/head'); ?>
+  <?= $page->meta()->opensearch() ?>
 
   <!-- Google Scholar -->
   <?php if ($page->template() == "essay") : ?>

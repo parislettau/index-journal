@@ -1,0 +1,10 @@
+title: Search
+icon: search
+options:
+  changeSlug: false
+  delete: false
+  changeStatus: false
+fields:
+  info:
+    type: info
+    text: Use the search page to find content.

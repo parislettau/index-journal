@@ -109,6 +109,14 @@ return [
 
   'routes' => [
     [
+      'pattern' => 'open-search.xml',
+      'action'  => function () {
+        $queryUrl = url('search') . '?q={searchTerms}';
+        $xml = snippet('opensearch', ['site' => site(), 'queryUrl' => $queryUrl], true);
+        return new Kirby\Cms\Response($xml, 'application/opensearchdescription+xml');
+      }
+    ],
+    [
       'pattern' => '/books/(:any)',
       'action'  => function ($uid) {
         return go("https://index-press.com/", 301);

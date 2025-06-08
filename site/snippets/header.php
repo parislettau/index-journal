@@ -8,6 +8,10 @@
   <!-- https://plugins.andkindness.com/seo/docs/get-started/installation-setup -->
   <?php snippet('seo/head'); ?>
 
+  <!-- oai -->
+  <link rel="alternate" type="application/oaipmh+xml" href="https://index-journal.org/oai" title="OAI-PMH" />
+
+
   <!-- Google Scholar -->
   <?php if ($page->template() == "essay") : ?>
     <!-- https://scholar.google.com/intl/en/scholar/inclusion.html#indexing -->

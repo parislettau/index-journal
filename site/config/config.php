@@ -44,6 +44,9 @@ return [
     return new \Bnomei\PageViewCounterField();
   },
 
+  'doaj.apiKey' => 'ac8d1ba459884ecab094ae6755da1e6d',
+
+
 
   // 'debug' => true,
   'debug' => true,

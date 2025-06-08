@@ -49,4 +49,34 @@ function citationRis(Kirby\Cms\Page $page): string {
     return implode("\n", $ris) . "\n";
 }
 
+function citationChicago(Kirby\Cms\Page $page): string {
+    $authors = [];
+    foreach ($page->authors()->yaml() as $author) {
+        $authors[] = $author['first_name'] . ' ' . $author['last_name'];
+    }
+    $authorsStr = implode(', ', $authors);
+
+    $title = $page->title()->value();
+    if ($page->subtitle()->isNotEmpty()) {
+        $title .= ': ' . $page->subtitle()->value();
+    }
+
+    $journal = $page->site()->title()->value();
+    $issueNum = $page->parent()->num();
+    $year = $page->parent()->issue_date()->toDate('Y');
+
+    $citation = trim($authorsStr);
+    if ($citation !== '') {
+        $citation .= '. ';
+    }
+    $citation .= '"' . $title . '." ' . $journal . ', no. ' . $issueNum . ' (' . $year . ')';
+    if ($page->doi()->isNotEmpty()) {
+        $citation .= '. https://doi.org/' . $page->doi()->value() . '.';
+    } else {
+        $citation .= '. ' . $page->url();
+    }
+
+    return $citation;
+}
+
 Kirby::plugin('custom/citation', []);

@@ -86,6 +86,7 @@
         </span>
       <?php endif ?>
     </footer>
+    <?php snippet('how-to-cite', ['page' => $page]) ?>
   </article>
 </main>
 <?php snippet('footer') ?>

@@ -8,7 +8,7 @@ use Kirby\Cms\Response;
 function doajOptions(): array
 {
     return [
-        'apiUrl' => option('doaj.apiUrl', 'https://doaj.org/api/v2/articles'),
+        'apiUrl' => option('doaj.apiUrl', 'https://doaj.org/api/articles'),
         'apiKey' => option('doaj.apiKey'),
     ];
 }
@@ -133,8 +133,11 @@ function sendToDoaj(array $data, ?array $opt = null): string
 {
     $opt ??= doajOptions();
 
-    $url    = $opt['apiUrl'] ?? 'https://doaj.org/api/v2/articles';
+    $url    = $opt['apiUrl'] ?? 'https://doaj.org/api/articles';
     $apiKey = $opt['apiKey'] ?? '';
+
+    $querySep = str_contains($url, '?') ? '&' : '?';
+    $url .= $querySep . 'api_key=' . rawurlencode($apiKey);
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -143,7 +146,6 @@ function sendToDoaj(array $data, ?array $opt = null): string
         CURLOPT_POSTFIELDS     => json_encode($data),
         CURLOPT_HTTPHEADER     => [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiKey,
         ],
         CURLOPT_HEADER         => true,
     ]);

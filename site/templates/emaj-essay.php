@@ -2,13 +2,17 @@
 <?php echo $page->counterCss(); ?>
 
 <main data-template="<?= $page->template() ?>">
+  <article>
+    <header>
+      <h1><span class="title"><?= $page->title() ?></span>
+        <?php if ($page->subtitle()->isNotEmpty()) : ?><span class="subtitle"><?= smartypants($page->subtitle()->kti()) ?></span><?php endif ?>
+        <?php if ($page->slug() != 'introduction') : ?><span class="author">by <?= $page->author() ?></span><?php endif ?>
+      </h1>
+    </header>
 
-  <h1><span class="title"><?= $page->title() ?></span>
-    <?php if ($page->subtitle()->isNotEmpty()) : ?><span class="subtitle"><?= smartypants($page->subtitle()->kti()) ?></span><?php endif ?>
-    <?php if ($page->slug() != 'introduction') : ?><span class="author">by <?= $page->author() ?></span><?php endif ?>
-  </h1>
+    <section>
 
-  <div class="text-block">
+      <div class="text-block">
 
     <?php if ($page->abstract()->isNotEmpty()) : ?>
       <div class="abstract-block">
@@ -27,21 +31,26 @@
       <?= smartypants($page->bibilography()->kirbytext()) ?>
     </div>
 
-    <?php if ($page->slug() != 'introduction') : ?>
-      <span class="essay-extra">
-        <?php if ($page->doi()->isNotEmpty()) : ?>
-          <span class="doi">DOI: <a href="https://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></a></span>
-        <?php endif ?>
-        <?php if ($page->hasDocuments()) : ?>
-          <span class="pdf"><a href="<?= $page->documents()->first()->url() ?>" target="_blank">PDF</a></span>
-        <?php endif ?>
-        <span class="citation">
-          <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
-          <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
+
+    </section>
+
+    <footer>
+      <?php if ($page->slug() != 'introduction') : ?>
+        <span class="essay-extra">
+          <?php if ($page->doi()->isNotEmpty()) : ?>
+            <span class="doi">DOI: <a href="https://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></a></span>
+          <?php endif ?>
+          <?php if ($page->hasDocuments()) : ?>
+            <span class="pdf"><a href="<?= $page->documents()->first()->url() ?>" target="_blank">PDF</a></span>
+          <?php endif ?>
+          <span class="citation">
+            <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
+            <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
+          </span>
         </span>
-      </span>
-    <?php endif ?>
-  </div>
+      <?php endif ?>
+    </footer>
+  </article>
 
 </main>
 <?php snippet('footer') ?>

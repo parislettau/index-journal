@@ -1,18 +1,23 @@
 <?php snippet('header') ?>
 <?php echo $page->counterCss(); ?>
 <main data-template="<?= $page->template() ?>">
-  <!-- Title -->
-  <section class="title-block" style="background-color: rgb(<?= $page->parent()->issue_color() ?>)">
-    <h1 style="font-size:6vw">
-      <span class="title"><?= $page->title() ?></span>
-      <?php if ($page->subtitle()->isNotEmpty()) : ?>
-        <span class="subtitle"><?= smartypants($page->subtitle()->kti()) ?></span>
-      <?php endif ?>
-      <?php if ($page->slug() != 'introduction') : ?>
-        <span class="author">by <?= $page->author() ?></span>
-      <?php endif ?>
-    </h1>
-  </section>
+  <article>
+    <header>
+      <!-- Title -->
+      <section class="title-block" style="background-color: rgb(<?= $page->parent()->issue_color() ?>)">
+        <h1 style="font-size:6vw">
+          <span class="title"><?= $page->title() ?></span>
+          <?php if ($page->subtitle()->isNotEmpty()) : ?>
+            <span class="subtitle"><?= smartypants($page->subtitle()->kti()) ?></span>
+          <?php endif ?>
+          <?php if ($page->slug() != 'introduction') : ?>
+            <span class="author">by <?= $page->author() ?></span>
+          <?php endif ?>
+        </h1>
+      </section>
+    </header>
+
+    <section>
 
 
   <!-- Text -->
@@ -64,19 +69,25 @@
     <?php endif ?>
     </div>
 
-    <?php if ($page->slug() != 'introduction') : ?>
-      <span class="essay-extra">
-        <?php if ($page->doi()->isNotEmpty()) : ?>
-          <span class="doi">
-            <a href="http://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></a>
+    </section>
+
+    <footer>
+      <?php if ($page->slug() != 'introduction') : ?>
+        <span class="essay-extra">
+          <?php if ($page->doi()->isNotEmpty()) : ?>
+            <span class="doi">
+              <a href="http://doi.org/<?= $page->doi() ?>"><?= $page->doi() ?></a>
+            </span>
+          <?php endif ?>
+          <span class="citation">
+            <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
+            <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
           </span>
-        <?php endif ?>
-        <span class="citation">
-          <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
-          <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
         </span>
-      </span>
-<?php endif ?>
+      <?php endif ?>
+    </footer>
+  </article>
+
 </main>
 <?php snippet('footer') ?>
 </html>

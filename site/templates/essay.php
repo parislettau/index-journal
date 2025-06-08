@@ -5,7 +5,7 @@
     <header>
       <!-- Title -->
       <section class="title-block" style="background-color: rgb(<?= $page->parent()->issue_color() ?>)">
-        <h1 style="font-size:6vw">
+        <h1 style="font-size:6vw; display:block" style="">
           <span class="title"><?= $page->title() ?></span>
           <?php if ($page->subtitle()->isNotEmpty()) : ?>
             <span class="subtitle"><?= smartypants($page->subtitle()->kti()) ?></span>
@@ -20,54 +20,54 @@
     <section>
 
 
-  <!-- Text -->
-  <div class="text-block">
-    <?php if ($page->slug() != 'introduction') : ?>
-      <?php if ($page->hasDocuments()) : ?>
-        <span class="pdf">(<a href="<?= $page->documents()->first()->url() ?>" target="_blank" rel="noopener noreferrer">PDF</a>)</span>
-      <?php endif ?>
-    <?php endif ?>
-    <!-- content -->
-    <div class="content-block">
-      <?= smartypants($page->text()->kirbytext()) ?>
-    </div>
-  </div>
-
-  <!-- Bios -->
-  <div class="text-bios">
-    <?= smartypants($page->bios()->kirbytext()) ?>
-  </div>
-
-  <!-- bibliographies -->
-  <?php if ($page->bibilography()->isNotEmpty()) : ?>
-    <p style="font-size: 1.4rem; text-indent: 0; text-transform: uppercase; margin-bottom: 1em; padding: 0 4em;">Bibliography</p>
-    <div class="text-bibliography">
-      <?= smartypants($page->bibilography()->kirbytext()) ?>
-    </div>
-  <?php endif ?>
-
-
-  <!-- bibliographies -->
-  <?php if ($page->selected_bibilography()->isNotEmpty()) : ?>
-    <div class="wrapper-bib">
-      <p style="font-size: 1.4rem; text-indent: 0; text-transform: uppercase; margin-bottom: 1em; padding: 0 4em; margin-top:4rem">
-        Selected Bibliography
-      </p>
-      <div class=" selected-bibliography">
-        <?= $page->headnote()->kirbytext() ?>
+      <!-- Text -->
+      <div class="text-block">
+        <?php if ($page->slug() != 'introduction') : ?>
+          <?php if ($page->hasDocuments()) : ?>
+            <span class="pdf">(<a href="<?= $page->documents()->first()->url() ?>" target="_blank" rel="noopener noreferrer">PDF</a>)</span>
+          <?php endif ?>
+        <?php endif ?>
+        <!-- content -->
+        <div class="content-block">
+          <?= smartypants($page->text()->kirbytext()) ?>
+        </div>
       </div>
-      <?php foreach ($page->selected_bibilography()->toStructure() as $section) : ?>
-        <div class="selected-bibliography">
-          <h2> <?= $section->heading() ?></h2>
 
-        </div>
+      <!-- Bios -->
+      <div class="text-bios">
+        <?= smartypants($page->bios()->kirbytext()) ?>
+      </div>
+
+      <!-- bibliographies -->
+      <?php if ($page->bibilography()->isNotEmpty()) : ?>
+        <p style="font-size: 1.4rem; text-indent: 0; text-transform: uppercase; margin-bottom: 1em; padding: 0 4em;">Bibliography</p>
         <div class="text-bibliography">
-          <?= $section->bibliography()->kirbytext() ?>
+          <?= smartypants($page->bibilography()->kirbytext()) ?>
         </div>
-      <?php endforeach ?>
+      <?php endif ?>
 
-    <?php endif ?>
-    </div>
+
+      <!-- bibliographies -->
+      <?php if ($page->selected_bibilography()->isNotEmpty()) : ?>
+        <div class="wrapper-bib">
+          <p style="font-size: 1.4rem; text-indent: 0; text-transform: uppercase; margin-bottom: 1em; padding: 0 4em; margin-top:4rem">
+            Selected Bibliography
+          </p>
+          <div class=" selected-bibliography">
+            <?= $page->headnote()->kirbytext() ?>
+          </div>
+          <?php foreach ($page->selected_bibilography()->toStructure() as $section) : ?>
+            <div class="selected-bibliography">
+              <h2> <?= $section->heading() ?></h2>
+
+            </div>
+            <div class="text-bibliography">
+              <?= $section->bibliography()->kirbytext() ?>
+            </div>
+          <?php endforeach ?>
+
+        <?php endif ?>
+        </div>
 
     </section>
 
@@ -89,4 +89,5 @@
   </article>
 </main>
 <?php snippet('footer') ?>
+
 </html>

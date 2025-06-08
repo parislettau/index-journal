@@ -25,7 +25,6 @@
     "php": ">= 8.4.0",
     "getkirby/cms": "^5.0.0-rc.3",
     "johannschopplich/kirby-blurry-placeholder": "^2.0",
-    "medienbaecker/autoresize": "^2.1",
     "hananils/kirby-colors": "^1.7",
     "sylvainjule/color-palette": "^1.0",
     "getkirby/cli": "^1.1",

@@ -1476,55 +1476,6 @@
             "install-path": "../matomo/device-detector"
         },
         {
-            "name": "medienbaecker/autoresize",
-            "version": "2.1.4",
-            "version_normalized": "2.1.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/medienbaecker/kirby-autoresize.git",
-                "reference": "aced13014a4d11469cce42d5f968c26e0dc93c0a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/medienbaecker/kirby-autoresize/zipball/aced13014a4d11469cce42d5f968c26e0dc93c0a",
-                "reference": "aced13014a4d11469cce42d5f968c26e0dc93c0a",
-                "shasum": ""
-            },
-            "require": {
-                "getkirby/composer-installer": "^1.1"
-            },
-            "time": "2022-05-16T05:50:59+00:00",
-            "type": "kirby-plugin",
-            "installation-source": "dist",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Thomas Günther",
-                    "email": "mail@medienbaecker.com",
-                    "homepage": "https://www.medienbaecker.com"
-                }
-            ],
-            "description": "Kirby Autoresize Plugin",
-            "support": {
-                "issues": "https://github.com/medienbaecker/kirby-autoresize/issues",
-                "source": "https://github.com/medienbaecker/kirby-autoresize/tree/2.1.4"
-            },
-            "funding": [
-                {
-                    "url": "https://a.paddle.com/v2/click/1129/36156?link=1170",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.paypal.me/medienbaecker/10",
-                    "type": "custom"
-                }
-            ],
-            "install-path": "../../site/plugins/autoresize"
-        },
-        {
             "name": "michelf/php-smartypants",
             "version": "1.8.1",
             "version_normalized": "1.8.1.0",

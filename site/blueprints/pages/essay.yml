@@ -1,5 +1,11 @@
 title: Essay
 
+buttons:
+  doaj:
+    icon: refresh
+    text: Submit to DOAJ
+    link: https://index-journal.org/submit-doaj/{{ page.id }}
+
 # icon: page
 # image:
 #   # query: false

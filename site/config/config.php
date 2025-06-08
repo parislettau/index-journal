@@ -132,6 +132,13 @@ return [
         return new Kirby\Cms\Response(citationRis($page), 'application/x-research-info-systems');
       }
     ],
+    [
+      'pattern' => 'oai',
+      'action'  => function () {
+        $xml = snippet('oai', [], true);
+        return new Kirby\Cms\Response($xml, 'text/xml');
+      }
+    ],
 
   ],
 

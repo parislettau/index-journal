@@ -4,7 +4,16 @@
     "watch": "npx tailwindcss -i ./src/css/tailwind.css -o ./assets/css/tailwind.css --content './site/**/*.php' -w",
     "build": "npx tailwindcss -i ./src/css/tailwind.css -o ./assets/css/tailwind.css --content './site/**/*.php' -m"
   },
-  "dependencies": {
-    "tailwindcss": "^3.4.14"
-  }
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.8",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8"
+  },
+  "description": "<img src=\"http://getkirby.com/assets/images/github/plainkit.jpg\" width=\"300\">",
+  "version": "1.0.0",
+  "main": "tailwind.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

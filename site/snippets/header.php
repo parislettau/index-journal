@@ -31,7 +31,7 @@
       <meta name="citation_doi" content="<?= $page->doi() ?>">
     <?php endif ?>
     <?php if ($page->abstract()->isNotEmpty()) : ?>
-      <meta name="citation_abstract" content="<?= $page->abstract()->kirbytextinline() ?>">
+      <meta name="citation_abstract" content="<?= $page->abstract()->value() ?>">
     <?php endif ?>
     <?php if ($page->keywords()->isNotEmpty()) : ?>
       <meta name="citation_keywords" content="<?= $page->keywords()->value() ?>">

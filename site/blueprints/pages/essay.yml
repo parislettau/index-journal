@@ -4,7 +4,9 @@ buttons:
   doaj:
     icon: refresh
     text: Submit to DOAJ
-    link: https://index-journal.org/submit-doaj/{{ page.id }}
+    # link: https://index-journal.org/submit-doaj/{{ page.id }}
+    link: http://localhost:8000/submit-doaj/{{ page.id }}
+   
 
 # icon: page
 # image:

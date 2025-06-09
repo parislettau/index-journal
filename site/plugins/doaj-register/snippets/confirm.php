@@ -1,4 +1,5 @@
 <?php
+
 /** @var Kirby\Cms\Page $essay */
 /** @var array $data */
 ?>
@@ -29,6 +30,9 @@
         <button type="submit" class="k-button k-button--filled" id="doaj-submit-btn">Confirm</button>
         <a href="<?= $essay->panelUrl() ?>" class="k-button">Cancel</a>
     </form>
+    <h2>JSON Data</h2>
+    <pre><?= json_encode($data['bibjson'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?></pre>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('doaj-submit-form');

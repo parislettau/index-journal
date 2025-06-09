@@ -1,10 +1,13 @@
 title: Essay
 
 buttons:
+  preview: true
+  settings: true
+  open: true
   doaj:
     icon: refresh
     text: Submit to DOAJ
-    link: https://index-journal.org/submit-doaj/{{ page.id }}
+    link: "{{ site.url }}/submit-doaj/{{ page.id }}"
 
 # icon: page
 # image:
@@ -76,6 +79,14 @@ tabs:
           doi:
             label: DOI
             type: text
+          doaj_id:
+            label: DOAJ ID
+            type: text
+            # disabled: true
+          doaj_record_url:
+            label: DOAJ Record URL
+            type: url
+            # disabled: true
           keywords:
             type: tags
           bios:

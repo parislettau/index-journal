@@ -1,5 +1,6 @@
 # System files
 # ------------
+/.env
 /.env.local
 
 Icon

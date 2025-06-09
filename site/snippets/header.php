@@ -9,7 +9,7 @@
   <?php snippet('seo/head'); ?>
 
   <!-- oai -->
-  <link rel="alternate" type="application/oaipmh+xml" href="https://index-journal.org/oai" title="OAI-PMH" />
+  <link rel="alternate" type="application/oaipmh+xml" href="<?= url('oai') ?>" title="OAI-PMH" />
 
 
   <!-- Google Scholar -->

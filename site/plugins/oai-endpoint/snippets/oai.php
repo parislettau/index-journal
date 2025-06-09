@@ -16,6 +16,12 @@ foreach ($issues as $issue) {
         'doi'      => $issue->issue_doi()->value(),
         'abstract' => null,
         'url'      => $issue->url(),
+        'subject'  => $issue->keywords()->value(),
+        'publisher'=> 'Index Journal',
+        'pubDate'  => $issue->issue_date()->toDate('Y-m-d'),
+        'type'     => 'Issue',
+        'language' => 'en',
+        'rights'   => 'CC BY-NC-ND 4.0',
     ];
 
     foreach ($issue->index()->filterBy('template', 'essay') as $essay) {
@@ -31,6 +37,12 @@ foreach ($issues as $issue) {
             'doi'      => $essay->doi()->value(),
             'abstract' => $essay->abstract()->value(),
             'url'      => $essay->url(),
+            'subject'  => $essay->keywords()->value(),
+            'publisher'=> $essay->publisher()->or('Index Journal')->value(),
+            'pubDate'  => $essay->parent()->issue_date()->toDate('Y-m-d'),
+            'type'     => $essay->article_type()->or('ScholarlyArticle')->value(),
+            'language' => $essay->language()->or('en')->value(),
+            'rights'   => $essay->rights()->or('CC BY-NC-ND 4.0')->value(),
         ];
     }
 }
@@ -57,6 +69,14 @@ foreach ($issues as $issue) {
 <?php foreach ($r['creators'] as $c): ?>
                     <dc:creator><?= esc($c) ?></dc:creator>
 <?php endforeach; ?>
+<?php if (!empty($r['subject'])): ?>
+                    <dc:subject><?= esc($r['subject']) ?></dc:subject>
+<?php endif; ?>
+                    <dc:publisher><?= esc($r['publisher']) ?></dc:publisher>
+                    <dc:date><?= esc($r['pubDate']) ?></dc:date>
+                    <dc:type><?= esc($r['type']) ?></dc:type>
+                    <dc:language><?= esc($r['language']) ?></dc:language>
+                    <dc:rights><?= esc($r['rights']) ?></dc:rights>
 <?php if (!empty($r['abstract'])): ?>
                     <dc:description><?= esc($r['abstract']) ?></dc:description>
 <?php endif; ?>

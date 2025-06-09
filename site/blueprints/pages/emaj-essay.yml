@@ -31,6 +31,39 @@ tabs:
           bios:
             label: Bio/s
             type: textarea
+          pub_date:
+            label: Publication Date
+            type: date
+            width: 1/2
+          publisher:
+            label: Publisher
+            type: text
+            default: Index Journal
+            width: 1/2
+          article_type:
+            label: Type
+            type: select
+            default: ScholarlyArticle
+            options:
+              - Text
+              - Article
+              - ScholarlyArticle
+          language:
+            label: Language
+            type: text
+            default: en
+            width: 1/2
+          rights:
+            label: Rights
+            type: select
+            default: CC BY-NC-ND 4.0
+            options:
+              - CC BY 4.0
+              - CC BY-SA 4.0
+              - CC BY-ND 4.0
+              - CC BY-NC 4.0
+              - CC BY-NC-SA 4.0
+              - CC BY-NC-ND 4.0
           viewcount:
             extends: fields/viewcount
           lastvisited:

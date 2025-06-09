@@ -6,6 +6,10 @@ buttons:
     text: Submit to Crossref
     link: https://index-journal.org/submit-crossref/{{ page.id }}
     # theme: purple-icon
+  doaj:
+    icon: refresh
+    text: Submit DOAJ Batch
+    link: https://index-journal.org/submit-doaj-bulk/{{ page.id }}
   
 
 tabs:

@@ -143,6 +143,11 @@ tabs:
             label: API Endpoint
             type: url
             default: https://doaj.org/api/articles
+
+          doaj_bulkApiUrl:
+            label: Bulk API Endpoint
+            type: url
+            default: https://doaj.org/api/v4/bulk/articles
           
 #  seotab: seo
   seo: seo/site

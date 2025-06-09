@@ -16,3 +16,7 @@ The route `/submit-doaj/<page-id>` accepts `GET` and `POST` requests.
 `GET` renders the confirmation page; a `POST` with `confirm=1` performs the
 upload.
 
+To submit all essays of an issue at once, open an issue page in the Panel and
+click **Submit DOAJ Batch**. The route `/submit-doaj-bulk/<issue-id>` works the
+same way and uploads all descendant essays in one request using DOAJ's bulk API.
+

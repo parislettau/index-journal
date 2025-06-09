@@ -78,6 +78,9 @@ tabs:
           doi:
             label: DOI
             type: text
+          doaj_id:
+            label: DOAJ ID
+            type: text
           keywords:
             type: tags
           bios:

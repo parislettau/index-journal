@@ -129,6 +129,20 @@ tabs:
             label: API Endpoint
             type: url
             default: https://api.crossref.org/v2/deposits
+
+          doaj_section:
+            type: headline
+            label: DOAJ Settings
+
+          doaj_apiKey:
+            label: API Key
+            type: text
+            width: 1/2
+
+          doaj_apiUrl:
+            label: API Endpoint
+            type: url
+            default: https://doaj.org/api/articles
           
 #  seotab: seo
   seo: seo/site

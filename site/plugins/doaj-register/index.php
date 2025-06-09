@@ -7,9 +7,10 @@ use Kirby\Cms\Response;
  */
 function doajOptions(): array
 {
+    $site = kirby()->site();
     return [
-        'apiUrl' => option('doaj.apiUrl', 'https://doaj.org/api/articles'),
-        'apiKey' => option('doaj.apiKey'),
+        'apiUrl' => $site->doaj_apiUrl()->or('https://doaj.org/api/articles')->value(),
+        'apiKey' => $site->doaj_apiKey()->value(),
     ];
 }
 
@@ -103,6 +104,10 @@ function collectDoajData(Kirby\Cms\Page $essay): array
     }
 
     $identifiers = [];
+    $issn = $site->crossref_issn()->value();
+    if ($issn !== '') {
+        $identifiers[] = ['type' => 'eissn', 'id' => $issn];
+    }
     if ($essay->doi()->isNotEmpty()) {
         $identifiers[] = ['type' => 'doi', 'id' => $essay->doi()->value()];
     }

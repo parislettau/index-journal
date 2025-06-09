@@ -84,11 +84,11 @@ tabs:
           doaj_id:
             label: DOAJ ID
             type: text
-            disabled: true
+            # disabled: true
           doaj_record_url:
             label: DOAJ Record URL
             type: url
-            disabled: true
+            # disabled: true
           keywords:
             type: tags
           bios:

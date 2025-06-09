@@ -100,11 +100,11 @@ tabs:
           doaj_upload_id:
             label: DOAJ Upload ID
             type: text
-            disabled: true
+            # disabled: true
           doaj_status:
             label: DOAJ Status URL
             type: url
-            disabled: true
+            # disabled: true
 
       published:
         headline: Essays / Sections

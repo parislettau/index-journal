@@ -9,8 +9,9 @@ function doajOptions(): array
 {
     $site = kirby()->site();
     return [
-        'apiUrl' => $site->doaj_apiUrl()->or('https://doaj.org/api/articles')->value(),
-        'apiKey' => $site->doaj_apiKey()->value(),
+        'apiUrl'      => $site->doaj_apiUrl()->or('https://doaj.org/api/articles')->value(),
+        'bulkApiUrl'  => $site->doaj_bulkApiUrl()->or('https://doaj.org/api/v4/bulk/articles')->value(),
+        'apiKey'      => $site->doaj_apiKey()->value(),
     ];
 }
 
@@ -30,7 +31,8 @@ function validateDoajSettings(array $opts): ?Response
  */
 Kirby::plugin('custom/doaj-register', [
     'snippets' => [
-        'doaj-confirm' => __DIR__ . '/snippets/confirm.php'
+        'doaj-confirm' => __DIR__ . '/snippets/confirm.php',
+        'doaj-confirm-bulk' => __DIR__ . '/snippets/confirm-bulk.php'
     ],
     'routes' => [
         [
@@ -92,6 +94,61 @@ Kirby::plugin('custom/doaj-register', [
                         }
                     }
                 }
+
+                return new Response($result, 'application/json');
+            },
+        ],
+        [
+            'pattern' => 'submit-doaj-bulk/(:all)',
+            'method'  => 'GET|POST',
+            'action'  => function (string $id) {
+
+                // 1. guards --------------------------------------------------
+                if (!kirby()->user()) {
+                    return new Response('Unauthorized', 'text/plain', 403);
+                }
+
+                if (!$issue = page($id)) {
+                    return new Response('Issue not found', 'text/plain', 404);
+                }
+
+                if ($issue->template() != 'issue') {
+                    return new Response('Invalid page type (' . $issue->template() . ')', 'text/plain', 400);
+                }
+
+                // 2. gather metadata ---------------------------------------
+                $essays = kirby()->site()->index()
+                    ->filterBy('template', 'essay')
+                    ->filter(fn($c) => $c->isDescendantOf($issue));
+
+                $articles = array_map(fn($e) => collectDoajData($e), $essays->values());
+
+                // 3. confirmation preview ---------------------------------
+                $request = kirby()->request();
+
+                if ($request->method() === 'GET' && $request->get('confirm') !== '1') {
+                    $html = snippet('doaj-confirm-bulk', [
+                        'issue'    => $issue,
+                        'articles' => $articles,
+                    ], true);
+                    return new Response($html, 'text/html');
+                }
+
+                // 4. reject POSTs without confirm=1 ------------------------
+                if ($request->method() === 'POST') {
+                    $confirm = $request->body()->get('confirm');
+                    if ($confirm !== '1') {
+                        return new Response('Confirmation required', 'text/plain', 400);
+                    }
+                }
+
+                // 5. send to DOAJ ------------------------------------------
+                $opts = doajOptions();
+                if ($resp = validateDoajSettings($opts)) {
+                    return $resp; // missing setting → abort
+                }
+
+                $result = sendBulkToDoaj($articles, $opts);
 
                 return new Response($result, 'application/json');
             },
@@ -162,6 +219,54 @@ function sendToDoaj(array $data, ?array $opt = null): string
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST           => true,
         CURLOPT_POSTFIELDS     => json_encode($data),
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+        ],
+        CURLOPT_HEADER         => true,
+    ]);
+    $raw  = curl_exec($ch);
+    $err  = curl_error($ch);
+    $info = curl_getinfo($ch);
+    curl_close($ch);
+
+    $headerSize = $info['header_size'] ?? 0;
+    $body       = substr($raw, $headerSize);
+
+    return json_encode([
+        'http_code'  => $info['http_code'] ?? 0,
+        'curl_error' => $err ?: null,
+        'body'       => $body ?: null,
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+}
+
+/**
+ * Upload multiple articles to DOAJ and return a JSON string describing the outcome.
+ */
+function sendBulkToDoaj(array $articles, ?array $opt = null): string
+{
+    $opt ??= doajOptions();
+
+    // derive bulk endpoint from single apiUrl if no explicit option
+    $url = $opt['bulkApiUrl'] ?? null;
+    if (!$url) {
+        $base = $opt['apiUrl'] ?? 'https://doaj.org/api/articles';
+        $url = preg_replace('#/articles$#', '/bulk/articles', $base);
+        if ($url === null) {
+            $url = 'https://doaj.org/api/v4/bulk/articles';
+        }
+    }
+    $apiKey = $opt['apiKey'] ?? '';
+
+    $querySep = str_contains($url, '?') ? '&' : '?';
+    $url .= $querySep . 'api_key=' . rawurlencode($apiKey);
+
+    $payload = ['articles' => $articles];
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode($payload),
         CURLOPT_HTTPHEADER     => [
             'Content-Type: application/json',
         ],

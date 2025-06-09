@@ -207,7 +207,7 @@ Kirby::plugin('custom/doaj-register', [
                     $html .= '<li><strong>Status URL:</strong> <a href="' . htmlspecialchars($body['status']) . '" target="_blank">' . htmlspecialchars($body['status']) . '</a></li>';
                     $html .= '</ul>';
                     $html .= '<p>You can check this link in a few minutes to track the progress of your submission.</p>';
-                    $html .= '<pre>' . $body . '</pre>';
+                    // $html .= '<pre>' . $body . '</pre>';
                     return new Response($html, 'text/html');
                 } else {
                     return new Response('<pre>' . htmlspecialchars($result) . '</pre>', 'text/html');

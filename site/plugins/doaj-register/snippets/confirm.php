@@ -34,9 +34,18 @@ $fields = [
     'Month'   => fn($b) => $b['month'] ?? '',
     'URL'     => $getUrl,
     'Journal' => fn($b) => $b['journal']['title'] ?? '',
-    'ISSN'    => fn($b) => $b['journal']['issn'] ?? '',
+    'ISSN' => fn($b) => (
+        function ($ids) {
+            foreach ($ids ?? [] as $id) {
+                if (($id['type'] ?? '') === 'eissn') {
+                    return $id['id'];
+                }
+            }
+            return '';
+        }
+    )($b['identifier'] ?? []),
     'Authors' => $getAuthors,
-    'Abstract'=> fn($b) => $b['abstract'] ?? '',
+    'Abstract' => fn($b) => $b['abstract'] ?? '',
 ];
 ?>
 <section>
@@ -65,8 +74,8 @@ $fields = [
                         <td><?= esc($old) ?></td>
                     <?php endif ?>
                     <td><?= esc($new) ?></td>
-                </tr>
-            <?php endforeach ?>
+                    </tr>
+                <?php endforeach ?>
         </tbody>
     </table>
     <form action="<?= url('submit-doaj/' . $essay->id()) ?>" method="post" style="display:flex;gap:.5rem;margin-top:2rem" id="doaj-submit-form">

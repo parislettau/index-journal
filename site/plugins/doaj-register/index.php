@@ -54,15 +54,20 @@ Kirby::plugin('custom/doaj-register', [
                 }
 
                 // 2. gather metadata ---------------------------------------
-                $data = collectDoajData($essay);
+                $data     = collectDoajData($essay);
+                $existing = null;
+                if ($essay->doaj_id()->isNotEmpty()) {
+                    $existing = fetchDoajRecord($essay->doaj_id()->value());
+                }
 
                 // 3. confirmation preview ---------------------------------
                 $request = kirby()->request();
 
                 if ($request->method() === 'GET' && $request->get('confirm') !== '1') {
                     $html = snippet('doaj-confirm', [
-                        'essay' => $essay,
-                        'data'  => $data,
+                        'essay'    => $essay,
+                        'data'     => $data,
+                        'existing' => $existing,
                     ], true);
                     return new Response($html, 'text/html');
                 }
@@ -136,7 +141,14 @@ Kirby::plugin('custom/doaj-register', [
                     ->filterBy('template', 'essay')
                     ->filter(fn($c) => $c->isDescendantOf($issue));
 
-                $articles = array_map(fn($e) => collectDoajData($e), $essays->values());
+                $articles = array_map(function ($e) {
+                    return [
+                        'data'     => collectDoajData($e),
+                        'existing' => $e->doaj_id()->isNotEmpty()
+                            ? fetchDoajRecord($e->doaj_id()->value())
+                            : null,
+                    ];
+                }, $essays->values());
 
                 // 3. confirmation preview ---------------------------------
                 $request = kirby()->request();
@@ -163,7 +175,8 @@ Kirby::plugin('custom/doaj-register', [
                     return $resp; // missing setting → abort
                 }
 
-                $result = sendBulkToDoaj($articles, $opts);
+                $payload = array_column($articles, 'data');
+                $result  = sendBulkToDoaj($payload, $opts);
 
                 $decoded = json_decode($result, true);
                 if (($decoded['http_code'] ?? 0) === 202 && !empty($decoded['body'])) {
@@ -355,4 +368,25 @@ function sendBulkToDoaj(array $articles, ?array $opt = null): string
         'curl_error' => $err ?: null,
         'body'       => $body ?: null,
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+}
+
+/**
+ * Fetch an existing DOAJ record.
+ */
+function fetchDoajRecord(string $id): ?array
+{
+    $url = 'https://doaj.org/api/v4/articles/' . rawurlencode($id);
+    $ch  = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FAILONERROR    => false,
+    ]);
+    $body = curl_exec($ch);
+    curl_close($ch);
+
+    if ($body === false || $body === null) {
+        return null;
+    }
+
+    return json_decode($body, true);
 }

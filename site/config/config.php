@@ -19,6 +19,8 @@ $base = dirname(__DIR__, 2);
 
 return [
   'url' => env('URL'),
+  'doaj.apiKey' => env('DOAJ_API_KEY'),
+  'doaj.apiUrl' => 'https://doaj.org/api/v2/articles',
 
 
   'doaj.apiKey' => 'ac8d1ba459884ecab094ae6755da1e6d',

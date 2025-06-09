@@ -46,6 +46,34 @@
   position: absolute
 }
 
+.mt-10 {
+  margin-top: 2.5rem
+}
+
+.mt-20 {
+  margin-top: 5rem
+}
+
+.mt-\[100px\] {
+  margin-top: 100px
+}
+
+.mt-\[140px\] {
+  margin-top: 140px
+}
+
+.mt-\[240px\] {
+  margin-top: 240px
+}
+
+.mt-\[120px\] {
+  margin-top: 120px
+}
+
+.mt-5 {
+  margin-top: 1.25rem
+}
+
 .block {
   display: block
 }
@@ -56,10 +84,6 @@
 
 .flex {
   display: flex
-}
-
-.inline-flex {
-  display: inline-flex
 }
 
 .table {
@@ -110,20 +134,10 @@
   scroll-snap-align: start
 }
 
-.flex-wrap {
-  flex-wrap: wrap
-}
-
 .space-x-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(1rem * var(--tw-space-x-reverse));
   margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)))
-}
-
-.space-x-1 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 0;
-  margin-right: calc(0.25rem * var(--tw-space-x-reverse));
-  margin-left: calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))
 }
 
 .overflow-x-auto {
@@ -164,12 +178,12 @@
   padding-bottom: 6rem
 }
 
-.pt-24 {
-  padding-top: 6rem
-}
-
 .pt-0 {
   padding-top: 0px
+}
+
+.pt-24 {
+  padding-top: 6rem
 }
 
 .text-center {
@@ -183,10 +197,6 @@
 
 .uppercase {
   text-transform: uppercase
-}
-
-.italic {
-  font-style: italic
 }
 
 .leading-tight {
@@ -233,88 +243,13 @@
   scroll-snap-align: start
 }
 
-.after\:ml-1::after {
-  content: var(--tw-content);
-  margin-left: 0.25rem
-}
-
-.after\:content-\[\"and\"\]::after {
-  --tw-content: "and";
-  content: var(--tw-content)
-}
-
-.after\:content-\[\"\2c \"\]::after {
-  --tw-content: ",";
-  content: var(--tw-content)
-}
-
 .after\:content-\[\'\2c \'\]::after {
   --tw-content: ',';
   content: var(--tw-content)
 }
 
-.after\:content-\[\'\2c \&nbsp\;\'\]::after {
-  --tw-content: ',&nbsp;';
-  content: var(--tw-content)
-}
-
-.after\:content-\[\'\2c \\00A0\'\]::after {
-  --tw-content: ',\00A0';
-  content: var(--tw-content)
-}
-
-.first\:content-\[\'\2c \'\]:first-child {
-  --tw-content: ',';
-  content: var(--tw-content)
-}
-
-.first\:before\:content-\[\'by\\00A0\'\]:first-child::before {
-  --tw-content: 'by\00A0';
-  content: var(--tw-content)
-}
-
-.first\:before\:content-\[\'by\'\]:first-child::before {
-  --tw-content: 'by';
-  content: var(--tw-content)
-}
-
-.first\:before\:content-\[\'editred\\00A0by\'\]:first-child::before {
-  --tw-content: 'editred\00A0by';
-  content: var(--tw-content)
-}
-
-.first\:before\:content-\[\'editred\\00A0\\by\'\]:first-child::before {
-  --tw-content: 'editred\00A0\by';
-  content: var(--tw-content)
-}
-
-.first\:before\:content-\[\'editedby\'\]:first-child::before {
-  --tw-content: 'editedby';
-  content: var(--tw-content)
-}
-
 .first\:before\:content-\[\'\'\]:first-child::before {
   --tw-content: '';
-  content: var(--tw-content)
-}
-
-.first\:before\:content-\[\'\\00A0\'\]:first-child::before {
-  --tw-content: '\00A0';
-  content: var(--tw-content)
-}
-
-.first\:after\:content-\[\'\2c \'\]:first-child::after {
-  --tw-content: ',';
-  content: var(--tw-content)
-}
-
-.last\:before\:content-\[\'\\00A0and\'\]:last-child::before {
-  --tw-content: '\00A0and';
-  content: var(--tw-content)
-}
-
-.last\:before\:content-\[\'and\'\]:last-child::before {
-  --tw-content: 'and';
   content: var(--tw-content)
 }
 

@@ -8,8 +8,6 @@ buttons:
     icon: refresh
     text: Submit to DOAJ
     link: "{{ site.url }}/submit-doaj/{{ page.id }}"
-    # link: http://localhost:8000/submit-doaj/{{ page.id }}
-   
 
 # icon: page
 # image:

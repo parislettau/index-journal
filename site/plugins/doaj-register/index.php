@@ -150,25 +150,6 @@ Kirby::plugin('custom/doaj-register', [
 
                 $result = sendBulkToDoaj($articles, $opts);
 
-                $decoded = json_decode($result, true);
-                if (($decoded['http_code'] ?? 0) === 202 && !empty($decoded['body'])) {
-                    $bodyJson = json_decode($decoded['body'], true);
-                    $data = [];
-                    if (!empty($bodyJson['upload_id'])) {
-                        $data['doaj_upload_id'] = $bodyJson['upload_id'];
-                    }
-                    if (!empty($bodyJson['status'])) {
-                        $data['doaj_status'] = $bodyJson['status'];
-                    }
-                    if ($data) {
-                        try {
-                            $issue->update($data);
-                        } catch (Throwable $e) {
-                            // ignore update errors
-                        }
-                    }
-                }
-
                 return new Response($result, 'application/json');
             },
         ],

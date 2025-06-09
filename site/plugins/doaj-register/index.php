@@ -80,6 +80,19 @@ Kirby::plugin('custom/doaj-register', [
                 }
 
                 $result = sendToDoaj($data, $opts);
+
+                $decoded = json_decode($result, true);
+                if (($decoded['http_code'] ?? 0) === 201 && !empty($decoded['body'])) {
+                    $bodyJson = json_decode($decoded['body'], true);
+                    if (!empty($bodyJson['id'])) {
+                        try {
+                            $essay->update(['doaj_id' => $bodyJson['id']]);
+                        } catch (Throwable $e) {
+                            // ignore update errors
+                        }
+                    }
+                }
+
                 return new Response($result, 'application/json');
             },
         ],

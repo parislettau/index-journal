@@ -90,17 +90,6 @@ tabs:
               archive: Archive
               current: Current
 
-      doaj:
-        headline: DOAJ
-        type: fields
-        fields:
-          doaj_upload_id:
-            label: DOAJ Upload ID
-            type: text
-          doaj_status:
-            label: DOAJ Status URL
-            type: url
-
       published:
         headline: Essays / Sections
         type: pages

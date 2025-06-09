@@ -6,14 +6,8 @@ uploads the data to DOAJ's API when confirmed.
 
 ## Usage
 
-1. Provide your DOAJ API key in `site/config/config.php`:
-
-```php
-return [
-    'doaj.apiKey' => env('DOAJ_API_KEY'),
-    // optional: 'doaj.apiUrl' => 'https://doaj.org/api/articles'
-];
-```
+1. Enter your DOAJ API key in the **Site** settings within the Kirby Panel.
+   You can also customise the API endpoint if required.
 
 2. In the Panel open an essay and click **Submit to DOAJ**. Review the displayed
    metadata and confirm the submission.

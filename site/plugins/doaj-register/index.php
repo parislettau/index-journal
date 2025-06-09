@@ -87,15 +87,30 @@ Kirby::plugin('custom/doaj-register', [
                 if (($decoded['http_code'] ?? 0) === 201 && !empty($decoded['body'])) {
                     $bodyJson = json_decode($decoded['body'], true);
                     if (!empty($bodyJson['id'])) {
+                        $recordUrl = 'https://doaj.org/api/v4/articles/' . $bodyJson['id'];
                         try {
-                            $essay->update(['doaj_id' => $bodyJson['id']]);
+                            $essay->update([
+                                'doaj_id'         => $bodyJson['id'],
+                                'doaj_record_url' => $recordUrl,
+                            ]);
                         } catch (Throwable $e) {
                             // ignore update errors
                         }
                     }
                 }
 
-                return new Response($result, 'application/json');
+                if (($decoded['http_code'] ?? 0) === 201 && !empty($bodyJson['id']) && !empty($bodyJson['location'])) {
+                    $articleUrl = 'https://doaj.org' . $bodyJson['location'];
+                    $html = '<h2>Article Submitted to DOAJ</h2>';
+                    $html .= '<p>Your article was successfully registered.</p>';
+                    $html .= '<ul>';
+                    $html .= '<li><strong>DOAJ ID:</strong> ' . htmlspecialchars($bodyJson['id']) . '</li>';
+                    $html .= '<li><strong>DOAJ Record:</strong> <a href="' . htmlspecialchars($articleUrl) . '" target="_blank">' . htmlspecialchars($articleUrl) . '</a></li>';
+                    $html .= '</ul>';
+                    return new Response($html, 'text/html');
+                } else {
+                    return new Response('<pre>' . htmlspecialchars($result) . '</pre>', 'text/html');
+                }
             },
         ],
         [
@@ -150,7 +165,40 @@ Kirby::plugin('custom/doaj-register', [
 
                 $result = sendBulkToDoaj($articles, $opts);
 
-                return new Response($result, 'application/json');
+                $decoded = json_decode($result, true);
+                if (($decoded['http_code'] ?? 0) === 202 && !empty($decoded['body'])) {
+                    $bodyJson = json_decode($decoded['body'], true);
+                    $data = [];
+                    if (!empty($bodyJson['upload_id'])) {
+                        $data['doaj_upload_id'] = $bodyJson['upload_id'];
+                    }
+                    if (!empty($bodyJson['status'])) {
+                        $data['doaj_status'] = $bodyJson['status'];
+                    }
+                    if ($data) {
+                        try {
+                            $issue->update($data);
+                        } catch (Throwable $e) {
+                            // ignore update errors
+                        }
+                    }
+                }
+
+                $body    = json_decode($decoded['body'] ?? '', true);
+
+                if (isset($body['upload_id'], $body['status'])) {
+                    $html = '<h2>Bulk Submission Accepted</h2>';
+                    $html .= '<p>Your article batch is now being processed by DOAJ.</p>';
+                    $html .= '<ul>';
+                    $html .= '<li><strong>Upload ID:</strong> ' . htmlspecialchars($body['upload_id']) . '</li>';
+                    $html .= '<li><strong>Status URL:</strong> <a href="' . htmlspecialchars($body['status']) . '" target="_blank">' . htmlspecialchars($body['status']) . '</a></li>';
+                    $html .= '</ul>';
+                    $html .= '<p>You can check this link in a few minutes to track the progress of your submission.</p>';
+                    $html .= '<pre>' . $body . '</pre>';
+                    return new Response($html, 'text/html');
+                } else {
+                    return new Response('<pre>' . htmlspecialchars($result) . '</pre>', 'text/html');
+                }
             },
         ],
     ],
@@ -165,12 +213,32 @@ function collectDoajData(Kirby\Cms\Page $essay): array
     $issue = $essay->parent();
 
     $authors = [];
-    foreach ($essay->authors()->toStructure()->toArray() as $a) {
-        $name = trim(($a['first_name'] ?? '') . ' ' . ($a['last_name'] ?? ''));
-        if (!$name && isset($a['name'])) {
-            $name = $a['name'];
+
+    $structured = $essay->authors()->toStructure();
+    if ($structured->isNotEmpty()) {
+        foreach ($structured as $a) {
+            $first = trim($a->first_name()->value());
+            $last  = trim($a->last_name()->value());
+            $name  = trim("$first $last");
+
+            // If name is blank, fallback to flat 'name' field if available
+            if ($name === '' && $a->name()->isNotEmpty()) {
+                $name = $a->name()->value();
+            }
+
+            $authorEntry = ['name' => $name];
+
+            if ($a->orcid()->isNotEmpty()) {
+                $authorEntry['orcid_id'] = $a->orcid()->value();
+            }
+
+            $authors[] = $authorEntry;
         }
-        $authors[] = ['name' => $name];
+    }
+
+    // Fallback: use `author` text field if structure is empty
+    if (empty($authors) && $essay->author()->isNotEmpty()) {
+        $authors[] = ['name' => $essay->author()->value()];
     }
 
     $identifiers = [];
@@ -184,7 +252,9 @@ function collectDoajData(Kirby\Cms\Page $essay): array
 
     return [
         'bibjson' => [
-            'title'  => $essay->title()->value(),
+            'title' => $essay->subtitle()->isNotEmpty()
+                ? $essay->title()->value() . ': ' . $essay->subtitle()->value()
+                : $essay->title()->value(),
             'journal' => [
                 'title' => $site->title()->value(),
                 'issn'  => $site->crossref_issn()->value(),
@@ -192,7 +262,7 @@ function collectDoajData(Kirby\Cms\Page $essay): array
             'year'  => $issue->issue_date()->toDate('Y'),
             'month' => $issue->issue_date()->toDate('m'),
             'link'  => [
-                ['type' => 'fulltext', 'url' => $essay->url()],
+                ['type' => 'fulltext', 'url' => 'https://index-journal.org/' . $essay->id()],
             ],
             'identifier' => $identifiers,
             'author' => $authors,
@@ -260,7 +330,7 @@ function sendBulkToDoaj(array $articles, ?array $opt = null): string
     $querySep = str_contains($url, '?') ? '&' : '?';
     $url .= $querySep . 'api_key=' . rawurlencode($apiKey);
 
-    $payload = ['articles' => $articles];
+    $payload = $articles;
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [

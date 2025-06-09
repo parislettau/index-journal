@@ -1,15 +1,19 @@
 title: Issue
 
 buttons:
+  preview: true
+  settings: true
+  open: true
   crossref:
     icon: refresh
     text: Submit to Crossref
-    link: https://index-journal.org/submit-crossref/{{ page.id }}
+    link: "{{ site.url }}/submit-crossref/{{ page.id }}"
     # theme: purple-icon
   doaj:
     icon: refresh
     text: Submit DOAJ Batch
-    link: https://index-journal.org/submit-doaj-bulk/{{ page.id }}
+    link: "{{ site.url }}/submit-doaj-bulk/{{ page.id }}"
+    # link: http://localhost:8000/submit-doaj-bulk/{{ page.id }}
   
 
 tabs:
@@ -89,6 +93,18 @@ tabs:
             options:
               archive: Archive
               current: Current
+      doaj:
+        headline: DOAJ
+        type: fields
+        fields:
+          doaj_upload_id:
+            label: DOAJ Upload ID
+            type: text
+            disabled: true
+          doaj_status:
+            label: DOAJ Status URL
+            type: url
+            disabled: true
 
       published:
         headline: Essays / Sections

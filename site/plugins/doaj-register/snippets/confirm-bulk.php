@@ -1,4 +1,5 @@
 <?php
+
 /** @var Kirby\Cms\Page $issue */
 /** @var array $articles */
 ?>
@@ -12,15 +13,15 @@
             <summary style="cursor:pointer">
                 <strong><?= esc($data['bibjson']['title'] ?? '') ?></strong>
                 <?php
-                    $doi = '';
-                    foreach (($data['bibjson']['identifier'] ?? []) as $id) {
-                        if (($id['type'] ?? '') === 'doi') {
-                            $doi = $id['id'];
-                            break;
-                        }
+                $doi = '';
+                foreach (($data['bibjson']['identifier'] ?? []) as $id) {
+                    if (($id['type'] ?? '') === 'doi') {
+                        $doi = $id['id'];
+                        break;
                     }
-                    if ($doi): ?>
-                        (<?= esc($doi) ?>)
+                }
+                if ($doi): ?>
+                    (<?= esc($doi) ?>)
                 <?php endif; ?>
             </summary>
             <div style="padding-left:1rem">
@@ -35,6 +36,10 @@
         <button type="submit" class="k-button k-button--filled" id="doaj-bulk-submit-btn">Confirm</button>
         <a href="<?= $issue->panelUrl() ?>" class="k-button">Cancel</a>
     </form>
+    <h2>Preview DOAJ Payload</h2>
+    <pre><?= json_encode($articles, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?></pre>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('doaj-bulk-submit-form');

@@ -47,8 +47,8 @@ Kirby::plugin('custom/doaj-register', [
                     return new Response('Page not found', 'text/plain', 404);
                 }
 
-                if ($essay->template() !== 'essay') {
-                    return new Response('Invalid page type', 'text/plain', 400);
+                if ($essay->template() != 'essay') {
+                    return new Response('Invalid page type (' . $essay->template() . ')', 'text/plain', 400);
                 }
 
                 // 2. gather metadata ---------------------------------------

@@ -47,6 +47,9 @@
             <a href="<?= url('citation/bibtex/' . $page->id()) ?>">BibTeX</a> |
             <a href="<?= url('citation/ris/' . $page->id()) ?>">RIS</a>
           </span>
+          <?php if ($page->rights()->isNotEmpty()) : ?>
+            <span class="rights"><?= $page->rights() ?></span>
+          <?php endif ?>
         </span>
       <?php endif ?>
     </footer>

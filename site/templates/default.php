@@ -3,7 +3,7 @@
 <main data-template="<?= $page->template() ?>">
   <header>
     <!-- Title -->
-    <section class="title-block" style="background-color: rgb(<?= $page->parent()->issue_color() ?>)">
+    <section class="title-block" style="">
       <h1 style="font-size:6vw; display:block" style="">
         <span class="title"><?= $page->title() ?></span>
       </h1>

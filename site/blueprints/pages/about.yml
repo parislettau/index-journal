@@ -6,21 +6,6 @@ image:
   query: false
   back: blue-200
 
-title: Essay
-
-buttons:
-  preview: true
-  settings: true
-  open: true
-  doaj:
-    icon: refresh
-    text: Submit to DOAJ
-    link: "{{ site.url }}/submit-doaj/{{ page.id }}"
-
-# icon: page
-# image:
-#   # query: false
-#   back: blue-200
 
 tabs:
   content:
@@ -47,3 +32,4 @@ tabs:
         sections:
           pages:
             type: pages
+            template: default

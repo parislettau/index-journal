@@ -72,9 +72,9 @@ return [
   // ],
 
   'markdown' => [
-    'extra' => true
+    'extra' => true,
   ],
-
+  'smartypants' => true,
   'panel.install' => true,
 
   'auth' => [

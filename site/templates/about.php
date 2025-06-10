@@ -14,7 +14,7 @@
     </div>
   </div>
 </main>
-<div class="flex justify-end m-[12px]">
+<div class="flex m-4">
   <div class="flex gap-[12px]">
     <img src="https://assets.crossref.org/logo/crossref-logo-200.svg" alt="Crossref logo" style="width:auto; height:50px;">
     <img src="http://blog.doaj.org/wp-content/uploads/2024/02/DOAJ_Black.svg" alt="DOAJ logo" style="width:auto; height:50px;">

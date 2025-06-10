@@ -2,7 +2,7 @@
 <?php if ($page->template() === 'essay') snippet('scholarly-schema'); ?>
 <?php snippet('seo/schemas'); ?>
 <footer class="border-t border-black text-sm text-black font-medium mt-[100px] mr-[6%] ml-4 mb-0 pb-[100px] overflow-hidden z-1000 relative w-[750px] clear-both">
-    <div class="max-w-5xl mx-auto grid grid-cols-3 sm:grid-cols-3 gap-8 text-sm ">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-8 text-sm ">
 
         <!-- Column 1: Journal Info -->
         <div>
@@ -14,12 +14,15 @@
         <!-- Column 2: Key Policies -->
         <div>
             <div class=" uppercase tracking-wide">Information</div>
-            <div><a href="/about/information#peer-review" class="hover:underline">About</a></div>
-            <div><a href="/about/information#" class="hover:underline">Publication Ethics</a></div>
-            <div><a href="/about/information#open-access" class="hover:underline">Open Access & Licensing</a></div>
-            <div><a href="/about/information#archiving" class="hover:underline">Archiving Policy</a></div>
-            <div><a href="/about/instructions" class="hover:underline">Instructions for Authors</a></div>
-            <div><a href="/about/information#indexing" class="hover:underline">Indexing & Discoverability</a></div>
+
+            <?php foreach ($site->footer()->pages()->toPages() as $page): ?>
+                <div>
+                    <a href="<?= $page->url() ?>" class="hover:underline">
+                        <?= html($page->title()) ?>
+                    </a>
+                </div>
+            <?php endforeach ?>
+
         </div>
 
         <!-- Column 3: Contact + Legal -->

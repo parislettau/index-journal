@@ -24,6 +24,7 @@ tabs:
         fields:
           footer:
             type: pages
+            query: 
   
   admin:
     icon: settings

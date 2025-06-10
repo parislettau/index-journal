@@ -4,77 +4,11 @@ tabs:
   issues:
     icon: pen
     sections:
-      # content:
-      #   type: fields
-      #   fields:
-      #     About:
-      #       headline: About
-      #       type: textarea
-      #       size: small
-
       issues:
         type: pages
         parent: kirby.page("issues")
         template: issue
-        # layout: table
 
-        # size: medium
-        # info: "{{ page.author }}"
-        # template: product
-        # empty: No books yet
-        # # sortBy: num
-        # size: medium
-        # type: pages
-        # headline: Books
-        # parent: site.find("books")
-        # template: product
-        # info: "$ {{ page.price }} / {{ page.design }}"
-        # image:
-        #   src: page.image
-        #   ratio: 5/3
-        #   back: black
-        #   image:
-        #     # query: page.image
-        #     query: page.cover.tofile
-        #     cover: true
-        #     ratio: 5/4
-  # books:
-  #   icon: book
-  #   sections:
-  #     content:
-  #       type: fields
-  #       fields:
-  #         About:
-  #           headline: About
-  #           type: textarea
-  #           size: small
-
-  #     books:
-  #       type: pages
-  #       headline: Books
-  #       parent: kirby.page("books")
-  #       layout: cards
-
-  #       # size: medium
-  #       info: "{{ page.author }}"
-  #       template: product
-  #       empty: No books yet
-  #       # sortBy: num
-  #       size: medium
-  #       type: pages
-  #       headline: Books
-  #       parent: site.find("books")
-  #       template: product
-  #       info: "$ {{ page.price }} / {{ page.design }}"
-  #       image:
-  #         src: page.image
-  #         ratio: 5/3
-  #         back: black
-  #         image:
-  #           # query: page.image
-  #           query: page.cover.tofile
-  #           cover: true
-  #           ratio: 5/4
   pages:
     icon: page
     sections:
@@ -82,6 +16,14 @@ tabs:
         label: Main Pages
         status: all
         sort: num
+
+  footer:
+    sections:
+      footer:
+        type: fields
+        fields:
+          footer:
+            type: pages
   
   admin:
     icon: settings

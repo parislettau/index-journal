@@ -37,9 +37,9 @@ snippet('books/header', ['color' => $color]) ?>
             <?php endif ?>
             <div class="layouts">
                 <?php foreach ($page->layout()->toLayouts() as $layout) : ?>
-                    <section class="grid" id="<?= $layout->id() ?>">
+                    <section class="grid gap-[14px] grid-cols-1 md:grid-cols-12" id="<?= $layout->id() ?>">
                         <?php foreach ($layout->columns() as $column) : ?>
-                            <div class="column" style="--span:<?= $column->span() ?>; --columns:<?= $column->span() ?>">
+                            <div class="column mb-[14px] md:col-span-<?= $column->span() ?>" style="--span:<?= $column->span() ?>; --columns:<?= $column->span() ?>">
                                 <?php foreach ($column->blocks() as $block) : ?>
                                     <div id="<?= $block->id() ?>" class="block block-type-<?= $block->type() ?>">
                                         <?= $block ?>

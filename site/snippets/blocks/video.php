@@ -1,5 +1,5 @@
 <?php if ($block->url()->isNotEmpty()) : ?>
-  <figure>
+  <figure class="my-4">
     <span class="video" style="--w:16;--h:9">
       <?= video($block->url()) ?>
     </span>

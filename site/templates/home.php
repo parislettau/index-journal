@@ -1,6 +1,6 @@
 <?php snippet('header') ?>
 
-<main>
+<main class="prose mx-auto max-w-3xl pt-24">
   <?php if ($page->show_hide() == 'true') : ?>
     <?php $sections = $page->cfp_builder()->toStructure() ?>
     <?php foreach ($sections as $section) : ?>

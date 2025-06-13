@@ -28,7 +28,7 @@ if ($block->location() == 'web') {
 
             <a href="<?= $image->url() ?>" data-lightbox>
                 <figure class="img" style="--w:<?= $image->width() ?>;--h:<?= $image->height() ?>">
-                    <img src="<?= $src ?>" alt="<?= $alt->esc() ?>">
+                    <img src="<?= $src ?>" alt="<?= $alt->esc() ?>" class="max-w-full">
                 </figure>
             </a>
 

@@ -1,7 +1,7 @@
 <?php snippet('header') ?>
 
-<main data-template="<?= $page->template() ?>">
-  <div class="introduction">
+<main data-template="<?= $page->template() ?>" class="pt-24 mx-auto max-w-3xl">
+  <div class="introduction prose">
     <figure>
       <!-- <img src="<?= $site->url() ?>/assets/images/02.png" alt=""> -->
       <div><?= $page->title() ?></div>
@@ -15,7 +15,7 @@
       <p>ISSN (elec): <?= $page->parent()->issn() ?></p>
     </div>
   </div>
-  <ul class="articles">
+  <ul class="articles mt-8">
     <?php foreach ($page->children()->listed() as $article) : ?>
       <li><a href="<?= $article->url() ?>"><?= $article->title() ?> <span class="authors">by <?= $article->author() ?></span></a></li>
     <?php endforeach ?>

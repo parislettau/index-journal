@@ -102,16 +102,17 @@
     })();
   </script>
 
-  <header class="index-header" style="background-color: <?= $color ?>; box-shadow: 0px 15px 16px 0px <?= $color ?>">
-    <h1><a href="<?= $site->url() ?>/books">INDEX<span> BOOKS</span> </a>,&nbsp; </nav>
-      <nav>
+  <header class="flex justify-between fixed left-0 w-screen p-4 bg-white shadow-[0px_15px_16px_0px_rgba(255,255,255,1)] transition z-10" style="background-color: <?= $color ?>; box-shadow: 0px 15px 16px 0px <?= $color ?>; top: var(--admin-bar--height, 0);">
+    <h1>
+      <a href="<?= $site->url() ?>/books">INDEX<span> BOOKS</span></a>,
+      <nav class="inline">
 
         <!-- <a href="/books/about" class="no-mobile">ABOUT, </a> -->
         <a class="snipcart-checkout">CART</a> (<span class="snipcart-items-count "></span>, <span class="snipcart-total-price"></span>)
       </nav>
     </h1>
 
-    <nav class="menu" style="cursor:pointer">
+    <nav class="menu cursor-pointer">
       <span>Menu</span>
     </nav>
   </header>

@@ -1,7 +1,7 @@
 <?php snippet('header') ?>
 <?php echo $page->counterCss(); ?>
 
-<main data-template="<?= $page->template() ?>">
+<main data-template="<?= $page->template() ?>" class="prose mx-auto max-w-3xl pt-24">
   <article>
     <header>
       <h1 style="display:block"><span class="title"><?= $page->title() ?></span>

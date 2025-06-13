@@ -1,51 +1,45 @@
 <?php snippet('books/header', ['color' => 'white']) ?>
-
-<head>
-    <?= css('assets/css/books.css?v=' . sha1_file('assets/css/books.css')) ?>
-</head>
-<main class="shop">
-    <div class="">
-        <ul class="shop-about">
+<main class="pt-[5.6em] pr-4 md:pr-1 pb-[5.6em]">
+    <div>
+        <ul class="pb-[5.6em]">
             <?= $site->about()->kt() ?>
         </ul>
-        <ul class="shop-container">
+        <ul class="grid grid-cols-3 md:grid-cols-1 gap-4 text-[length:var(--font-small)] relative">
 
             <?php foreach ($page->children()->listed() as $product) : ?>
                 <li>
-                    <a href="<?= $product->url() ?>" class="link-container">
+                    <a href="<?= $product->url() ?>" class="group relative overflow-hidden block">
                         <?php if ($image = $product->cover()->tofile()) : ?>
-                            <figure class="figuregrid product ">
-                                <span class="img " style="--w:4;--h:3;--background:black;background:black" data-contain="false">
+                            <figure class="figuregrid transition-none opacity-100 block group-hover:opacity-0">
+                                <span class="img" style="--w:4;--h:3;--background:black;background:black" data-contain="false">
                                     <picture>
                                         <source srcset="<?= $image->srcset('webp') ?>" type="image/webp">
                                         <img alt="<?= $image->alt() ?>" src="<?= $image->url() ?>" srcset="<?= $image->srcset('default') ?>" style="  height: 80%; margin: auto;">
                                     </picture>
                                 </span>
-                            </figure>
-                            <div class="info">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center z-20 invisible group-hover:visible">
                                 <figcaption class="text ">
                                     <p><?= $product->title() ?></p>
-                                    <?php if ($product->editors()) : ?>
-
-                                        <ul class="editors" style="margin-top:0.6rem">
-                                            <?php if ($product->editors()->isNotEmpty()) : ?>
-                                                <?php foreach ($product->editors()->split() as $editor) : ?>
-                                                    <li class="editor sub-title-books"><span> <?= $editor ?></span></li>
-                                                <?php endforeach ?>
-                                            <?php else : ?>
-                                                <?php foreach ($product->authors()->split() as $author) : ?>
-                                                    <li class="author sub-title-books"><span><?= $author ?></span></li>
-                                                <?php endforeach ?>
-                                            <?php endif ?>
-
-                                        </ul>
-                                    <?php endif ?>
+                                    <?php
+                                    if ($product->editors()->isNotEmpty()) {
+                                        $names = $product->editors()->split();
+                                        $label = 'Edited by ';
+                                    } else {
+                                        $names = $product->authors()->split();
+                                        $label = 'by ';
+                                    }
+                                    $last = array_pop($names);
+                                    $list = $last;
+                                    if (count($names)) {
+                                        $list = implode(', ', $names) . ' and ' . $last;
+                                    }
+                                    ?>
+                                    <p class="text-base mt-2"><?= $label . $list ?></p>
                                 </figcaption>
                             </div>
                         <?php endif ?>
 
                     </a>
-                    </figure>
                 </li>
             <?php endforeach ?>
         </ul>

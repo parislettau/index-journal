@@ -1,5 +1,5 @@
-<div class="pane">
-  <span class="pane-close">Close</span>
+<div class="pane fixed inset-0 z-50 bg-white hidden">
+  <span class="pane-close absolute top-4 right-4 cursor-pointer">Close</span>
   <header>
     <h1><a href=".">INDEX JOURNAL</a>, <span>Issue No. 2 LAW</span></h1>
   </header>

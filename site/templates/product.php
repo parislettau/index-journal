@@ -2,14 +2,9 @@
 $color = $page->color();
 snippet('books/header', ['color' => $color]) ?>
 
-<head>
-    <?= css('assets/css/books.css?v=' . sha1_file('assets/css/books.css')) ?>
-    <?= css('@auto') ?>
-</head>
-
 <?php $product = $page ?>
 
-<main>
+<main class="prose mx-auto max-w-3xl pt-24">
     <section class="title-block product-title" style="background-color: <?= $page->color() ?>">
         <h1 style="font-size:6vw"><span class="title"><?= $page->title() ?></span>
             <?php if ($page->subtitle()->isNotEmpty()) : ?><span class="subtitle"><?= smartypants($page->subtitle()->kti()) ?></span><?php endif ?>

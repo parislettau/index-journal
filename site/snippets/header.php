@@ -95,7 +95,7 @@
 </head>
 
 <body data-display="<?= $page->template() ?>">
-  <header class="index-header" <?php if ($page->template() == 'essay') : ?>style="background-color: rgb(<?= $page->parent()->issue_color() ?>); box-shadow: 0px 11px 16px 0px rgba(<?= $page->parent()->issue_color() ?>);" <?php endif ?>>
+  <header class="flex justify-between fixed left-0 w-screen p-4 bg-white shadow-[0px_15px_16px_0px_rgba(255,255,255,1)] transition z-10" style="top: var(--admin-bar--height, 0);<?php if ($page->template() == 'essay') : ?> background-color: rgb(<?= $page->parent()->issue_color() ?>); box-shadow: 0px 11px 16px 0px rgba(<?= $page->parent()->issue_color() ?>);<?php endif ?>">
     <h1>
       <a href="<?= $site->url() ?>">INDEX JOURNAL</a>
 

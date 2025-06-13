@@ -1,6 +1,6 @@
-<div class="grid">
+<div class="grid gap-4">
     <div class="column" style="--columns: 12">
-        <ul class="gallery">
+        <ul class="gallery grid grid-cols-3 gap-4">
             <?php foreach ($block->images()->toFiles() as $image) : ?>
                 <li>
                     <a href="<?= $image->url() ?>" data-lightbox>

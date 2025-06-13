@@ -1,9 +1,9 @@
 <?php snippet('header') ?>
 
-<div class="introduction">
+<div class="introduction prose mx-auto max-w-3xl mt-24">
   <?= $page->intro()->kirbytext() ?>
 </div>
-<main data-template="<?= $page->template() ?>">
+<main data-template="<?= $page->template() ?>" class="mt-12 prose mx-auto max-w-3xl">
 
   <ul>
     <?php foreach (page('emaj')->children()->listed() as $issue) : ?>

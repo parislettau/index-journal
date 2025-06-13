@@ -96,12 +96,12 @@
 
 <body data-display="<?= $page->template() ?>">
   <header class="flex justify-between fixed left-0 w-screen p-4 bg-white shadow-[0px_15px_16px_0px_rgba(255,255,255,1)] transition z-10 font-sans" style="top: var(--admin-bar--height, 0);<?php if ($page->template() == 'essay') : ?> background-color: rgb(<?= $page->parent()->issue_color() ?>); box-shadow: 0px 11px 16px 0px rgba(<?= $page->parent()->issue_color() ?>);<?php endif ?>">
-    <h1 class="font-sans">
-      <a href="<?= $site->url() ?>">INDEX JOURNAL</a>
+    <h1 class="font-sans font-normal text-[var(--font-body)]">
+      <a href="<?= $site->url() ?>" class="hover:cursor-pointer hover:border-b">INDEX JOURNAL</a>
 
 
       <?php foreach (page('issues')->children()->listed()->flip()->slice(0, 1) as $issue) : ?>
-        <a href="<?= $issue->url() ?>" class="current-issue"><span>, Issue </span><span>No. </span><?= $issue->num() ?><span style="text-transform: uppercase;"> <?= $issue->title() ?></span></a>
+        <a href="<?= $issue->url() ?>" class="current-issue hover:cursor-pointer hover:border-b max-[670px]:hidden"><span>, Issue </span><span>No. </span><?= $issue->num() ?><span style="text-transform: uppercase;"> <?= $issue->title() ?></span></a>
       <?php endforeach ?>
 
 

@@ -2,6 +2,9 @@
 module.exports = {
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['DinSynt', 'sans-serif'],
+      },
       // Adding custom utilities for scroll snap behavior
       scrollSnapType: {
         y: "y mandatory", // Enables vertical snapping
